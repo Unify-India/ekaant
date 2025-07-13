@@ -1,0 +1,7 @@
+{
+  "name": "ekaant",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
