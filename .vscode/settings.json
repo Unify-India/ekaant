@@ -1,3 +1,77 @@
 {
-  "typescript.preferences.autoImportFileExcludePatterns": ["@ionic/angular/common", "@ionic/angular"]
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "@ionic/angular/common",
+    "@ionic/angular"
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "todohighlight.isEnable": true,
+  "todohighlight.isCaseSensitive": false,
+  "todohighlight.keywords": [
+    {
+      "text": "NOTE:",
+      "color": "lime",
+      "backgroundColor": "rgba(0, 0, 0, 0.2)",
+      "overviewRulerColor": "grey",
+      "isWholeLine": true
+    },
+    {
+      "text": "INFO:",
+      "color": "#00FFFF",
+      "backgroundColor": "rgba(0, 0, 0, 0.2)",
+      "isWholeLine": true
+    },
+    {
+      "text": "FIXME:",
+      "color": "orange",
+      "backgroundColor": "rgba(0, 0, 0, 0.2)",
+      "isWholeLine": true
+    },
+    {
+      "text": "TODO:",
+      "color": "aquamarine",
+      "backgroundColor": "rgba(0, 0, 0, 0.2)",
+      "isWholeLine": true
+    },
+    {
+      "text": "CHORE:",
+      "color": "#FF00FF",
+      "backgroundColor": "rgba(0, 0, 0, 0.2)",
+      "isWholeLine": true
+    }
+  ],
+  // "todohighlight.keywordsPattern": "//\\s+(TODO:|NOTE:|FIXME:|CHORE:|INFO:)|<!--\\s+(TODO:|NOTE:|FIXME:|CHORE:INFO:).*?-->",
+  "todohighlight.include": [
+    "**/*.js",
+    "**/*.ts",
+    "**/*.html",
+    "**/*.css",
+    "**/*.json",
+    "**/*.scss"
+  ],
+  "todohighlight.exclude": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.vscode/**",
+    "**/.github/**",
+    "**/_output/**",
+    "**/*.min.*",
+    "**/*.map",
+    "**/.next/**"
+  ],
+  "todohighlight.maxFilesForSearch": 5120
 }
