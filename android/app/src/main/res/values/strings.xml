@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ekaant</string>
+    <string name="title_activity_main">ekaant</string>
+    <string name="package_name">app.web.ekaant</string>
+    <string name="custom_url_scheme">app.web.ekaant</string>
+</resources>
