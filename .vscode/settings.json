@@ -74,8 +74,5 @@
     "**/.next/**"
   ],
   "todohighlight.maxFilesForSearch": 5120,
-  "cSpell.words": [
-    "Ekaant",
-    "styleext"
-  ]
+  "cSpell.words": ["checkmark", "Ekaant", "styleext"]
 }
