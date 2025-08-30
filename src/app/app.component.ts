@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import {
   IonApp,
@@ -18,7 +18,7 @@ import {
 import { addIcons } from 'ionicons';
 import { UsedIcons } from './shared/core/icons/used-icons';
 import { MenuData } from './shared/core/menu/menu.data';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { TranslateConfigService } from './services/translation/translation.service';
 import { ApiService } from './shared/services/api/api.service';
@@ -44,9 +44,12 @@ import { AuthService } from './auth/service/auth.service';
     IonLabel,
     IonRouterLink,
     IonRouterOutlet,
+    TranslateModule,
   ],
 })
 export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
+  private translate = inject(TranslateService);
+
   appPages = MenuData.defaultAppPages;
   icons = UsedIcons.icons;
   isLoggedIn = false;
@@ -54,7 +57,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private authService: AuthService,
-    private translate: TranslateService,
     private translateConfigService: TranslateConfigService,
     private apiService: ApiService,
   ) {
@@ -73,7 +75,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
         console.log('Fetched data from RTDB:', data);
       })
       .catch((error) => {
-        console.error('Error fetching data from RTDB:', error);
+        console.warn('Error fetching data from RTDB:', error);
       });
   }
 
