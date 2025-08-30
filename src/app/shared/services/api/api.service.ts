@@ -1,16 +1,14 @@
-// In your service file (e.g., api.service.ts)
-
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { getDatabase, ref, get, push, set, connectDatabaseEmulator } from '@angular/fire/database';
 import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private db;
+  private functions = inject(Functions);
+  private db = getDatabase();
 
-  constructor(private functions: Functions) {
-    this.db = getDatabase();
+  constructor() {
     if (environment.useEmulators) {
       console.log('Using Firebase Realtime Database Emulator');
       connectDatabaseEmulator(this.db, 'localhost', environment.ports.database);

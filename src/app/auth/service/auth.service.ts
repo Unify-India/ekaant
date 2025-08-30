@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
@@ -9,10 +9,13 @@ import { ToasterService } from 'src/app/services/toaster/toaster.service';
   providedIn: 'root',
 })
 export class AuthService {
+  private router = inject(Router);
+  private toaster = inject(ToasterService);
+
   private currentUser: { id: string; role: string; subscriptionExpiry: Date } | null = null;
   private authStatusListener = new BehaviorSubject<{ id: string; role: string } | null>(null);
 
-  constructor(private router: Router, private toaster: ToasterService) {
+  constructor() {
     this.loadUserFromSession();
   }
 
