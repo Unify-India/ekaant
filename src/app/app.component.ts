@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import {
   IonApp,
   IonSplitPane,
@@ -16,28 +16,13 @@ import {
   IonRouterLink,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import {
-  mailOutline,
-  mailSharp,
-  paperPlaneOutline,
-  paperPlaneSharp,
-  heartOutline,
-  heartSharp,
-  archiveOutline,
-  archiveSharp,
-  trashOutline,
-  trashSharp,
-  warningOutline,
-  warningSharp,
-  bookmarkOutline,
-  bookmarkSharp,
-  personCircleOutline,
-  personCircleSharp,
-  checkmarkCircleOutline,
-  checkmarkCircleSharp,
-  libraryOutline,
-  librarySharp,
-} from 'ionicons/icons';
+import { UsedIcons } from './shared/core/icons/used-icons';
+import { MenuData } from './shared/core/menu/menu.data';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+import { TranslateConfigService } from './services/translation/translation.service';
+import { ApiService } from './shared/services/api/api.service';
+import { AuthService } from './auth/service/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -61,37 +46,69 @@ import {
     IonRouterOutlet,
   ],
 })
-export class AppComponent {
-  public appPages = [
-    { title: 'Home', url: 'home', icon: 'home' },
-    { title: 'Nearby Library', url: '/nearby-library', icon: 'paper-plane' },
-    { title: 'Favorites', url: '/folder/favorites', icon: 'heart' },
-    { title: 'Pricing', url: '/pricing', icon: 'pricetag' },
-    { title: 'Testimonials', url: '/testimonials', icon: 'star' },
-  ];
-  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
-  constructor() {
-    addIcons({
-      mailOutline,
-      mailSharp,
-      paperPlaneOutline,
-      paperPlaneSharp,
-      heartOutline,
-      heartSharp,
-      archiveOutline,
-      archiveSharp,
-      trashOutline,
-      trashSharp,
-      warningOutline,
-      warningSharp,
-      bookmarkOutline,
-      bookmarkSharp,
-      personCircleOutline,
-      personCircleSharp,
-      checkmarkCircleOutline,
-      checkmarkCircleSharp,
-      libraryOutline,
-      librarySharp,
+export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
+  appPages = MenuData.defaultAppPages;
+  icons = UsedIcons.icons;
+  isLoggedIn = false;
+  private authListenerSubs!: Subscription;
+
+  constructor(
+    private authService: AuthService,
+    private translate: TranslateService,
+    private translateConfigService: TranslateConfigService,
+    private apiService: ApiService,
+  ) {
+    addIcons(this.icons);
+  }
+  ngOnInit() {
+    this.updateMenu();
+    this.isLoggedIn = this.authService.isLoggedIn();
+    this.authListenerSubs = this.authService.getAuthStatusListener().subscribe((user) => {
+      this.isLoggedIn = !!user;
+      this.updateMenu();
     });
+    this.apiService
+      .getDataFromRealtimeDB('/translations')
+      .then((data) => {
+        console.log('Fetched data from RTDB:', data);
+      })
+      .catch((error) => {
+        console.error('Error fetching data from RTDB:', error);
+      });
+  }
+
+  ngAfterViewInit() {
+    const browserLang = this.translate.getBrowserLang() || 'en';
+    this.translateConfigService.fetchTranslations(browserLang);
+  }
+  ngOnDestroy() {
+    this.authListenerSubs.unsubscribe();
+  }
+
+  updateMenu() {
+    const user = this.authService.getCurrentUser();
+    this.isLoggedIn = !!user;
+    if (!user) {
+      this.appPages = MenuData.defaultAppPages;
+    } else {
+      switch (user.role) {
+        case 'Admin':
+          this.appPages = MenuData.adminAppPages;
+          break;
+        case 'Manager':
+          this.appPages = MenuData.managerAppPages;
+          break;
+        case 'Student':
+          this.appPages = MenuData.studentAppPages;
+          break;
+        default:
+          this.appPages = MenuData.defaultAppPages;
+          break;
+      }
+    }
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }
