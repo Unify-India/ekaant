@@ -1,25 +1,25 @@
-
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
+  private router = inject(Router);
 
   // Static users for MVP: username, password, role
   private staticUsers = [
     { username: 'student', password: 'student123', role: 'student' },
     { username: 'manager', password: 'manager123', role: 'manager' },
-    { username: 'admin', password: 'admin123', role: 'admin' }
+    { username: 'admin', password: 'admin123', role: 'admin' },
   ];
 
-  private currentUser: { username: string, role: string } | null = null;
-
-  constructor(private router: Router) { }
+  private currentUser: { username: string; role: string } | null = null;
 
   login(username: string, password: string): boolean {
-    const user = this.staticUsers.find(u => u.username === username && u.password === password);
+    const user = this.staticUsers.find(
+      (u) => u.username === username && u.password === password
+    );
     if (user) {
       this.currentUser = { username: user.username, role: user.role };
       localStorage.setItem('ekaant_user', JSON.stringify(this.currentUser));
