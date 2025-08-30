@@ -72,3 +72,4 @@ public/*
 
 resources/ios/**/*
 resources/android/**/*
+src/environments/**

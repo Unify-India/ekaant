@@ -6,7 +6,7 @@ export const environment = {
     projectId: 'your-project-id',
     storageBucket: 'your-project-id.appspot.com',
     messagingSenderId: '123456789012',
-    appId: '1:123456789012:web:youruniqueappidhash',
+    appId: '1:123456789012:web:youruniqueappidhass',
     measurementId: 'G-YOURMEASUREMENTID',
   },
 };
