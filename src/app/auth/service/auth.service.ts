@@ -12,10 +12,7 @@ export class AuthService {
   private currentUser: { id: string; role: string; subscriptionExpiry: Date } | null = null;
   private authStatusListener = new BehaviorSubject<{ id: string; role: string } | null>(null);
 
-  constructor(
-    private router: Router,
-    private toaster: ToasterService,
-  ) {
+  constructor(private router: Router, private toaster: ToasterService) {
     this.loadUserFromSession();
   }
 
@@ -87,7 +84,6 @@ export class AuthService {
       await this.saveUserData(uid, email, role, verified);
 
       if (autoLogin) {
-        // Auto login for Student or first Admin
         this.currentUser = {
           id: uid,
           role: role,
@@ -98,7 +94,6 @@ export class AuthService {
         this.toaster.showToast('Registration successful!', 'success');
         this.redirectToDashboard(role);
       } else {
-        // For Teacher, School, or Admin (when already exists), do not auto login. They require admin approval.
         if (role === 'Admin') {
           this.toaster.showToast('Registration successful! Your admin account is pending approval.', 'success');
         } else {
@@ -132,10 +127,8 @@ export class AuthService {
         expectedPath = `users/student/${uid}`;
       } else if (selectedRole === 'Admin') {
         expectedPath = `users/admin/${uid}`;
-      } else if (selectedRole === 'Teacher') {
-        expectedPath = `users/teachers/${uid}`;
-      } else if (selectedRole === 'School') {
-        expectedPath = `users/schools/${uid}`;
+      } else if (selectedRole === 'Manager') {
+        expectedPath = `users/managers/${uid}`;
       } else {
         expectedPath = `users/user/${uid}`;
       }
@@ -200,14 +193,11 @@ export class AuthService {
       case 'Admin':
         this.router.navigate(['/admin/dashboard']);
         break;
-      case 'Teacher':
-        this.router.navigate(['/teacher/dashboard']);
+      case 'Manager':
+        this.router.navigate(['/manager/dashboard']);
         break;
       case 'Student':
         this.router.navigate(['/student/dashboard']);
-        break;
-      case 'School':
-        this.router.navigate(['/school/profile']);
         break;
       default:
         this.router.navigate(['/dashboard']);
