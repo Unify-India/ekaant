@@ -64,5 +64,16 @@
     "**/.next/**"
   ],
   "todohighlight.maxFilesForSearch": 5120,
-  "cSpell.words": ["checkmark", "Ekaant", "Firestore", "styleext"]
+  "cSpell.words": [
+    "bazel",
+    "checkmark",
+    "Ekaant",
+    "Firestore",
+    "libpeerconnection",
+    "mnpcod",
+    "runtimeconfig",
+    "styleext",
+    "testem",
+    "xcuserstate"
+  ]
 }
