@@ -9,7 +9,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "postversion": "node ./scripts/version.js && npx cap sync android && git add capacitor.config.ts android"
   },
   "private": true,
   "dependencies": {
