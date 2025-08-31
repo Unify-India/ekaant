@@ -39,6 +39,8 @@ import {
   cashSharp,
   constructOutline,
   constructSharp,
+  chatbubblesOutline,
+  chatbubblesSharp,
 } from 'ionicons/icons';
 
 export class UsedIcons {
@@ -83,5 +85,7 @@ export class UsedIcons {
     cashSharp,
     constructOutline,
     constructSharp,
+    chatbubblesOutline,
+    chatbubblesSharp,
   };
 }
