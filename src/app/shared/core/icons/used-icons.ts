@@ -35,6 +35,10 @@ import {
   libraryOutline,
   librarySharp,
   arrowForward,
+  cashOutline,
+  cashSharp,
+  constructOutline,
+  constructSharp,
 } from 'ionicons/icons';
 
 export class UsedIcons {
@@ -75,5 +79,9 @@ export class UsedIcons {
     libraryOutline,
     librarySharp,
     arrowForward,
+    cashOutline,
+    cashSharp,
+    constructOutline,
+    constructSharp,
   };
 }
