@@ -1,0 +1,20 @@
+.policy-header {
+  margin-bottom: 1rem;
+
+  h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-top: 0.5rem;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    margin: 0.25rem 0;
+  }
+}
+
+.policy-text {
+  white-space: pre-wrap;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
