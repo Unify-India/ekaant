@@ -8,15 +8,11 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () => import('./public/login/login.page').then((m) => m.LoginPage),
+    loadComponent: () => import('./auth/login/login.page').then((m) => m.LoginPage),
   },
   {
     path: 'about-us',
-    loadComponent: () => import('./public/about-us/about-us.page').then((m) => m.AboutUsPage),
-  },
-  {
-    path: 'help-support',
-    loadComponent: () => import('./public/help-support/help-support.page').then((m) => m.HelpSupportPage),
+    loadComponent: () => import('./pages/about-us/about-us.page').then((m) => m.AboutUsPage),
   },
   {
     path: 'signup',
@@ -39,12 +35,12 @@ export const routes: Routes = [
     loadComponent: () => import('./student/apply-library/apply-library.page').then((m) => m.ApplyLibraryPage),
   },
   {
-    path: 'dashboard',
-    loadComponent: () => import('./student/dashboard/dashboard.page').then((m) => m.DashboardPage),
+    path: 'student',
+    loadChildren: () => import('./student/student-routing-module').then((m) => m.StudentRoutingModule),
   },
   {
-    path: 'manager-dashboard',
-    loadComponent: () => import('./manager/dashboard/dashboard.page').then((m) => m.DashboardPage),
+    path: 'manager',
+    loadChildren: () => import('./manager/manager-routing.module').then((m) => m.ManagerRoutingModule),
   },
   {
     path: 'complete-profile',
@@ -63,8 +59,8 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'dashboard',
-    loadComponent: () => import('./admin/dashboard/dashboard.page').then((m) => m.DashboardPage),
+    path: 'admin',
+    loadChildren: () => import('./admin/admin-routing.module').then((m) => m.AdminRoutingModule),
   },
   {
     path: 'library-requests',
@@ -81,6 +77,33 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    loadComponent: () => import('./public/home/home.page').then((m) => m.HomePage),
+    loadComponent: () => import('./pages/home/home.page').then((m) => m.HomePage),
+  },
+  {
+    path: 'pricing',
+    loadComponent: () => import('./pages/pricing/pricing.page').then((m) => m.PricingPage),
+  },
+  {
+    path: 'footer',
+    loadComponent: () => import('./pages/footer/footer.page').then((m) => m.FooterPage),
+  },
+  {
+    path: 'privacy-policy',
+    loadComponent: () => import('./privacy-policy/privacy-policy.page').then((m) => m.PrivacyPolicyPage),
+  },
+  {
+    path: 'delete-account',
+    loadComponent: () => import('./pages/delete-account/delete-account.page').then((m) => m.DeleteAccountPage),
+  },
+  {
+    path: 'support',
+    loadComponent: () => import('./pages/support/support.page').then((m) => m.SupportPage),
+  },
+];
+
+export const staticRoutes = [
+  {
+    path: '**',
+    loadComponent: () => import('./pages/not-found/not-found.page').then((m) => m.NotFoundPage),
   },
 ];
