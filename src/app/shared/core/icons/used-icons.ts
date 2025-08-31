@@ -34,6 +34,7 @@ import {
   checkmarkCircleSharp,
   libraryOutline,
   librarySharp,
+  arrowForward,
 } from 'ionicons/icons';
 
 export class UsedIcons {
@@ -73,5 +74,6 @@ export class UsedIcons {
     checkmarkCircleSharp,
     libraryOutline,
     librarySharp,
+    arrowForward,
   };
 }
