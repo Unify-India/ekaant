@@ -15,7 +15,7 @@ const routes: Routes = [
         loadComponent: () => import('./dashboard/dashboard.page').then((m) => m.DashboardPage),
       },
       {
-        path: 'library-requests',
+        path: 'pending-requests',
         loadComponent: () => import('./library-requests/library-requests.page').then((m) => m.LibraryRequestsPage),
       },
       {
@@ -26,6 +26,20 @@ const routes: Routes = [
       {
         path: 'user-feedback',
         loadComponent: () => import('./user-feedback/user-feedback.page').then((m) => m.UserFeedbackPage),
+      },
+      {
+        path: 'library-management',
+        loadComponent: () =>
+          import('./library-management/library-management.page').then((m) => m.LibraryManagementPage),
+      },
+      {
+        path: 'user-management',
+        loadComponent: () => import('./user-management/user-management.page').then((m) => m.UserManagementPage),
+      },
+      {
+        path: 'reports/performance-report',
+        loadComponent: () =>
+          import('./reports/performance-report/performance-report.page').then((m) => m.PerformanceReportPage),
       },
     ],
   },
