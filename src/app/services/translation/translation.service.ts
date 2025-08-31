@@ -20,8 +20,8 @@ export class TranslateConfigService {
   }
 
   public fetchTranslations(lang: string) {
-    const apiUrl = `/assets/i18n/${lang}.json`; // Local URL
-    // const apiUrl = `http://127.0.0.1:9000/translations/${lang}.json?ns=demo-acharya`; // Correct URL
+    // const apiUrl = `/assets/i18n/${lang}.json`; // Local URL
+    const apiUrl = `http://127.0.0.1:9000/translations/${lang}.json?ns=demo-ekaant`; // Correct URL
 
     this.http.get(apiUrl).subscribe({
       next: (translations: any) => {
