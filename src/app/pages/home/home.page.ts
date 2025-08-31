@@ -102,7 +102,7 @@ export class HomePage implements OnInit {
       price: '₹15',
       duration: '/month/student',
       buttonText: 'Go Premium',
-      buttonColor: 'dark',
+      buttonColor: 'warning',
       image: 'https://picsum.photos/seed/premium/400/200',
       popular: false,
     },

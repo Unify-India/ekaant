@@ -67,7 +67,7 @@
     </div>
   </section>
 
-  <section class="services-section">
+  <section class="services-section ion-padding">
     <h2 class="section-title">Explore Our Services</h2>
     <p class="section-subtitle">Find the perfect study environment, book your seat, or get support instantly.</p>
 
@@ -112,13 +112,13 @@
     </ion-grid>
   </section>
 
-  <section id="pricing-section" class="section ion-padding">
+  <section id="pricing-section" class="pricing-section ion-padding">
     <div class="section-heading">
       <h2 class="section-title">Simple, Transparent Pricing</h2>
       <p class="section-subtitle">Choose the plan that's right for you. Start for free.</p>
     </div>
 
-    <div class="pricing-container">
+    <div class="pricing-container ion-margin">
       @for (plan of pricingPlans; track plan) {
       <ion-card class="pricing-card info-card" [ngClass]="{'popular': plan.popular}">
         @if (plan.popular) {
