@@ -75,8 +75,17 @@ ion-card-title {
   transition: all 0.3s ease;
   box-sizing: border-box;
   border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   &:hover {
     box-shadow: var(--ion-color-primary-shade) 0px 2px 1rem;
+  }
+  ion-card-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    align-content: baseline;
   }
 }
 
@@ -107,7 +116,6 @@ ion-card-title {
 .description {
   font-size: 0.9rem;
   color: #555;
-  margin: 12px 0;
   text-align: left;
 }
 
@@ -124,7 +132,126 @@ ion-card-title {
   }
 }
 
-ion-button {
-  // font-weight: bold;
-  text-transform: none;
+.btn-get-started {
+  margin-top: auto;
+  font-size: 1rem;
+  ion-button {
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+}
+
+.services-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ion-text-color);
+}
+
+.section-subtitle {
+  font-size: 15px;
+  color: var(--ion-text-color-step-600);
+  margin-bottom: 20px;
+}
+
+.service-card {
+  border-radius: 12px;
+  padding: 20px;
+  text-align: left;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  }
+
+  h3 {
+    margin: 12px 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--ion-text-color-step-600);
+    margin-bottom: 12px;
+  }
+
+  .service-link {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ion-color-primary);
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    ion-icon {
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+  }
+}
+
+.service-icon {
+  font-size: 28px;
+  padding: 10px;
+  border-radius: 50%;
+  background: var(--ion-color-light);
+}
+
+.action-section {
+  --background: var(--ion-color-dark);
+  width: 100%;
+  position: relative;
+  margin: 2rem auto;
+  .content-wrapper {
+    text-align: center;
+    margin: auto;
+    max-width: 600px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ion-text-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    color: var(--ion-color-medium);
+    margin-bottom: 1.5rem;
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: fit-content;
+    gap: 1rem;
+    justify-content: space-around;
+    margin: 2rem auto;
+    ion-button {
+      font-weight: 600;
+    }
+
+    .btn-student {
+      --background: var(--ion-color-light);
+      --color: var(--ion-color-dark);
+    }
+
+    .btn-owner {
+      --background: var(--ion-color-primary);
+      --color: var(--ion-color-light);
+    }
+  }
 }

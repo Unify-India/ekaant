@@ -67,6 +67,51 @@
     </div>
   </section>
 
+  <section class="services-section">
+    <h2 class="section-title">Explore Our Services</h2>
+    <p class="section-subtitle">Find the perfect study environment, book your seat, or get support instantly.</p>
+
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="12" size-md="4">
+          <ion-card class="service-card info-card ion-padding">
+            <ion-icon name="location-outline" class="service-icon" color="success"></ion-icon>
+            <h3>Nearby Libraries</h3>
+            <p>Discover libraries near you, check real-time seat availability, and find your ideal study spot.</p>
+            <a routerLink="/libraries" class="service-link ion-text-primary">
+              Find a Library
+              <ion-icon name="arrow-forward"></ion-icon>
+            </a>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="4">
+          <ion-card class="service-card info-card ion-padding">
+            <ion-icon name="calendar-outline" class="service-icon" color="primary"></ion-icon>
+            <h3>Book Your Seat</h3>
+            <p>Ready to book? Fill out the enrollment form to secure your seat for your preferred time and plan.</p>
+            <a routerLink="/enroll" class="service-link ion-text-primary">
+              Enroll Now
+              <ion-icon name="arrow-forward"></ion-icon>
+            </a>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="4">
+          <ion-card class="service-card info-card ion-padding">
+            <ion-icon name="alert-circle-outline" class="service-icon" color="danger"></ion-icon>
+            <h3>Report an Issue</h3>
+            <p>Facing an issue with facilities? Create a support ticket and get it resolved quickly by our team.</p>
+            <a routerLink="/support" class="service-link ion-text-primary">
+              Create a Ticket
+              <ion-icon name="arrow-forward"></ion-icon>
+            </a>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </section>
+
   <section id="pricing-section" class="section ion-padding">
     <div class="section-heading">
       <h2 class="section-title">Simple, Transparent Pricing</h2>
@@ -86,16 +131,43 @@
         </ion-card-header>
         <ion-card-content>
           <p class="description">{{ plan.description }}</p>
+          <div class="btn-get-started">
+            <p class="price">
+              {{ plan.price }}
+              <span class="duration">{{ plan.duration }}</span>
+            </p>
 
-          <p class="price">
-            {{ plan.price }}
-            <span class="duration">{{ plan.duration }}</span>
-          </p>
-
-          <ion-button expand="block" class="text-bold" [color]="plan.buttonColor">{{ plan.buttonText }}</ion-button>
+            <ion-button expand="block" [color]="plan.buttonColor">{{ plan.buttonText }}</ion-button>
+          </div>
         </ion-card-content>
       </ion-card>
       }
     </div>
+  </section>
+
+  <section id="testimony-section">
+    <app-feedback></app-feedback>
+  </section>
+
+  <section id="action-section" class="action-section ion-padding ion-margin-bpottom">
+    <div class="content-wrapper">
+      <h2 class="title">Don't Let Registers Slow You Down</h2>
+      <p class="subtitle">Join the future of library management. It's time to go digital.</p>
+
+      <div class="action-buttons">
+        <ion-button fill="solid" color="light" class="btn-student">
+          Students: Book a Room
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+
+        <ion-button fill="solid" color="primary" class="btn-owner">
+          Owners: Start for Free
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </section>
+  <section id="footer">
+    <app-footer></app-footer>
   </section>
 </ion-content>
