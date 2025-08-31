@@ -1,13 +1,32 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>feedback</ion-title>
-  </ion-toolbar>
-</ion-header>
+<section class="testimony-section">
+  <div class="header">
+    <h2>Loved by Libraries and Students</h2>
+    <p>Don't just take our word for it. Here's what people are saying.</p>
+  </div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">feedback</ion-title>
-    </ion-toolbar>
-  </ion-header>
-</ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" sizeMd="6" *ngFor="let t of testimonials">
+        <ion-card class="testimonial-card info-card ion-padding">
+          <ion-card-content>
+            <div class="stars">
+              <ion-icon *ngFor="let s of [].constructor(t.stars)" name="star" size="large" color="warning"></ion-icon>
+            </div>
+            <p class="feedback">"{{ t.feedback }}"</p>
+
+            <div class="profile">
+              --
+              <!-- <ion-avatar>
+                <img [src]="t.avatar" alt="{{ t.name }}" />
+              </ion-avatar> -->
+              <div class="profile-info">
+                <strong>{{ t.name }}</strong>
+                <p>{{ t.role }}</p>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</section>
