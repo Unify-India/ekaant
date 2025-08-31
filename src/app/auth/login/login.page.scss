@@ -1,32 +1,105 @@
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  vertical-align: middle;
-  height: 90vh;
-  width: 100%;
-  margin: auto;
-}
-
-.login-card {
-  position: relative;
+.container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  max-width: min(400px, 90%);
   align-items: center;
-  min-height: 20vh;
-  height: auto;
-  // background-color: red;
-  background: rgba(255, 255, 255, 0.1);
-  margin: auto;
-  padding: 20px 0;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-}
-ion-button {
+  height: 100%;
   width: 100%;
-  max-width: 300px;
-  margin: auto;
+}
+
+.back-to-home {
+  margin: 1rem 0;
+  ion-button {
+    display: inline-flex;
+    align-items: center;
+    text-transform: none;
+    align-content: baseline;
+    font-size: 1rem;
+  }
+  span {
+    padding-top: 0.25rem;
+  }
+}
+.card {
+  width: 90%;
+  max-width: fit-content;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 0.25rem 1rem var(--ion-color-light-tint);
+  text-align: center;
+  background-color: var(--ion-color-light-shade);
+}
+
+h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+p {
+  margin: 6px 0 18px;
+  color: #666;
+}
+
+h4 {
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.role-cards {
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem auto;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.role-card {
+  flex: 1;
+  box-sizing: border-box;
+  padding: 2rem;
+  border: 2px solid #ddd;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: var(--ion-color-light-shade);
+
+  ion-icon {
+    font-size: 28px;
+    display: block;
+    margin-right: 1rem;
+  }
+
+  span {
+    font-weight: 500;
+    font-size: 1.2rem;
+  }
+
+  &:hover {
+    border-color: var(--ion-color-primary);
+    background-color: var(--ion-color-light-tint);
+  }
+
+  &.selected {
+    border-color: var(--ion-color-primary);
+    // background: var(--ion-color-primary-tint);
+    ion-icon,
+    span {
+      color: var(--ion-color-primary);
+    }
+  }
+}
+
+.social-login {
+  margin-top: 20px;
+  text-align: center;
+
+  p {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #666;
+  }
 }

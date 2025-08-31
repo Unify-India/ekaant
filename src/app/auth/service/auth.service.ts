@@ -38,8 +38,8 @@ export class AuthService {
   private getUserDataPath(role: string): string {
     if (role === 'Student' || role === 'Admin') {
       return `users/${role.toLowerCase()}`;
-    } else if (role === 'Teacher') {
-      return 'pending/teachers';
+    } else if (role === 'Manager') {
+      return 'pending/managers';
     } else if (role === 'School') {
       return 'pending/schools';
     } else {
@@ -63,11 +63,11 @@ export class AuthService {
     try {
       const userCredential = await createUserWithEmailAndPassword(getAuth(), email, password);
       const uid = userCredential.user.uid;
-      // For teacher and school, set verified to false. For Admin, decide based on existing admins.
+      // For manager and school, set verified to false. For Admin, decide based on existing admins.
       const db = getDatabase();
       let verified = true;
       let autoLogin = false;
-      if (role === 'Teacher' || role === 'School') {
+      if (role === 'Manager' || role === 'School') {
         verified = false;
       } else if (role === 'Admin') {
         // Check if any admin exists

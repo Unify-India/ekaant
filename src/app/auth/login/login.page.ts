@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../service/auth.service';
-import { logoGoogle } from 'ionicons/icons';
+import { arrowForward, logoFacebook, logoGoogle } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 
 @Component({
@@ -12,21 +12,37 @@ import { addIcons } from 'ionicons';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
+  imports: [IonicModule, CommonModule, FormsModule, RouterLink],
 })
 export class LoginPage implements OnInit {
-  pageTitle = 'Welcome to Abhyas';
-  icons = { logoGoogle };
+  pageTitle = 'Welcome to Ekaant';
+  icons = { logoGoogle, logoFacebook, arrowForward };
 
   selectedRole: string | null = null;
   email: string = '';
   password: string = '';
-  isRegisterMode: boolean = false; // new flag to toggle between login and registration
+  isRegisterMode: boolean = false;
+  role: string | null = null;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-  ) {
+  selectRole(role: string) {
+    this.selectedRole = role;
+    this.role = role;
+  }
+
+  login() {
+    console.log('Login with', this.role, this.email, this.password);
+    // API call here
+  }
+
+  googleLogin() {
+    console.log('Google login');
+  }
+
+  facebookLogin() {
+    console.log('Facebook login');
+  }
+
+  constructor(private authService: AuthService, private router: Router) {
     addIcons(this.icons);
   }
 
@@ -39,10 +55,6 @@ export class LoginPage implements OnInit {
       console.error('Error logging in with Google:', error);
       // Handle login error (e.g., display an error message)
     }
-  }
-
-  selectRole(role: string) {
-    this.selectedRole = role;
   }
 
   async loginOrRegisterWithEmail() {

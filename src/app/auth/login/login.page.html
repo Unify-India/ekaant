@@ -13,55 +13,81 @@
       <ion-title size="large">{{pageTitle}}</ion-title>
     </ion-toolbar>
   </ion-header>
-  <div id="container">
-    <div class="login-container">
-      <div class="login-card">
-        <div *ngIf="isRegisterMode">
-          <ion-label class="segment-label">Select Role for Registration</ion-label>
-          <ion-segment [(ngModel)]="selectedRole">
-            <ion-segment-button value="Student">
-              <ion-label>Student</ion-label>
-            </ion-segment-button>
-            <ion-segment-button value="Teacher">
-              <ion-label>Teacher</ion-label>
-            </ion-segment-button>
-            <ion-segment-button value="School">
-              <ion-label>School</ion-label>
-            </ion-segment-button>
-          </ion-segment>
-          <div *ngIf="!selectedRole || selectedRole === ''">
-            <ion-text color="medium">Please select a role to continue.</ion-text>
+  <div class="container ion-padding">
+    <!-- Back Button -->
+    <div class="back-to-home">
+      <ion-button fill="clear" routerLink="/home" *ngIf="!role">
+        <ion-icon slot="start" name="home-outline"></ion-icon>
+        <span>Back to Home</span>
+      </ion-button>
+      <ion-button fill="clear" (click)="role=null" *ngIf="role">
+        <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
+        Back
+      </ion-button>
+    </div>
+
+    <div class="card">
+      <!-- Role Selection Section -->
+      <ng-container *ngIf="!role; else loginForm">
+        <h2>Welcome Back</h2>
+        <p>Sign in to access your dashboard</p>
+        <h4>Select Your Role</h4>
+
+        <div class="role-cards">
+          <div class="role-card" [class.selected]="selectedRole === 'student'" (click)="selectRole('student')">
+            <ion-icon name="person-outline"></ion-icon>
+            <span>Student</span>
+          </div>
+
+          <div class="role-card" [class.selected]="selectedRole === 'manager'" (click)="selectRole('manager')">
+            <ion-icon name="people-outline"></ion-icon>
+            <span>Manager</span>
           </div>
         </div>
+      </ng-container>
 
-        <div *ngIf="!isRegisterMode && !selectedRole">
-          <ion-button expand="block" (click)="selectRole('Teacher')">Login as Teacher</ion-button>
-          <ion-button expand="block" (click)="selectRole('Student')">Login as Student</ion-button>
-          <ion-button expand="block" (click)="loginWithGoogle()">
-            <ion-icon name="logo-google" slot="start"></ion-icon>
-            Login with Google
-          </ion-button>
-        </div>
+      <!-- Login Form Section -->
+      <ng-template #loginForm>
+        <h2>Welcome Back</h2>
+        <p>Sign in to access your dashboard</p>
+        <h4>Role: {{ role | titlecase }}</h4>
 
-        <!-- Email/Password Form Section -->
-        <div *ngIf="selectedRole">
-          <ion-item>
-            <ion-label position="floating">Email</ion-label>
-            <ion-input [(ngModel)]="email" type="email"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="floating">Password</ion-label>
-            <ion-input [(ngModel)]="password" type="password"></ion-input>
-          </ion-item>
-          <ion-button expand="block" (click)="loginOrRegisterWithEmail()">
-            {{ isRegisterMode ? 'Register' : ('Login as ' + selectedRole) }}
-          </ion-button>
-          <ion-button expand="block" fill="clear" (click)="toggleAuthMode()">
-            {{ isRegisterMode ? "Already have an account? Login" : "Don't have an account? Register" }}
-          </ion-button>
-          <ion-button expand="block" color="medium" (click)="cancelLogin()">Cancel</ion-button>
+        <ion-item>
+          <ion-label position="floating">Email Address</ion-label>
+          <ion-input type="email" [(ngModel)]="email"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Password</ion-label>
+          <ion-input type="password" [(ngModel)]="password"></ion-input>
+        </ion-item>
+
+        <ion-button expand="block" (click)="login()">
+          Continue
+
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+
+        <div class="social-login">
+          <p>Or continue with</p>
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <ion-button expand="block" color="danger" fill="outline" (click)="googleLogin()">
+                  <ion-icon slot="start" name="logo-google"></ion-icon>
+                  Google
+                </ion-button>
+              </ion-col>
+              <ion-col>
+                <ion-button expand="block" color="primary" fill="outline" (click)="facebookLogin()">
+                  <ion-icon slot="start" name="logo-facebook"></ion-icon>
+                  Facebook
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
         </div>
-      </div>
+      </ng-template>
     </div>
   </div>
 </ion-content>
