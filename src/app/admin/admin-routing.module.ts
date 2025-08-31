@@ -14,6 +14,19 @@ const routes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('./dashboard/dashboard.page').then((m) => m.DashboardPage),
       },
+      {
+        path: 'library-requests',
+        loadComponent: () => import('./library-requests/library-requests.page').then((m) => m.LibraryRequestsPage),
+      },
+      {
+        path: 'library-request-detail',
+        loadComponent: () =>
+          import('./library-request-detail/library-request-detail.page').then((m) => m.LibraryRequestDetailPage),
+      },
+      {
+        path: 'user-feedback',
+        loadComponent: () => import('./user-feedback/user-feedback.page').then((m) => m.UserFeedbackPage),
+      },
     ],
   },
 ];

@@ -24,15 +24,7 @@ export const routes: Routes = [
   },
   {
     path: 'browse-libraries',
-    loadComponent: () => import('./student/browse-libraries/browse-libraries.page').then((m) => m.BrowseLibrariesPage),
-  },
-  {
-    path: 'library-details',
-    loadComponent: () => import('./student/library-details/library-details.page').then((m) => m.LibraryDetailsPage),
-  },
-  {
-    path: 'apply-library',
-    loadComponent: () => import('./student/apply-library/apply-library.page').then((m) => m.ApplyLibraryPage),
+    loadComponent: () => import('./pages/browse-libraries/browse-libraries.page').then((m) => m.BrowseLibrariesPage),
   },
   {
     path: 'student',
@@ -43,37 +35,8 @@ export const routes: Routes = [
     loadChildren: () => import('./manager/manager-routing.module').then((m) => m.ManagerRoutingModule),
   },
   {
-    path: 'complete-profile',
-    loadComponent: () => import('./manager/complete-profile/complete-profile.page').then((m) => m.CompleteProfilePage),
-  },
-  {
-    path: 'student-applications',
-    loadComponent: () =>
-      import('./manager/student-applications/student-applications.page').then((m) => m.StudentApplicationsPage),
-  },
-  {
-    path: 'student-application-detail',
-    loadComponent: () =>
-      import('./manager/student-application-detail/student-application-detail.page').then(
-        (m) => m.StudentApplicationDetailPage,
-      ),
-  },
-  {
     path: 'admin',
     loadChildren: () => import('./admin/admin-routing.module').then((m) => m.AdminRoutingModule),
-  },
-  {
-    path: 'library-requests',
-    loadComponent: () => import('./admin/library-requests/library-requests.page').then((m) => m.LibraryRequestsPage),
-  },
-  {
-    path: 'library-request-detail',
-    loadComponent: () =>
-      import('./admin/library-request-detail/library-request-detail.page').then((m) => m.LibraryRequestDetailPage),
-  },
-  {
-    path: 'user-feedback',
-    loadComponent: () => import('./admin/user-feedback/user-feedback.page').then((m) => m.UserFeedbackPage),
   },
   {
     path: 'home',
@@ -89,7 +52,7 @@ export const routes: Routes = [
   },
   {
     path: 'privacy-policy',
-    loadComponent: () => import('./privacy-policy/privacy-policy.page').then((m) => m.PrivacyPolicyPage),
+    loadComponent: () => import('./pages/privacy-policy/privacy-policy.page').then((m) => m.PrivacyPolicyPage),
   },
   {
     path: 'delete-account',
