@@ -10,8 +10,9 @@ export class ApiService {
 
   constructor() {
     if (environment.useEmulators) {
-      console.log('Using Firebase Realtime Database Emulator');
-      connectDatabaseEmulator(this.db, 'localhost', environment.ports.database);
+      const dbPort = 9000;
+      console.log('Using Firebase Realtime Database Emulator on port:', dbPort);
+      connectDatabaseEmulator(this.db, 'localhost', dbPort);
     } else {
       console.log('Using Firebase Realtime Database Cloud');
     }
