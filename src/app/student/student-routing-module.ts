@@ -1,10 +1,54 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-const routes: Routes = [];
+const routes: Routes = [
+  {
+    path: '',
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'apply-library',
+        loadComponent: () => import('./apply-library/apply-library.page').then((m) => m.ApplyLibraryPage),
+      },
+      {
+        path: 'browse-libraries',
+        loadComponent: () =>
+          import('../pages/browse-libraries/browse-libraries.page').then((m) => m.BrowseLibrariesPage),
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./dashboard/dashboard.page').then((m) => m.DashboardPage),
+      },
+      {
+        path: 'my-bookings',
+        loadComponent: () => import('./my-bookings/my-bookings.page').then((m) => m.MyBookingsPage),
+      },
+      {
+        path: 'my-library',
+        loadComponent: () => import('./my-library/my-library.page').then((m) => m.MyLibraryPage),
+      },
+      {
+        path: 'payments',
+        loadComponent: () => import('./payments/payments.page').then((m) => m.PaymentsPage),
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./profile/profile.page').then((m) => m.ProfilePage),
+      },
+      {
+        path: 'tickets',
+        loadComponent: () => import('./tickets/tickets.page').then((m) => m.TicketsPage),
+      },
+    ],
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class StudentRoutingModule { }
+export class StudentRoutingModule {}
