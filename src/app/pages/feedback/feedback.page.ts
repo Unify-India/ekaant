@@ -11,7 +11,7 @@ import { addIcons } from 'ionicons';
   templateUrl: './feedback.page.html',
   styleUrls: ['./feedback.page.scss'],
   standalone: true,
-  imports: [IonCard, IonCol, IonRow, IonGrid, IonCardContent, IonIcon, IonAvatar, CommonModule, FormsModule],
+  imports: [IonCard, IonCol, IonRow, IonGrid, IonCardContent, IonIcon, CommonModule, FormsModule],
 })
 export class FeedbackPage {
   constructor() {
