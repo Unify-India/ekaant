@@ -1,0 +1,29 @@
+<ion-card class="library-card">
+  <ion-card-header>
+    <ion-card-title>
+      {{ library.name }}
+    </ion-card-title>
+    <ion-card-subtitle class="ion-flex ion-align-items-center">
+      <ion-icon color="warning" name="locate-outline"></ion-icon>
+      <span>{{ library.address }}</span>
+    </ion-card-subtitle>
+    <div class="status-badge" [ngClass]="library.isFull ? 'full' : 'available'">
+      <span class="dot"></span>
+      {{ library.isFull ? 'Full' : 'Available' }}
+    </div>
+  </ion-card-header>
+
+  <ion-card-content>
+    <div class="availability">
+      <ion-icon name="people-outline"></ion-icon>
+      {{ library.availableSeats }} / {{ library.totalSeats }} seats available
+    </div>
+  </ion-card-content>
+
+  <div class="card-footer">
+    <ion-button expand="block" [color]="actionColor" (click)="onActionClick()">
+      {{ actionLabel }}
+      <ion-icon slot="end" [name]="library.isFull ? 'notifications-outline' : 'arrow-forward'"></ion-icon>
+    </ion-button>
+  </div>
+</ion-card>

@@ -1,0 +1,82 @@
+.library-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 0.5rem;
+  min-width: 24%;
+  margin: 0;
+  ion-card-header {
+    position: relative;
+
+    .status-badge {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+  }
+  ion-card-title {
+    margin: 1.2rem 0;
+    font-size: 1.2rem;
+  }
+  ion-card-content {
+    flex-grow: 1; // Pushes footer down
+    display: flex;
+    align-items: flex-start;
+    font-size: 0.9rem;
+  }
+
+  .card-footer {
+    margin-top: auto; // Forces footer to bottom
+    padding: 0.5rem 1rem 1rem;
+  }
+
+  @media screen and (max-width: 768px) {
+    min-width: none;
+    width: 100%;
+    ion-card-title {
+      margin: 0 0;
+    }
+  }
+}
+ion-card-subtitle,
+.availability {
+  display: inline-flex;
+  width: 100%;
+  font-size: 1rem;
+  flex-wrap: wrap;
+  ion-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+    font-size: 1rem;
+  }
+  span {
+    display: inline-flex;
+    width: calc(100% - 1.5rem);
+    padding-bottom: 4px;
+  }
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2rem;
+  background-color: rgba(var(--ion-color-success-rgb), 0.15);
+  color: var(--ion-color-success);
+
+  &.full {
+    background-color: rgba(var(--ion-color-danger-rgb), 0.15);
+    color: var(--ion-color-danger);
+  }
+
+  .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    margin-right: 0.4rem;
+    background-color: currentColor;
+  }
+}
