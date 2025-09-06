@@ -23,6 +23,39 @@ const routes: Routes = [
         loadComponent: () =>
           import('./student-applications/student-applications.page').then((m) => m.StudentApplicationsPage),
       },
+      {
+        path: 'performance-report',
+        loadComponent: () =>
+          import('./performance-report/performance-report.page').then((m) => m.PerformanceReportPage),
+      },
+      {
+        path: 'tickets',
+        loadComponent: () => import('./tickets/tickets.page').then((m) => m.TicketsPage),
+      },
+      {
+        path: 'slot-management',
+        loadComponent: () => import('./slot-management/slot-management.page').then((m) => m.SlotManagementPage),
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./users/users.page').then((m) => m.UsersPage),
+      },
+      {
+        path: 'bookings',
+        loadComponent: () => import('./bookings/bookings.page').then((m) => m.BookingsPage),
+      },
+      {
+        path: 'campaign',
+        loadComponent: () => import('./campaign/campaign.page').then((m) => m.CampaignPage),
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./notifications/notifications.page').then((m) => m.NotificationsPage),
+      },
+      {
+        path: 'payment-history',
+        loadComponent: () => import('./payment-history/payment-history.page').then((m) => m.PaymentHistoryPage),
+      },
     ],
   },
 ];
