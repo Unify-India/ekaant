@@ -56,95 +56,6 @@ ion-card-title {
   margin-bottom: 24px;
 }
 
-.pricing-section {
-  background: color-mix(in srgb, var(--ion-color-dark) 5%, transparent);
-  // padding-bottom: 2rem;
-}
-.pricing-container {
-  display: grid;
-  gap: 20px;
-  justify-content: center;
-  grid-template-columns: 1fr;
-  padding-bottom: 2rem;
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.pricing-card {
-  position: relative;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-  border-radius: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  &:hover {
-    box-shadow: 0 0 0.5rem var(--ion-color-primary-shade);
-  }
-  ion-card-content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    align-content: baseline;
-  }
-}
-
-.popular {
-  // border: 2px solid var(--ion-color-success);
-  &:hover {
-    box-shadow: 0 0 0.75rem color-mix(in srgb, var(--ion-color-success) 40%, transparent);
-    transition: box-shadow 0.3s ease;
-  }
-}
-
-.badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: var(--ion-color-primary);
-  color: white;
-  font-size: 0.7rem;
-  font-weight: bold;
-  padding: 4px 8px;
-  border-radius: 8px;
-}
-
-.plan-image {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 0.5rem 0.5rem 0 0;
-}
-
-.description {
-  font-size: 0.9rem;
-  color: #555;
-  text-align: left;
-}
-
-.price {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin: 12px 0;
-  text-align: left;
-
-  .duration {
-    font-size: 0.9rem;
-    font-weight: normal;
-    color: #666;
-  }
-}
-
-.btn-get-started {
-  margin-top: auto;
-  font-size: 1rem;
-  ion-button {
-    font-weight: bold;
-    text-transform: uppercase;
-  }
-}
-
 .services-section {
   text-align: center;
   margin: auto;
@@ -215,7 +126,7 @@ ion-card-title {
 }
 
 .action-section {
-  background: color-mix(in srgb, var(--ion-color-success) 10%, transparent);
+  // background: color-mix(in srgb, var(--ion-color-success) 10%, transparent);
   width: 100%;
   position: relative;
   .content-wrapper {
@@ -259,4 +170,8 @@ ion-card-title {
       --color: var(--ion-color-light);
     }
   }
+}
+
+.testimony-section {
+  background: color-mix(in srgb, var(--ion-color-dark) 5%, transparent);
 }
