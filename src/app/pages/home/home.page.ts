@@ -19,7 +19,7 @@ import { FeedbackPage } from '../feedback/feedback.page';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
-  styleUrls: ['./home.page.scss'],
+  styleUrls: ['./home.page.scss', '../pricing/pricing.page.scss'],
   standalone: true,
   imports: [
     IonGrid,
