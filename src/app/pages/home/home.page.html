@@ -14,6 +14,10 @@
     </ion-toolbar>
   </ion-header>
 
+  <section id="landing-screen" class="landing-screen">
+    <app-landing-screen></app-landing-screen>
+  </section>
+
   <section id="experience-section" class="ion-padding">
     <div class="section-heading">
       <h2 class="section-title">A Better Experience for Everyone</h2>
@@ -78,7 +82,7 @@
             <ion-icon name="location-outline" class="service-icon" color="success"></ion-icon>
             <h3>Nearby Libraries</h3>
             <p>Discover libraries near you, check real-time seat availability, and find your ideal study spot.</p>
-            <a routerLink="/libraries" class="service-link ion-text-primary">
+            <a routerLink="/browse-libraries" class="service-link ion-text-primary">
               Find a Library
               <ion-icon name="arrow-forward"></ion-icon>
             </a>
@@ -118,7 +122,7 @@
       <p class="section-subtitle">Choose the plan that's right for you. Start for free.</p>
     </div>
 
-    <div class="pricing-container ion-margin">
+    <div class="pricing-container">
       @for (plan of pricingPlans; track plan) {
       <ion-card class="pricing-card info-card" [ngClass]="{'popular': plan.popular}">
         @if (plan.popular) {
@@ -155,12 +159,12 @@
       <p class="subtitle">Join the future of library management. It's time to go digital.</p>
 
       <div class="action-buttons">
-        <ion-button fill="solid" color="light" class="btn-student">
+        <ion-button fill="solid" color="light" class="btn-student" routerLink="/browse-libraries">
           Students: Book a Room
           <ion-icon slot="end" name="arrow-forward"></ion-icon>
         </ion-button>
 
-        <ion-button fill="solid" color="primary" class="btn-owner">
+        <ion-button fill="solid" color="primary" class="btn-owner" routerLink="/register-library">
           Owners: Start for Free
           <ion-icon slot="end" name="arrow-forward"></ion-icon>
         </ion-button>

@@ -1,23 +1,14 @@
-.section-title {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.section-subtitle {
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 24px;
+.landing-screen {
+  position: relative;
+  width: 100%;
+  height: fit-content;
+  display: block;
 }
 
 .cards-container {
   display: grid;
   gap: 16px;
-
-  /* Mobile → stacked cards */
   grid-template-columns: 1fr;
-
-  /* Desktop → two cards side by side */
   @media (min-width: 768px) {
     grid-template-columns: 1fr 1fr;
   }
@@ -61,12 +52,6 @@ ion-card-title {
   margin: auto;
   background: color-mix(in srgb, var(--ion-color-secondary-tint) 5%, transparent);
   // background: red;
-}
-
-.section-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--ion-text-color);
 }
 
 .section-subtitle {
