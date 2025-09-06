@@ -1,4 +1,8 @@
 <ion-card class="library-card">
+  <div class="status-badge" [ngClass]="library.isFull ? 'full' : 'available'">
+    <span class="dot"></span>
+    {{ library.isFull ? 'Full' : 'Available' }}
+  </div>
   <ion-card-header>
     <ion-card-title>
       {{ library.name }}
@@ -7,10 +11,6 @@
       <ion-icon color="warning" name="locate-outline"></ion-icon>
       <span>{{ library.address }}</span>
     </ion-card-subtitle>
-    <div class="status-badge" [ngClass]="library.isFull ? 'full' : 'available'">
-      <span class="dot"></span>
-      {{ library.isFull ? 'Full' : 'Available' }}
-    </div>
   </ion-card-header>
 
   <ion-card-content>
