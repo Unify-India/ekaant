@@ -1,6 +1,6 @@
 .pricing-container {
   display: grid;
-  gap: 20px;
+  gap: 1.5rem;
   justify-content: center;
   grid-template-columns: 1fr;
   padding-bottom: 2rem;
@@ -29,7 +29,6 @@
 }
 
 .popular {
-  // border: 2px solid var(--ion-color-success);
   &:hover {
     box-shadow: 0 0 0.75rem color-mix(in srgb, var(--ion-color-success) 40%, transparent);
     transition: box-shadow 0.3s ease;

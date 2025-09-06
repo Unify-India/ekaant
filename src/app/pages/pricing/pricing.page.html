@@ -19,7 +19,7 @@
       <p class="section-subtitle">Choose the plan that's right for you. Start for free.</p>
     </div>
 
-    <div class="pricing-container ion-margin">
+    <div class="pricing-container">
       @for (plan of pricingPlans; track plan) {
       <ion-card class="pricing-card info-card" [ngClass]="{'popular': plan.popular}">
         @if (plan.popular) {
