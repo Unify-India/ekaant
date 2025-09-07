@@ -79,3 +79,4 @@ src/environments/environment.ts
 .firebase
 *-debug.log
 .runtimeconfig.json
+firebase/seeds/*
