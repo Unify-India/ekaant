@@ -41,6 +41,14 @@ import {
   constructSharp,
   chatbubblesOutline,
   chatbubblesSharp,
+  locateOutline,
+  locateSharp,
+  notificationsOutline,
+  megaphoneOutline,
+  megaphoneSharp,
+  notificationsSharp,
+  bookOutline,
+  bookSharp,
 } from 'ionicons/icons';
 
 export class UsedIcons {
@@ -87,5 +95,13 @@ export class UsedIcons {
     constructSharp,
     chatbubblesOutline,
     chatbubblesSharp,
+    locateOutline,
+    locateSharp,
+    notificationsOutline,
+    notificationsSharp,
+    megaphoneOutline,
+    megaphoneSharp,
+    bookOutline,
+    bookSharp,
   };
 }

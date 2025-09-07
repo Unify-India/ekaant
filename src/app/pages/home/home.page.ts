@@ -15,6 +15,9 @@ import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.m
 import { addIcons } from 'ionicons';
 import { FooterPage } from '../footer/footer.page';
 import { FeedbackPage } from '../feedback/feedback.page';
+import { LandingScreenComponent } from './landing-screen/landing-screen.component';
+import { AdminRoutingModule } from 'src/app/admin/admin-routing.module';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -34,6 +37,9 @@ import { FeedbackPage } from '../feedback/feedback.page';
     FormsModule,
     FeedbackPage,
     FooterPage,
+    LandingScreenComponent,
+    AdminRoutingModule,
+    RouterLink,
   ],
   providers: [],
 })
