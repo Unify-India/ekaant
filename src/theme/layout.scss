@@ -16,3 +16,25 @@
     font-size: 2rem;
   }
 }
+
+.section-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: var(--ion-text-color);
+  font-size: 2rem;
+
+  @media screen and (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+.section-subtitle {
+  font-size: 1rem;
+  color: var(--ion-text-color-step-600);
+  margin-bottom: 24px;
+  padding: 0 1rem;
+}
+
+.no-margin {
+  margin: 0;
+}
