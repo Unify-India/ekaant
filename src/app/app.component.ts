@@ -23,6 +23,7 @@ import { Subscription } from 'rxjs';
 import { TranslateConfigService } from './services/translation/translation.service';
 import { ApiService } from './shared/services/api/api.service';
 import { AuthService } from './auth/service/auth.service';
+import { IMenuOptions } from './models/global.interface';
 
 @Component({
   selector: 'app-root',
@@ -50,7 +51,7 @@ import { AuthService } from './auth/service/auth.service';
 export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   private translate = inject(TranslateService);
 
-  appPages = MenuData.defaultAppPages;
+  appPages: IMenuOptions[] = MenuData.defaultAppPages;
   icons = UsedIcons.icons;
   isLoggedIn = false;
   private authListenerSubs!: Subscription;
@@ -66,7 +67,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.updateMenu();
     this.isLoggedIn = this.authService.isLoggedIn();
     this.authListenerSubs = this.authService.getAuthStatusListener().subscribe((user) => {
-      this.isLoggedIn = !!user;
+      // this.isLoggedIn = !!user;
       this.updateMenu();
     });
     this.apiService
@@ -112,5 +113,15 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   logout() {
     this.authService.logout();
+  }
+
+  getIconColor(page: { icon: string; color?: string }): string {
+    if (!page) {
+      return 'medium';
+    }
+    if (!page.color) {
+      return 'medium';
+    }
+    return page.color || 'medium';
   }
 }
