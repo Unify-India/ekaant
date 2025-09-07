@@ -62,6 +62,14 @@ export const routes: Routes = [
     path: 'support',
     loadComponent: () => import('./pages/support/support.page').then((m) => m.SupportPage),
   },
+  {
+    path: 'register-library',
+    loadComponent: () => import('./pages/register-library/register-library.page').then((m) => m.RegisterLibraryPage),
+  },
+  {
+    path: 'application-form',
+    loadComponent: () => import('./pages/application-form/application-form.page').then((m) => m.ApplicationFormPage),
+  },
 ];
 
 export const staticRoutes = [

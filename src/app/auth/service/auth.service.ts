@@ -40,8 +40,6 @@ export class AuthService {
       return `users/${role.toLowerCase()}`;
     } else if (role === 'Manager') {
       return 'pending/managers';
-    } else if (role === 'School') {
-      return 'pending/schools';
     } else {
       return 'users/user';
     }
