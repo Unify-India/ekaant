@@ -1,0 +1,133 @@
+.icon-container {
+  display: flex;
+  height: 4rem;
+  width: 4rem;
+  margin: auto;
+  text-align: center;
+  background-image: linear-gradient(to right bottom, #0054e9, #234ef0, #3947f6, #4d3dfb, #6030ff);
+  border-radius: 0.5rem;
+  align-items: center;
+  ion-icon {
+    color: white;
+    margin: auto;
+    align-self: center;
+  }
+}
+
+.header {
+  text-align: center;
+  margin: 1rem auto 0;
+  width: min(100%, 50rem);
+
+  h2 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    font-size: 0.95rem;
+  }
+}
+
+.features-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: auto;
+  // gap: 0.5rem;
+  justify-content: stretch;
+  height: fit-content;
+  width: min(100%, 50rem);
+  @media (max-width: 768px) {
+    gap: 1rem;
+  }
+}
+
+ion-card {
+  text-align: left;
+  height: 100%;
+  margin: 0;
+  border-radius: 0.5rem;
+
+  ion-card-header {
+    display: flex;
+    align-items: center;
+  }
+  ion-icon {
+    font-size: 1.8rem;
+    margin-right: 0.5rem;
+    padding: 0.5rem;
+    color: var(--ion-color-primary);
+  }
+  ion-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  ion-card-content {
+    font-size: 0.9rem;
+    color: var(--ion-color-medium);
+  }
+}
+
+.steps {
+  text-align: center;
+  margin: 2rem auto;
+  width: min(100%, 50rem);
+
+  h3 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .step-box {
+    background: var(--ion-color-light);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+
+    ion-icon {
+      font-size: 2rem;
+      color: var(--ion-color-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    p {
+      font-size: 0.85rem;
+      color: var(--ion-color-medium);
+    }
+  }
+}
+
+.cta {
+  text-align: center;
+  width: 100%;
+  ion-button {
+    box-sizing: border-box;
+    --border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    span {
+      padding: 1rem;
+    }
+    @media (max-width: 768px) {
+      width: 95%;
+      span {
+        padding: 1.25rem;
+      }
+    }
+  }
+
+  .note {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--ion-color-medium);
+  }
+}

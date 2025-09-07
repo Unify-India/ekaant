@@ -1,13 +1,120 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>register-library</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{pageTitle}}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">register-library</ion-title>
+      <ion-title size="large">{{pageTitle}}</ion-title>
     </ion-toolbar>
   </ion-header>
+  <ion-content class="ion-padding">
+    <!-- Header Icon + Title -->
+    <div class="header ion-padding">
+      <div class="blue-violet-gradient icon-container">
+        <ion-icon name="library-outline" size="large"></ion-icon>
+      </div>
+      <h2 class="section-title">Register Your Library</h2>
+      <p class="section-subtitle">
+        Join our platform and connect with students looking for the perfect study environment. Start your 6-month free
+        trial today and revolutionize your library management.
+      </p>
+    </div>
+
+    <!-- Features -->
+    <ion-grid class="features-grid">
+      <ion-row class="features-row">
+        <ion-col size="12" size-md="4">
+          <ion-card>
+            <ion-card-header>
+              <ion-icon name="sparkles-outline" color="warning"></ion-icon>
+              <ion-card-title>6-Month Free Trial</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Experience all premium features at no cost for the first 6 months. No hidden fees or charges.
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="4">
+          <ion-card>
+            <ion-card-header>
+              <ion-icon name="business-outline" color="secondary"></ion-icon>
+              <ion-card-title>Easy Management</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Streamline your operations with digital enrollment, automated tracking, and real-time analytics.
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="4">
+          <ion-card>
+            <ion-card-header>
+              <ion-icon name="trending-up-outline" color="success"></ion-icon>
+              <ion-card-title>Increased Revenue</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Attract more students, reduce administrative overhead, and boost your library’s profitability.
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Registration Steps -->
+    <div class="steps">
+      <h3 class="section-title">Simple Registration Process</h3>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" size-sm="6" size-md="3">
+            <div class="step-box">
+              <ion-icon name="document-text-outline" color="tertiary"></ion-icon>
+              <h4>1. Basic Information</h4>
+              <p>Library name, address, and operating hours</p>
+            </div>
+          </ion-col>
+
+          <ion-col size="12" size-sm="6" size-md="3">
+            <div class="step-box">
+              <ion-icon name="images-outline" color="secondary"></ion-icon>
+              <h4>2. Setup Details</h4>
+              <p>Photos, seating, amenities, and pricing</p>
+            </div>
+          </ion-col>
+
+          <ion-col size="12" size-sm="6" size-md="3">
+            <div class="step-box">
+              <ion-icon name="shield-checkmark-outline" color="danger"></ion-icon>
+              <h4>3. Policies</h4>
+              <p>Requirements and code of conduct</p>
+            </div>
+          </ion-col>
+
+          <ion-col size="12" size-sm="6" size-md="3">
+            <div class="step-box">
+              <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
+              <h4>4. Review & Submit</h4>
+              <p>Preview and submit for approval</p>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+
+    <!-- CTA Button -->
+    <div class="cta">
+      <ion-button routerLink="/library-registration-form">
+        <ion-icon name="library-outline"></ion-icon>
+        <span>Start Registration Process</span>
+        <ion-icon name="arrow-forward"></ion-icon>
+      </ion-button>
+      <p class="section-subtitle">Takes about 10-15 minutes to complete • No payment required</p>
+    </div>
+  </ion-content>
 </ion-content>

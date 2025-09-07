@@ -1,20 +1,45 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { AdminRoutingModule } from 'src/app/admin/admin-routing.module';
+import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
+import { addIcons } from 'ionicons';
+import {
+  businessOutline,
+  checkmarkDoneOutline,
+  documentTextOutline,
+  imagesOutline,
+  shieldCheckmarkOutline,
+  libraryOutline,
+  trendingUpOutline,
+  arrowForward,
+  sparklesOutline,
+} from 'ionicons/icons';
+import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
 
 @Component({
   selector: 'app-register-library',
   templateUrl: './register-library.page.html',
   styleUrls: ['./register-library.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [BaseUiComponents, UiEssentials, CommonModule, FormsModule, AdminRoutingModule],
 })
 export class RegisterLibraryPage implements OnInit {
+  pageTitle = 'Library Registration';
 
-  constructor() { }
-
-  ngOnInit() {
+  constructor() {
+    addIcons({
+      libraryOutline,
+      documentTextOutline,
+      imagesOutline,
+      shieldCheckmarkOutline,
+      checkmarkDoneOutline,
+      arrowForward,
+      trendingUpOutline,
+      businessOutline,
+      sparklesOutline,
+    });
   }
 
+  ngOnInit() {}
 }
