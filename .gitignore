@@ -80,3 +80,4 @@ src/environments/environment.ts
 *-debug.log
 .runtimeconfig.json
 firebase/seeds/*
+docs/pitch/*
