@@ -49,6 +49,7 @@ import {
   notificationsSharp,
   bookOutline,
   bookSharp,
+  arrowBack,
 } from 'ionicons/icons';
 
 export class UsedIcons {
@@ -103,5 +104,6 @@ export class UsedIcons {
     megaphoneSharp,
     bookOutline,
     bookSharp,
+    arrowBack,
   };
 }
