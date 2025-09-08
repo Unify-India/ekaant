@@ -14,7 +14,7 @@
     </ion-toolbar>
   </ion-header>
   <div id="content">
-    <div class="heading">
+    <div class="ion-padding">
       <h4 class="section-subtitle">Step {{ currentSectionIndex() + 1 }} of {{ sections.length }}</h4>
       <ion-progress-bar [value]="progress()" color="success"></ion-progress-bar>
     </div>
@@ -75,30 +75,34 @@
       <p>Loading...</p>
       } }}
     </div>
-    <div>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          @if (currentSectionIndex() > 0) {
-          <ion-button (click)="prevSection()">
-            <ion-icon slot="start" name="arrow-back"></ion-icon>
-            Previous
-          </ion-button>
-          }
-        </ion-buttons>
+    <div class="ion-padding">
+      <ion-toolbar fill="none" color="none">
+        @if (currentSectionIndex() > 0) {
+        <ion-button (click)="prevSection()" color="secondary" class="previous-button" slot="start">
+          <ion-icon slot="start" name="chevron-back"></ion-icon>
+          Previous
+        </ion-button>
+        }
 
-        <ion-buttons slot="end">
-          @if (currentSectionIndex() < sections.length - 1) {
-          <ion-button (click)="nextSection()" [disabled]="!isCurrentSectionValid()">
-            Next
-            <ion-icon slot="end" name="arrow-forward"></ion-icon>
-          </ion-button>
-          } @else {
-          <ion-button color="success" (click)="onSubmit()" [disabled]="!masterForm.valid">
-            Submit Registration
-            <ion-icon slot="end" name="checkmark-done-outline"></ion-icon>
-          </ion-button>
-          }
-        </ion-buttons>
+        <ion-button id="present-alert" fill="clear" color="dark">Cancel</ion-button>
+        <ion-alert
+          trigger="present-alert"
+          header="Cancel Registration?"
+          message="Are you sure you want to cancel the registration process? All entered data will be lost."
+          [buttons]="alertButtons"
+        ></ion-alert>
+        @if (currentSectionIndex() < sections.length - 1) {
+        <ion-button (click)="nextSection()" [disabled]="!isCurrentSectionValid()" color="primary" slot="end">
+          <span>Next</span>
+
+          <ion-icon slot="end" name="chevron-forward"></ion-icon>
+        </ion-button>
+        } @else {
+        <ion-button class="next-button" color="success" slot="end" (click)="onSubmit()" [disabled]="!masterForm.valid">
+          <span>Submit Registration</span>
+          <ion-icon slot="start" name="checkmark-done-outline"></ion-icon>
+        </ion-button>
+        }
       </ion-toolbar>
     </div>
   </div>

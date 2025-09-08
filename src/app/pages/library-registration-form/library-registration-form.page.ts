@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -11,10 +11,9 @@ import {
   IonSegment,
   IonSegmentButton,
   IonLabel,
-  IonButton,
   IonIcon,
-  IonButtons,
   IonProgressBar,
+  IonAlert,
 } from '@ionic/angular/standalone';
 
 // Import your child components
@@ -35,6 +34,8 @@ import {
   documentLockOutline,
   imageOutline,
   documentOutline,
+  chevronForward,
+  chevronBack,
 } from 'ionicons/icons';
 import { AmenitiesComponent } from './components/amenities/amenities.component';
 import { BookCollectionComponent } from './components/book-collection/book-collection.component';
@@ -45,6 +46,8 @@ import { PricingPlansComponent } from './components/pricing-plans/pricing-plans.
 import { CodeOfConductComponent } from './components/code-of-conduct/code-of-conduct.component';
 import { RequirementsComponent } from './components/requirements/requirements.component';
 
+import type { OverlayEventDetail } from '@ionic/core';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-library-registration-form',
   standalone: true,
@@ -68,15 +71,15 @@ import { RequirementsComponent } from './components/requirements/requirements.co
     IonSegment,
     IonSegmentButton,
     IonLabel,
-    IonButton,
     IonIcon,
-    IonButtons,
     IonProgressBar,
+    IonAlert,
   ],
   templateUrl: './library-registration-form.page.html',
   styleUrls: ['./library-registration-form.page.scss'],
 })
 export class LibraryRegistrationFormPage {
+  private router = inject(Router);
   pageTitle = 'Register your library';
   sections = [
     { id: 'basicInformation', icon: 'business-outline', label: 'Basic Info' },
@@ -103,13 +106,36 @@ export class LibraryRegistrationFormPage {
     if (totalFormSections <= 0) return 0;
     return completedSections / totalFormSections;
   });
+  isAlertOpen = false;
+  public alertButtons = [
+    {
+      text: 'Cancel',
+      role: 'cancel',
+      handler: () => {},
+    },
+    {
+      text: 'OK',
+      role: 'confirm',
+      handler: () => {
+        this.router.navigate(['/home']);
+      },
+    },
+  ];
 
+  setResult(event: CustomEvent<OverlayEventDetail>) {
+    console.log(`Dismissed with role: ${event.detail.role}`);
+  }
+
+  setOpen(isOpen: boolean) {
+    this.isAlertOpen = isOpen;
+  }
   constructor() {
     addIcons({
       checkmarkCircleOutline,
-      arrowBack,
-      arrowForward,
+      chevronBack,
+      chevronForward,
       checkmarkDoneOutline,
+      arrowForward,
       eyeOutline,
       warningOutline,
       peopleOutline,
@@ -171,6 +197,15 @@ export class LibraryRegistrationFormPage {
     } else {
       console.error('Form is invalid', this.masterForm);
       alert('Please complete all required sections.');
+    }
+  }
+
+  onCancel() {
+    if (confirm('Are you sure you want to cancel the registration? All data will be lost.')) {
+      // Reset the form and navigate away or reset state as needed
+      this.masterForm.reset();
+      this.currentSectionIndex.set(0);
+      this.maxReachedIndex.set(0);
     }
   }
 }
