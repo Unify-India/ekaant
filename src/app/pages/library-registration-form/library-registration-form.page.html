@@ -1,0 +1,105 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{pageTitle}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{pageTitle}}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div id="content">
+    <div class="heading">
+      <h4 class="section-subtitle">Step {{ currentSectionIndex() + 1 }} of {{ sections.length }}</h4>
+      <ion-progress-bar [value]="progress()" color="success"></ion-progress-bar>
+    </div>
+    <div id="segment-container" class="ion-padding">
+      <ion-segment [value]="currentSectionId()" (ionChange)="onSegmentChange($event)" scrollable swipeGesture="true">
+        @for (section of sections; track section.id; let i = $index) {
+        <ion-segment-button [value]="section.id" [disabled]="i > maxReachedIndex()">
+          <ion-icon [name]=" section.icon"></ion-icon>
+          @if (isSectionComplete(section.id)) {
+          <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+          }
+          <ion-label>{{ section.label }}</ion-label>
+        </ion-segment-button>
+        }
+      </ion-segment>
+    </div>
+
+    <div class="form-section-container">
+      @switch (currentSectionId()) { @case ('basicInformation') { @defer {
+      <app-basic-information (formReady)="addSectionForm('basicInformation', $event)"></app-basic-information>
+      } @placeholder {
+      <p>Loading...</p>
+      } } @case ('hostProfile') { @defer {
+      <app-host-profile (formReady)="addSectionForm('hostProfile', $event)"></app-host-profile>
+      } @placeholder {
+      <p>Loading...</p>
+      } } @case ('bookCollection') { @defer {
+      <app-book-collection (formReady)="addSectionForm('bookCollection', $event)"></app-book-collection>
+      } @placeholder {
+      <p>Loading...</p>
+      } } @case ('amenities') { @defer {
+      <app-amenities (formReady)="addSectionForm('amenities', $event)"></app-amenities>
+      } @placeholder {
+      <p>Loading...</p>
+      } } @case ('seatManagement') { @defer {
+      <app-seat-management (formReady)="addSectionForm('seatManagement', $event)"></app-seat-management>
+      } @placeholder {
+      <p>Loading...</p>
+      } } @case ('libraryImages') { @defer {
+      <app-library-images (formReady)="addSectionForm('libraryImages', $event)"></app-library-images>
+      } @placeholder {
+      <p>Loading...</p>
+      } } @case ('preview') { @defer {
+      <app-preview (formReady)="addSectionForm('preview', $event)"></app-preview>
+      } @placeholder {
+      <p>Loading...</p>
+      } } @case ('pricingPlans'){ @defer {
+      <app-pricing-plans (formReady)="addSectionForm('pricingPlans', $event)"></app-pricing-plans>
+      } @placeholder {
+      <p>Loading...</p>
+      } } @case ('codeOfConduct'){ @defer {
+      <app-code-of-conduct (formReady)="addSectionForm('codeOfConduct', $event)"></app-code-of-conduct>
+      } @placeholder {
+      <p>Loading...</p>
+      } } @case ('requirements') { @defer {
+      <app-requirements (formReady)="addSectionForm('requirements', $event)"></app-requirements>
+      } @placeholder {
+      <p>Loading...</p>
+      } }}
+    </div>
+    <div>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          @if (currentSectionIndex() > 0) {
+          <ion-button (click)="prevSection()">
+            <ion-icon slot="start" name="arrow-back"></ion-icon>
+            Previous
+          </ion-button>
+          }
+        </ion-buttons>
+
+        <ion-buttons slot="end">
+          @if (currentSectionIndex() < sections.length - 1) {
+          <ion-button (click)="nextSection()" [disabled]="!isCurrentSectionValid()">
+            Next
+            <ion-icon slot="end" name="arrow-forward"></ion-icon>
+          </ion-button>
+          } @else {
+          <ion-button color="success" (click)="onSubmit()" [disabled]="!masterForm.valid">
+            Submit Registration
+            <ion-icon slot="end" name="checkmark-done-outline"></ion-icon>
+          </ion-button>
+          }
+        </ion-buttons>
+      </ion-toolbar>
+    </div>
+  </div>
+</ion-content>

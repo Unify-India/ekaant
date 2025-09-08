@@ -70,6 +70,10 @@ export const routes: Routes = [
     path: 'application-form',
     loadComponent: () => import('./pages/application-form/application-form.page').then((m) => m.ApplicationFormPage),
   },
+  {
+    path: 'library-registration-form',
+    loadComponent: () => import('./pages/library-registration-form/library-registration-form.page').then( m => m.LibraryRegistrationFormPage)
+  },
 ];
 
 export const staticRoutes = [
