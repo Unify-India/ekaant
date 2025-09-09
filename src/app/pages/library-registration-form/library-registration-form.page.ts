@@ -2,7 +2,6 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-// Import necessary Ionic Standalone Components
 import {
   IonHeader,
   IonToolbar,
@@ -16,7 +15,6 @@ import {
   IonAlert,
 } from '@ionic/angular/standalone';
 
-// Import your child components
 import { BasicInformationComponent } from './components/basic-information/basic-information.component';
 import { HostProfileComponent } from './components/host-profile/host-profile.component';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
@@ -27,7 +25,6 @@ import {
   warningOutline,
   wifiOutline,
   checkmarkCircleOutline,
-  arrowBack,
   arrowForward,
   checkmarkDoneOutline,
   businessOutline,
@@ -48,6 +45,8 @@ import { RequirementsComponent } from './components/requirements/requirements.co
 
 import type { OverlayEventDetail } from '@ionic/core';
 import { Router } from '@angular/router';
+import { LibraryRegistrationFormService } from './service/library-registration-form.service';
+
 @Component({
   selector: 'app-library-registration-form',
   standalone: true,
@@ -80,29 +79,19 @@ import { Router } from '@angular/router';
 })
 export class LibraryRegistrationFormPage {
   private router = inject(Router);
-  pageTitle = 'Register your library';
-  sections = [
-    { id: 'basicInformation', icon: 'business-outline', label: 'Basic Info' },
-    { id: 'hostProfile', icon: 'person-outline', label: 'Host Profile' },
-    { id: 'libraryImages', icon: 'image-outline', label: 'Images' },
-    { id: 'bookCollection', icon: 'book-outline', label: 'Book Collection' },
-    { id: 'amenities', icon: 'wifi-outline', label: 'Amenities' },
-    { id: 'seatManagement', icon: 'people-outline', label: 'Seating' },
-    { id: 'pricingPlans', icon: 'cash-outline', label: 'Pricing' },
-    { id: 'requirements', icon: 'document-outline', label: 'Requirements' },
-    { id: 'codeOfConduct', icon: 'document-lock-outline', label: 'Conduct Code' },
-    { id: 'preview', icon: 'eye-outline', label: 'Preview & Submit' },
-  ];
-  currentSectionIndex = signal(0);
-  maxReachedIndex = signal(0);
-  masterForm = new FormBuilder().group({});
-  currentSectionId = computed(() => this.sections[this.currentSectionIndex()].id);
+  private lrfService = inject(LibraryRegistrationFormService);
 
+  pageTitle = 'Register your library';
+  sections = this.lrfService.steps;
+  masterForm = this.lrfService.mainForm;
+  currentSectionIndex = this.lrfService.currentSectionIndex;
+  maxReachedIndex = this.lrfService.maxReachedIndex;
+
+  currentSectionId = computed(() => this.sections[this.currentSectionIndex()].key);
   progress = computed(() => {
-    // FIX: Assert the type of the array to AbstractControl[]
     const controls = Object.values(this.masterForm.controls) as AbstractControl[];
     const completedSections = controls.filter((control) => control.valid).length;
-    const totalFormSections = this.sections.length - 1; // Exclude summary
+    const totalFormSections = this.sections.length;
     if (totalFormSections <= 0) return 0;
     return completedSections / totalFormSections;
   });
@@ -126,9 +115,6 @@ export class LibraryRegistrationFormPage {
     console.log(`Dismissed with role: ${event.detail.role}`);
   }
 
-  setOpen(isOpen: boolean) {
-    this.isAlertOpen = isOpen;
-  }
   constructor() {
     addIcons({
       checkmarkCircleOutline,
@@ -147,10 +133,6 @@ export class LibraryRegistrationFormPage {
     });
   }
 
-  /**
-   * Called by child components when they are ready, passing up their FormGroup.
-   * FIX 2: Accept 'unknown' and use a type guard to ensure safety.
-   */
   addSectionForm(name: string, group: unknown) {
     if (group instanceof FormGroup) {
       this.masterForm.addControl(name, group);
@@ -160,40 +142,23 @@ export class LibraryRegistrationFormPage {
   }
 
   onSegmentChange(event: any) {
-    const newIndex = this.sections.findIndex((s) => s.id === event.detail.value);
-    if (newIndex <= this.maxReachedIndex()) {
-      this.currentSectionIndex.set(newIndex);
-    }
+    const newIndex = this.sections.findIndex((s) => s.key === event.detail.value);
+    this.lrfService.goToStep(newIndex);
   }
 
   nextSection() {
-    if (this.isCurrentSectionValid() && this.currentSectionIndex() < this.sections.length - 1) {
-      const newIndex = this.currentSectionIndex() + 1;
-      this.currentSectionIndex.set(newIndex);
-      this.maxReachedIndex.set(Math.max(this.maxReachedIndex(), newIndex));
-    }
+    this.lrfService.nextStep();
   }
 
   prevSection() {
-    if (this.currentSectionIndex() > 0) {
-      this.currentSectionIndex.set(this.currentSectionIndex() - 1);
-    }
-  }
-
-  isCurrentSectionValid(): boolean {
-    const currentId = this.currentSectionId();
-    // return this.masterForm.get(currentId)?.valid ?? false;
-    return true;
-  }
-
-  isSectionComplete(sectionId: string): boolean {
-    return this.masterForm.get(sectionId)?.valid ?? false;
+    this.lrfService.prevStep();
   }
 
   onSubmit() {
     if (this.masterForm.valid) {
       console.log('Final Form Data:', this.masterForm.value);
       alert('Registration Submitted!');
+      this.router.navigate(['/registration-acknowledgement']);
     } else {
       console.error('Form is invalid', this.masterForm);
       alert('Please complete all required sections.');
@@ -202,10 +167,25 @@ export class LibraryRegistrationFormPage {
 
   onCancel() {
     if (confirm('Are you sure you want to cancel the registration? All data will be lost.')) {
-      // Reset the form and navigate away or reset state as needed
       this.masterForm.reset();
       this.currentSectionIndex.set(0);
-      this.maxReachedIndex.set(0);
+      this.setOpen(true);
     }
+  }
+  handleCancelConfirm() {
+    this.lrfService.reset();
+    this.router.navigate(['/home']);
+  }
+
+  isCurrentSectionValid(): boolean {
+    return this.lrfService.isCurrentStepValid();
+  }
+
+  isSectionComplete(sectionId: string): boolean {
+    return this.lrfService.getFormGroup(sectionId)?.valid ?? false;
+  }
+
+  setOpen(isOpen: boolean) {
+    this.isAlertOpen = isOpen;
   }
 }
