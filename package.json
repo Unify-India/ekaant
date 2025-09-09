@@ -57,7 +57,8 @@
     "@types/jasmine": "^5.1.9",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
-    "eslint": "^9.34.0",
+    "eslint": "^9.35.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^54.1.1",
     "eslint-plugin-prefer-arrow": "^1.2.3",
@@ -68,6 +69,7 @@
     "karma-coverage": "^2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "prettier": "^3.6.2",
     "typescript": "^5.9.2"
   },
   "description": "Ekaant is an innovative Minimum Viable Product (MVP) application designed to revolutionize library operations, specifically targeting the management of self-study cubicle reservations and the traditional system of book lending in India.",
