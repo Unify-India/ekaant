@@ -11,7 +11,14 @@
   "jsxSingleQuote": false,
   "bracketSameLine": false,
   "arrowParens": "always",
+  "angularIndentScriptTags": true,
   "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "parser": "angular"
+      }
+    },
     {
       "files": ["*.ts"],
       "options": {

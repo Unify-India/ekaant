@@ -1,11 +1,7 @@
 {
   "root": true,
   "ignorePatterns": ["projects/**/*", "firebase/functions/**/*"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "jasmine"],
   "rules": {
@@ -13,10 +9,7 @@
     "no-constant-condition": "off",
     "@typescript-eslint/no-this-alias": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/explicit-module-boundary-types": [
-      "warn",
-      { "allowArgumentsExplicitlyTypedAsAny": true }
-    ],
+    "@typescript-eslint/explicit-module-boundary-types": ["warn", { "allowArgumentsExplicitlyTypedAsAny": true }],
     "object-curly-spacing": ["error", "always"],
     "quotes": ["error", "single"]
   },
@@ -30,7 +23,10 @@
       },
       "extends": [
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@angular-eslint/recommended",
+        "prettier"
       ],
       "rules": {
         "@angular-eslint/no-empty-lifecycle-method": ["off"],
@@ -71,10 +67,7 @@
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "no-unused-vars": "off",
         "no-undef": "off",
-        "@typescript-eslint/ban-ts-comment": [
-          "error",
-          { "ts-expect-error": true }
-        ]
+        "@typescript-eslint/ban-ts-comment": ["error", { "ts-expect-error": true }]
       }
     },
     {
@@ -82,7 +75,11 @@
       "parserOptions": {
         "project": ["tsconfig.(app|spec).json"]
       },
-      "extends": ["plugin:@angular-eslint/template/recommended"],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended",
+        "plugin:@angular-eslint/template/accessibility",
+        "prettier"
+      ],
       "rules": {
         "@typescript-eslint/ban-ts-comment": "off"
       }
