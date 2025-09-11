@@ -1,0 +1,53 @@
+.upload-area {
+  border: 2px dashed var(--ion-color-medium);
+  border-radius: 16px;
+  padding: 2.5rem 1.5rem;
+  margin: 1rem auto;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: var(--ion-color-light-shade);
+
+  ion-icon {
+    font-size: 48px;
+    color: var(--ion-color-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-weight: 500;
+  }
+
+  ion-note {
+    display: block;
+    margin-top: 0.5rem;
+  }
+
+  &:hover {
+    border-color: var(--ion-color-primary);
+    background-color: #e9efff10;
+  }
+}
+
+.primary-glass-box {
+  padding: 1rem 0.5rem;
+  h4 {
+    margin: 0 0 0.5rem 0.5rem;
+    font-size: 1rem;
+  }
+}
+.tips-list {
+  margin: 0;
+  li {
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}

@@ -1,3 +1,51 @@
-<p>
-  library-images works!
-</p>
+<ion-card class="registration-section-card">
+  <h2>{{ pageTitle }}</h2>
+  <p>{{ pageDescription }}</p>
+
+  <!-- Warning Glass Box -->
+  @if (imagesForm.invalid) {
+    <div class="ion-padding-start ion-padding-end glass-box warning-glass-box ion-margin-bottom">
+      <ion-icon name="warning-outline" color="warning"></ion-icon>
+      <ion-note color="warning">
+        {{ completionWarning }}
+      </ion-note>
+    </div>
+  }
+
+  <!-- Main Content Form -->
+  <form [formGroup]="imagesForm">
+    <h3>{{ photosSectionTitle }}</h3>
+    <p>{{ photosSectionDescription }}</p>
+
+    <!-- File Upload Area -->
+    <div class="section-header">
+      <h4>{{ uploadAreaTitle }}</h4>
+      <!-- <ion-note color="medium">{{ libraryPhotosArray.length }} / {{ maxImages }} Images</ion-note> -->
+      <ion-note color="medium">0 / 10 Images</ion-note>
+    </div>
+
+    <input
+      type="file"
+      hidden
+      multiple
+      (change)="onFileSelected($event)"
+      #fileInput
+      accept="image/png, image/jpeg, image/webp"
+    />
+
+    <div class="upload-area" (click)="triggerFileUpload(fileInput)">
+      <ion-icon name="image-outline"></ion-icon>
+      <p>{{ uploadAreaHint }}</p>
+      <ion-note color="medium">{{ uploadAreaConstraints }}</ion-note>
+    </div>
+  </form>
+
+  <div class="glass-box primary-glass-box ion-margin-top ion-flex-column ion-padding">
+    <h4>{{ tipsTitle }}</h4>
+    <ul class="tips-list">
+      @for (tip of photoTips; track tip) {
+        <li>{{ tip }}</li>
+      }
+    </ul>
+  </div>
+</ion-card>
