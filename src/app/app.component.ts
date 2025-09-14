@@ -1,5 +1,8 @@
 import { AfterViewInit, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+
+import { Subscription } from 'rxjs';
+
 import {
   IonApp,
   IonSplitPane,
@@ -15,15 +18,15 @@ import {
   IonRouterOutlet,
   IonRouterLink,
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { UsedIcons } from './shared/core/icons/used-icons';
-import { MenuData } from './shared/core/menu/menu.data';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
-import { TranslateConfigService } from './services/translation/translation.service';
-import { ApiService } from './shared/services/api/api.service';
+import { addIcons } from 'ionicons';
+
 import { AuthService } from './auth/service/auth.service';
 import { IMenuOptions } from './models/global.interface';
+import { TranslateConfigService } from './services/translation/translation.service';
+import { UsedIcons } from './shared/core/icons/used-icons';
+import { MenuData } from './shared/core/menu/menu.data';
+import { ApiService } from './shared/services/api/api.service';
 
 @Component({
   selector: 'app-root',

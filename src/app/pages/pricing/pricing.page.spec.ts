@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { PricingPage } from './pricing.page';
 
 describe('PricingPage', () => {

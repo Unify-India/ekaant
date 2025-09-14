@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+
 import {
   IonCard,
   IonCardHeader,
@@ -10,14 +12,14 @@ import {
   IonRow,
   IonGrid,
 } from '@ionic/angular/standalone';
-import { alertCircleOutline, calendarOutline, locationOutline } from 'ionicons/icons';
-import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { addIcons } from 'ionicons';
-import { FooterPage } from '../footer/footer.page';
-import { FeedbackPage } from '../feedback/feedback.page';
-import { LandingScreenComponent } from './landing-screen/landing-screen.component';
+import { alertCircleOutline, calendarOutline, locationOutline } from 'ionicons/icons';
 import { AdminRoutingModule } from 'src/app/admin/admin-routing.module';
-import { RouterLink } from '@angular/router';
+import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
+
+import { FeedbackPage } from '../feedback/feedback.page';
+import { FooterPage } from '../footer/footer.page';
+import { LandingScreenComponent } from './landing-screen/landing-screen.component';
 
 @Component({
   selector: 'app-home',

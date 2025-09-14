@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { MyBookingsPage } from './my-bookings.page';
 
 describe('MyBookingsPage', () => {

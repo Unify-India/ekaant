@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { PrivacyPolicyPage } from './privacy-policy.page';
 
 describe('PrivacyPolicyPage', () => {

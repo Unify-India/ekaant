@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../service/auth.service';
-import { arrowForward, logoFacebook, logoGoogle } from 'ionicons/icons';
+
+import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
+import { arrowForward, logoFacebook, logoGoogle } from 'ionicons/icons';
+
+import { AuthService } from '../service/auth.service';
 
 @Component({
   selector: 'app-login',

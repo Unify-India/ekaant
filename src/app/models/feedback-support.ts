@@ -1,9 +1,9 @@
 export interface FeedbackSupport {}
 
 export interface Testimonial {
-  name: string;
-  role: string;
   avatar: string;
   feedback: string;
+  name: string;
+  role: string;
   stars: number;
 }

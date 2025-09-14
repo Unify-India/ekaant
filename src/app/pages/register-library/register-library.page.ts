@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AdminRoutingModule } from 'src/app/admin/admin-routing.module';
-import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
+
 import { addIcons } from 'ionicons';
 import {
   businessOutline,
@@ -15,6 +14,8 @@ import {
   arrowForward,
   sparklesOutline,
 } from 'ionicons/icons';
+import { AdminRoutingModule } from 'src/app/admin/admin-routing.module';
+import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
 
 @Component({

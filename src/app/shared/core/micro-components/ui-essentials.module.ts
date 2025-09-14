@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+
 import {
   IonInput,
   IonCard,
@@ -14,6 +15,7 @@ import {
   IonList,
   IonLabel,
   IonImg,
+  IonNote,
   IonSegment,
   IonSegmentButton,
 } from '@ionic/angular/standalone';
@@ -37,6 +39,7 @@ import {
     IonCardTitle,
     IonCardHeader,
     IonSegment,
+    IonNote,
     IonSegmentButton,
   ],
   exports: [
@@ -55,6 +58,7 @@ import {
     IonCardSubtitle,
     IonCardTitle,
     IonCardHeader,
+    IonNote,
     IonSegment,
     IonSegmentButton,
   ],

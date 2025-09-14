@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { CompleteProfilePage } from './complete-profile.page';
 
 describe('CompleteProfilePage', () => {

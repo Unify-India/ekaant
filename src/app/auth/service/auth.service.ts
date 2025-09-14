@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
+
+import { BehaviorSubject } from 'rxjs';
+
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { getDatabase, ref, set, get } from 'firebase/database';
 import { ToasterService } from 'src/app/services/toaster/toaster.service';

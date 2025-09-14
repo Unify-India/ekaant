@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { Functions, httpsCallable } from '@angular/fire/functions';
 import { getDatabase, ref, get, push, set, connectDatabaseEmulator } from '@angular/fire/database';
+import { Functions, httpsCallable } from '@angular/fire/functions';
+
 import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
