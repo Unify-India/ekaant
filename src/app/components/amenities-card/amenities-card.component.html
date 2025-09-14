@@ -1,0 +1,14 @@
+<div class="amenities-card ion-padding" [class]="amenity.isAvailable ? 'success' : 'medium'">
+  <div class="amenity-icon">
+    <ion-icon [name]="amenity.icon" [color]="amenity.isAvailable ? 'success' : 'medium'"></ion-icon>
+  </div>
+  <div class="amenity-label">
+    {{ amenity.amenityName }}
+  </div>
+  <div class="amenity-status">
+    <ion-icon
+      [name]="amenity.isAvailable ? 'checkmark-circle-outline' : 'close-circle-outline'"
+      [color]="amenity.isAvailable ? 'success' : 'medium'"
+    ></ion-icon>
+  </div>
+</div>
