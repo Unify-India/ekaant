@@ -5,10 +5,8 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './quick-action.component.html',
   styleUrls: ['./quick-action.component.scss'],
 })
-export class QuickActionComponent  implements OnInit {
-
-  constructor() { }
+export class QuickActionComponent implements OnInit {
+  constructor() {}
 
   ngOnInit() {}
-
 }

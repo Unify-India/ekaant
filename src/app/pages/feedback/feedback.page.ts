@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-import { IonAvatar, IonIcon, IonCardContent, IonGrid, IonRow, IonCol, IonCard } from '@ionic/angular/standalone';
+import { IonIcon, IonCardContent, IonGrid, IonRow, IonCol, IonCard } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { star } from 'ionicons/icons';
 import { Testimonial } from 'src/app/models/feedback-support';

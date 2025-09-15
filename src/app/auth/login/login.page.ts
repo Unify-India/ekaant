@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowForward, logoFacebook, logoGoogle } from 'ionicons/icons';
@@ -44,7 +43,10 @@ export class LoginPage implements OnInit {
     console.log('Facebook login');
   }
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {
     addIcons(this.icons);
   }
 

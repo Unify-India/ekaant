@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-
 import { IonicModule } from '@ionic/angular';
 
 import { QuickActionComponent } from './quick-action.component';
@@ -10,8 +9,8 @@ describe('QuickActionComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ QuickActionComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [QuickActionComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(QuickActionComponent);

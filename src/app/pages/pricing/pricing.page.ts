@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { IonContent, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/angular/standalone';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 

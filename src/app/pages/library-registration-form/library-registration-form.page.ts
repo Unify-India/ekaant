@@ -1,7 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-
+import { Router } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -14,10 +14,7 @@ import {
   IonProgressBar,
   IonAlert,
 } from '@ionic/angular/standalone';
-
-import { BasicInformationComponent } from './components/basic-information/basic-information.component';
-import { HostProfileComponent } from './components/host-profile/host-profile.component';
-import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
+import type { OverlayEventDetail } from '@ionic/core';
 import { addIcons } from 'ionicons';
 import {
   eyeOutline,
@@ -34,17 +31,18 @@ import {
   chevronForward,
   chevronBack,
 } from 'ionicons/icons';
+import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
+
 import { AmenitiesComponent } from './components/amenities/amenities.component';
+import { BasicInformationComponent } from './components/basic-information/basic-information.component';
 import { BookCollectionComponent } from './components/book-collection/book-collection.component';
+import { CodeOfConductComponent } from './components/code-of-conduct/code-of-conduct.component';
+import { HostProfileComponent } from './components/host-profile/host-profile.component';
 import { LibraryImagesComponent } from './components/library-images/library-images.component';
 import { PreviewComponent } from './components/preview/preview.component';
-import { SeatManagementComponent } from './components/seat-management/seat-management.component';
 import { PricingPlansComponent } from './components/pricing-plans/pricing-plans.component';
-import { CodeOfConductComponent } from './components/code-of-conduct/code-of-conduct.component';
 import { RequirementsComponent } from './components/requirements/requirements.component';
-
-import type { OverlayEventDetail } from '@ionic/core';
-import { Router } from '@angular/router';
+import { SeatManagementComponent } from './components/seat-management/seat-management.component';
 import { LibraryRegistrationFormService } from './service/library-registration-form.service';
 
 @Component({

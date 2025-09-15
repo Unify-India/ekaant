@@ -7,13 +7,14 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [provideRouter([])]
+      providers: [provideRouter([])],
     }).compileComponents();
   });
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
+
     expect(app).toBeTruthy();
   });
 
@@ -22,6 +23,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const app = fixture.nativeElement;
     const menuItems = app.querySelectorAll('ion-label');
+
     expect(menuItems.length).toEqual(12);
     expect(menuItems[0].textContent).toContain('Inbox');
     expect(menuItems[1].textContent).toContain('Outbox');
@@ -32,12 +34,10 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const app = fixture.nativeElement;
     const menuItems = app.querySelectorAll('ion-item');
+
     expect(menuItems.length).toEqual(12);
-    expect(menuItems[0].getAttribute('href')).toEqual(
-      '/folder/inbox'
-    );
-    expect(menuItems[1].getAttribute('href')).toEqual(
-      '/folder/outbox'
-    );
+    expect(menuItems[0].getAttribute('href')).toEqual('/folder/inbox');
+
+    expect(menuItems[1].getAttribute('href')).toEqual('/folder/outbox');
   });
 });

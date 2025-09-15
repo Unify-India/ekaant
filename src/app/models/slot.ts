@@ -1,2 +1,1 @@
-export interface Slot {
-}
+export interface Slot {}

@@ -1,2 +1,1 @@
-export interface LibraryManager {
-}
+export interface LibraryManager {}

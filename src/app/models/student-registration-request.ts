@@ -1,2 +1,1 @@
-export interface StudentRegistrationRequest {
-}
+export interface StudentRegistrationRequest {}

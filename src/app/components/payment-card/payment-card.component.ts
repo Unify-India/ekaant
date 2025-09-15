@@ -5,10 +5,8 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './payment-card.component.html',
   styleUrls: ['./payment-card.component.scss'],
 })
-export class PaymentCardComponent  implements OnInit {
-
-  constructor() { }
+export class PaymentCardComponent implements OnInit {
+  constructor() {}
 
   ngOnInit() {}
-
 }

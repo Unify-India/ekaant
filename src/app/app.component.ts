@@ -1,8 +1,5 @@
 import { AfterViewInit, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-
-import { Subscription } from 'rxjs';
-
 import {
   IonApp,
   IonSplitPane,
@@ -20,6 +17,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
+import { Subscription } from 'rxjs';
 
 import { AuthService } from './auth/service/auth.service';
 import { IMenuOptions } from './models/global.interface';

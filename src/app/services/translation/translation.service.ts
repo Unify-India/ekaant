@@ -1,12 +1,14 @@
 // src/app/translate.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({ providedIn: 'root' })
 export class TranslateConfigService {
-  constructor(private translate: TranslateService, private http: HttpClient) {
+  constructor(
+    private translate: TranslateService,
+    private http: HttpClient,
+  ) {
     this.initTranslate();
   }
 
