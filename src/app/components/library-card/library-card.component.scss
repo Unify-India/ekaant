@@ -5,27 +5,23 @@
   border-radius: 0.5rem;
   min-width: 24%;
   margin: 0;
-  .status-badge {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-  }
+
   ion-card-header {
-    position: relative;
+    padding-top: 0;
   }
   ion-card-title {
-    margin: 1.2rem 0;
+    margin: 0.5rem 0;
     font-size: 1.2rem;
   }
   ion-card-content {
-    flex-grow: 1; // Pushes footer down
+    flex-grow: 1;
     display: flex;
     align-items: flex-start;
     font-size: 0.9rem;
   }
 
   .card-footer {
-    margin-top: auto; // Forces footer to bottom
+    margin-top: auto;
     padding: 0.5rem 1rem 1rem;
   }
 
@@ -38,7 +34,7 @@
   }
 }
 ion-card-subtitle {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 ion-card-subtitle,
 .availability {
@@ -59,19 +55,28 @@ ion-card-subtitle,
     padding-bottom: 4px;
   }
 }
-.status-badge {
+.badge-container {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  padding: 0.25rem;
+}
+.badge {
   display: inline-flex;
   align-items: center;
   font-size: 0.9rem;
   font-weight: 500;
   padding: 0.3rem 0.6rem;
   border-radius: 2rem;
-  background-color: rgba(var(--ion-color-success-rgb), 0.15);
-  color: var(--ion-color-success);
 
   &.full {
     background-color: rgba(var(--ion-color-danger-rgb), 0.15);
     color: var(--ion-color-danger);
+  }
+
+  &.available {
+    background-color: rgba(var(--ion-color-success-rgb), 0.15);
+    color: var(--ion-color-success);
   }
 
   .dot {
@@ -80,5 +85,18 @@ ion-card-subtitle,
     border-radius: 50%;
     margin-right: 0.4rem;
     background-color: currentColor;
+  }
+}
+
+.card-footer {
+  display: flex;
+  gap: 8px;
+
+  ion-button {
+    flex: 1;
+    margin: 0;
+    span {
+      padding-top: 2px;
+    }
   }
 }

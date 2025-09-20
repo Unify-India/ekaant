@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { IonButton, IonCardSubtitle, IonCardHeader, IonCard, IonCardTitle, IonBadge } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { pinOutline } from 'ionicons/icons';
+import { eyeOutline, pinOutline } from 'ionicons/icons';
+import { AdminRoutingModule } from 'src/app/admin/admin-routing.module';
 import { Library } from 'src/app/models/library';
 import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
 
@@ -10,12 +12,22 @@ import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials
   selector: 'app-library-card',
   templateUrl: './library-card.component.html',
   styleUrls: ['./library-card.component.scss'],
-  imports: [UiEssentials, CommonModule, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton],
+  imports: [
+    UiEssentials,
+    CommonModule,
+    IonCard,
+    IonCardHeader,
+    IonCardSubtitle,
+    IonCardTitle,
+    IonButton,
+    AdminRoutingModule,
+    RouterLink,
+  ],
 })
 export class LibraryCardComponent {
   @Input() library!: Library;
   constructor() {
-    addIcons({ pinOutline });
+    addIcons({ pinOutline, eyeOutline });
   }
   /**
    * Emits when the bottom action button is pressed.
@@ -34,11 +46,31 @@ export class LibraryCardComponent {
   }
 
   get actionLabel(): string {
-    return this.library.isFull ? 'Apply to Waitlist' : 'Enroll / Register';
+    return this.library.isFull ? 'Waitlist' : 'Enroll';
   }
 
   get actionColor(): string {
     return this.library.isFull ? 'danger' : 'primary';
+  }
+
+  get getLibraryTypeClass(): string {
+    let classes = '';
+    switch (this.library.type) {
+      case 'co-ed':
+        classes = 'bg-purple-100 text-purple-800';
+        break;
+      case 'boys only':
+        classes = 'bg-blue-100 text-blue-800';
+        break;
+      case 'girls only':
+        classes = 'bg-pink-100 text-pink-800';
+        break;
+
+      default:
+        classes = '';
+        break;
+    }
+    return classes;
   }
 
   /** called from template when user clicks the button */

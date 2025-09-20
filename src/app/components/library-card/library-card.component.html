@@ -1,8 +1,14 @@
 <ion-card class="library-card">
-  <div class="status-badge" [ngClass]="library.isFull ? 'full' : 'available'">
-    <span class="dot"></span>
-    {{ library.isFull ? 'Full' : 'Available' }}
+  <div class="badge-container">
+    <div class="badge" [ngClass]="getLibraryTypeClass">
+      {{ library.type }}
+    </div>
+    <div class="badge" [ngClass]="library.isFull ? 'full' : 'available'">
+      <span class="dot"></span>
+      {{ library.isFull ? 'Full' : 'Available' }}
+    </div>
   </div>
+
   <ion-card-header>
     <ion-card-title>
       {{ library.name }}
@@ -21,8 +27,12 @@
   </ion-card-content>
 
   <div class="card-footer">
-    <ion-button expand="block" [color]="actionColor" (click)="onActionClick()">
-      {{ actionLabel }}
+    <ion-button color="medium" routerLink="/library-details">
+      <span>View</span>
+      <ion-icon slot="start" name="eye-outline"></ion-icon>
+    </ion-button>
+    <ion-button [color]="actionColor" (click)="onActionClick()">
+      <span>{{ actionLabel }}</span>
       <ion-icon slot="end" [name]="library.isFull ? 'notifications-outline' : 'arrow-forward'"></ion-icon>
     </ion-button>
   </div>
