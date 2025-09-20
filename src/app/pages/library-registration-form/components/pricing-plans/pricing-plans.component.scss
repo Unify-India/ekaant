@@ -1,0 +1,83 @@
+.options-container {
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 12px;
+  background-color: var(--ion-color-light);
+  padding: 1rem;
+}
+
+.options-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--ion-color-medium);
+  ion-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.plan-display-card,
+.plan-edit-form {
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden; // Ensures children conform to border-radius
+}
+
+.plan-display-card {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background-color: var(--ion-color-light-tint);
+
+  .plan-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .detail-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .plan-type {
+      background-color: #e9efff;
+      color: var(--ion-color-primary);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: 500;
+    }
+    .plan-rate {
+      font-weight: 600;
+    }
+  }
+
+  ion-buttons {
+    display: flex;
+    gap: 4px;
+  }
+}
+
+.plan-edit-form {
+  padding: 1.5rem;
+  background-color: #fafbff;
+
+  ion-item {
+    --background: var(--ion-color-light);
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 1rem;
+  }
+}

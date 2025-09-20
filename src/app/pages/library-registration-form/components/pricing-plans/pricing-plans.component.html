@@ -1,3 +1,108 @@
-<p>
-  pricing-plans works!
-</p>
+<ion-card class="registration-section-card">
+  <h2 class="section-title">{{ pageTitle }}</h2>
+  <p class="section-subtitle">{{ subTitle }}</p>
+
+  @if (pricingPlansForm.invalid && pricingPlansForm.touched) {
+    <div class="glass-box warning-glass-box">
+      <ion-icon name="warning-outline" color="warning"></ion-icon>
+      <ion-note color="warning">{{ completionWarning }}</ion-note>
+    </div>
+  }
+
+  <form [formGroup]="pricingPlansForm">
+    <div class="options-container">
+      <div class="options-header">
+        <div>
+          <h4>{{ optionsTitle }}</h4>
+          <ion-note>{{ optionsDescription }}</ion-note>
+        </div>
+        <ion-button (click)="addPlan()" [disabled]="editingIndex() !== null">
+          <ion-icon slot="start" name="add-outline"></ion-icon>
+          {{ addPlanButtonText }}
+        </ion-button>
+      </div>
+
+      <div [formArrayName]="'pricingPlans'">
+        @if (pricingPlans.controls.length > 0) {
+          @for (plan of pricingPlans.controls; track $index) {
+            <div [formGroupName]="$index">
+              @if (editingIndex() === $index) {
+                <div class="plan-edit-form">
+                  <ion-item fill="outline">
+                    <ion-label position="stacked">Plan Type</ion-label>
+                    <ion-select formControlName="planType" placeholder="Select Type">
+                      @for (type of planTypes; track type) {
+                        <ion-select-option [value]="type">{{ type }}</ion-select-option>
+                      }
+                    </ion-select>
+                  </ion-item>
+                  <ion-item fill="outline" class="ion-margin-top">
+                    <ion-label position="stacked">Time Slot</ion-label>
+                    <ion-select formControlName="timeSlot" placeholder="Select Slot">
+                      @for (slot of timeSlots; track slot) {
+                        <ion-select-option [value]="slot">{{ slot }}</ion-select-option>
+                      }
+                    </ion-select>
+                  </ion-item>
+                  <ion-item fill="outline" class="ion-margin-top">
+                    <ion-label position="stacked">Rate (₹)</ion-label>
+                    <ion-input formControlName="rate" type="number" placeholder="0"></ion-input>
+                  </ion-item>
+                  <ion-item fill="outline" class="ion-margin-top">
+                    <ion-label position="stacked">Description (Optional)</ion-label>
+                    <ion-textarea
+                      formControlName="description"
+                      [autoGrow]="true"
+                      placeholder="Add any additional details..."
+                    ></ion-textarea>
+                  </ion-item>
+                  <div class="form-actions">
+                    <ion-button (click)="savePlan($index)" color="success">
+                      <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+                      Save
+                    </ion-button>
+                    <ion-button (click)="removePlan($index)" color="danger" fill="outline">
+                      <ion-icon slot="start" name="close-outline"></ion-icon>
+                      Remove
+                    </ion-button>
+                  </div>
+                </div>
+              } @else {
+                <div class="plan-display-card">
+                  <div class="plan-details">
+                    <div class="detail-row">
+                      <ion-icon name="time-outline" color="primary"></ion-icon>
+                      <span>{{ plan.value.timeSlot }}</span>
+                      <span class="plan-type">{{ plan.value.planType }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <ion-icon name="cash-outline"></ion-icon>
+                      <span class="plan-rate">₹ {{ plan.value.rate }}</span>
+                    </div>
+                    @if (plan.value.description) {
+                      <ion-note>{{ plan.value.description }}</ion-note>
+                    }
+                  </div>
+                  <ion-buttons>
+                    <ion-button fill="clear" color="medium" (click)="editPlan($index)">
+                      <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                    </ion-button>
+                    <ion-button fill="clear" color="danger" (click)="removePlan($index)">
+                      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+                    </ion-button>
+                  </ion-buttons>
+                </div>
+              }
+            </div>
+          }
+        } @else {
+          <div class="empty-state">
+            <ion-icon name="time-outline"></ion-icon>
+            <h4>{{ emptyStateText }}</h4>
+            <ion-note>{{ emptyStateSubText }}</ion-note>
+          </div>
+        }
+      </div>
+    </div>
+  </form>
+</ion-card>
