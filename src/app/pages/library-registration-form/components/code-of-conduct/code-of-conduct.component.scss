@@ -1,0 +1,55 @@
+.editor-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+// Overriding Quill's default styles to match the Ionic look
+quill-editor {
+  display: block;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 8px;
+  overflow: hidden; // To contain the rounded corners
+
+  .ql-toolbar {
+    background-color: var(--ion-color-light-tint);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom: 1px solid var(--ion-color-light-shade) !important; // Use !important to override inline styles if needed
+  }
+  .ql-container {
+    height: 250px; // Set a default height
+    font-size: 1rem;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+}
+
+.preview-container {
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 8px;
+  min-height: 250px;
+  padding: 12px 15px; // Matches Quill's internal padding
+  background: var(--ion-color-light);
+
+  // Basic styling for content rendered from the editor
+  h1,
+  h2,
+  h3 {
+    margin-top: 0;
+  }
+  ul,
+  ol {
+    padding-left: 20px;
+  }
+}
+
+.important-note {
+  background-color: #fff9e6; // A light yellow
+  border: 1px solid #ffe399; // A soft orange border
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}

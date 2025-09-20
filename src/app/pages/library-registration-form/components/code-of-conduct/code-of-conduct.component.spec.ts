@@ -9,8 +9,8 @@ describe('CodeOfConductComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CodeOfConductComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [CodeOfConductComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CodeOfConductComponent);

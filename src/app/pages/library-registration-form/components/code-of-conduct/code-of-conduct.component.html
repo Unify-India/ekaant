@@ -1,3 +1,40 @@
-<p>
-  code-of-conduct works!
-</p>
+<ion-card class="registration-section-card">
+  <h2 class="section-title">{{ pageTitle }}</h2>
+  <p class="section-subtitle">{{ subTitle }}</p>
+
+  <h3 class="ion-margin-top">{{ sectionDescription }}</h3>
+
+  <form [formGroup]="conductForm">
+    <div class="editor-label">
+      <ion-label>{{ editorLabel }}</ion-label>
+      @if (isEditing()) {
+        <ion-button fill="clear" (click)="togglePreview(false)">
+          <ion-icon slot="start" name="eye-outline"></ion-icon>
+          Preview
+        </ion-button>
+      } @else {
+        <ion-button fill="clear" (click)="togglePreview(true)">
+          <ion-icon slot="start" name="create-outline"></ion-icon>
+          Edit
+        </ion-button>
+      }
+    </div>
+
+    @if (isEditing()) {
+      <div>
+        <quill-editor
+          formControlName="conductText"
+          [modules]="quillConfig"
+          placeholder="Start writing your library's rules here..."
+        ></quill-editor>
+        <ion-note>{{ helperText }}</ion-note>
+      </div>
+    } @else {
+      <div class="preview-container" [innerHTML]="conductForm.get('conductText')?.value"></div>
+    }
+  </form>
+
+  <div class="important-note">
+    <ion-note>{{ importantNote }}</ion-note>
+  </div>
+</ion-card>
