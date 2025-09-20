@@ -1,3 +1,85 @@
-<p>
-  requirements works!
-</p>
+<ion-card class="registration-section-card">
+  <h2 class="section-title">{{ pageTitle }}</h2>
+  <p class="section-subtitle">{{ subTitle }}</p>
+
+  @if (requirementsForm.invalid && requirementsForm.touched) {
+    <div class="glass-box warning-glass-box">
+      <ion-icon name="warning-outline" color="warning"></ion-icon>
+      <ion-note color="warning">{{ completionWarning }}</ion-note>
+    </div>
+  }
+
+  <form [formGroup]="requirementsForm">
+    <h3>{{ commonTitle }}</h3>
+    <div class="common-requirements-grid">
+      @for (req of availableRequirements(); track req) {
+        <ion-chip class="requirement-chip" (click)="addCommonRequirement(req)">
+          <ion-icon name="add-outline"></ion-icon>
+          <ion-label>{{ req }}</ion-label>
+        </ion-chip>
+      }
+    </div>
+    <ion-button (click)="addCustomRequirement()">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      {{ addCustomButtonText }}
+    </ion-button>
+
+    <h3 class="ion-margin-top">{{ selectedTitle }}</h3>
+
+    <div [formArrayName]="'selectedRequirements'">
+      @if (selectedRequirements.controls.length > 0) {
+        @for (control of selectedRequirements.controls; track $index) {
+          <div class="selected-requirement-item" [formGroupName]="$index">
+            <ion-item lines="none" class="item-header">
+              <ion-label>Requirement {{ $index + 1 }}</ion-label>
+              <ion-button fill="clear" color="danger" (click)="removeRequirement($index)">
+                <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+
+            <div class="item-body">
+              @if (control.get('isCustom')?.value) {
+                <ion-textarea
+                  formControlName="description"
+                  placeholder="Enter requirement details..."
+                  [autoGrow]="true"
+                ></ion-textarea>
+              } @else {
+                <p>{{ control.get('description')?.value }}</p>
+              }
+
+              <ion-item lines="none">
+                <ion-checkbox formControlName="attachSample" labelPlacement="end">
+                  Attach sample document or form
+                </ion-checkbox>
+              </ion-item>
+
+              @if (control.get('attachSample')?.value) {
+                <input type="file" hidden #fileInput (change)="onFileSelected($event, $index)" />
+                <div class="upload-box" (click)="triggerFileInput(fileInput)">
+                  @if (control.get('sampleFile')?.value; as file) {
+                    <ion-icon name="checkmark-circle" color="success"></ion-icon>
+                    <p>{{ file.name }}</p>
+                  } @else {
+                    <ion-icon name="document-attach-outline"></ion-icon>
+                    <p>Click to upload document</p>
+                    <ion-note color="medium">PDF, DOC, or Image files up to 10MB</ion-note>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="empty-state">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <p>{{ emptyStateText }}</p>
+        </div>
+      }
+    </div>
+  </form>
+
+  <div class="ion-padding-start ion-padding-end">
+    <ion-note class="info-note">{{ note }}</ion-note>
+  </div>
+</ion-card>
