@@ -1,0 +1,12 @@
+<div class="ion-margin">
+  @for (item of requirements; track $index) {
+    <div class="requirement-item">
+      <div>
+        <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+      </div>
+      <div>
+        <span>{{ item }}</span>
+      </div>
+    </div>
+  }
+</div>
