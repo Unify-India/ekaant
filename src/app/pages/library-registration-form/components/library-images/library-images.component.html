@@ -20,8 +20,7 @@
     <!-- File Upload Area -->
     <div class="section-header">
       <h4>{{ uploadAreaTitle }}</h4>
-      <!-- <ion-note color="medium">{{ libraryPhotosArray.length }} / {{ maxImages }} Images</ion-note> -->
-      <ion-note color="medium">0 / 10 Images</ion-note>
+      <ion-note color="medium">{{ libraryPhotosArray.length }} / {{ maxImages }} Images</ion-note>
     </div>
 
     <input
@@ -33,11 +32,32 @@
       accept="image/png, image/jpeg, image/webp"
     />
 
-    <div class="upload-area" (click)="triggerFileUpload(fileInput)">
-      <ion-icon name="image-outline"></ion-icon>
-      <p>{{ uploadAreaHint }}</p>
-      <ion-note color="medium">{{ uploadAreaConstraints }}</ion-note>
-    </div>
+    @if (libraryPhotosArray.length < maxImages) {
+      <div class="upload-area" (click)="triggerFileUpload(fileInput)">
+        <ion-icon name="image-outline"></ion-icon>
+        <p>{{ uploadAreaHint }}</p>
+        <ion-note color="medium">{{ uploadAreaConstraints }}</ion-note>
+      </div>
+    }
+
+    @if (libraryPhotosArray.controls.length > 0) {
+      <ion-grid class="preview-grid ion-margin-top">
+        <ion-row>
+          @for (photoControl of libraryPhotosArray.controls; track $index) {
+            <ion-col size="6" size-md="4" size-lg="3">
+              <div class="image-preview-wrapper">
+                <ion-img [src]="photoControl.get('previewUrl')?.value"></ion-img>
+                <ion-fab vertical="top" horizontal="end" slot="fixed">
+                  <ion-fab-button (click)="removePhoto($index)" color="danger" size="small">
+                    <ion-icon name="close-circle"></ion-icon>
+                  </ion-fab-button>
+                </ion-fab>
+              </div>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    }
   </form>
 
   <div class="glass-box primary-glass-box ion-margin-top ion-flex-column ion-padding">

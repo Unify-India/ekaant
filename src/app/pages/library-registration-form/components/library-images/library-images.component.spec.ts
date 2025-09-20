@@ -9,8 +9,8 @@ describe('LibraryImagesComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LibraryImagesComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [LibraryImagesComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LibraryImagesComponent);
