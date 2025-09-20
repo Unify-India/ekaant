@@ -9,8 +9,8 @@ describe('CubicleCardComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CubicleCardComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [CubicleCardComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CubicleCardComponent);

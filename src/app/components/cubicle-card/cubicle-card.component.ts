@@ -5,10 +5,8 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './cubicle-card.component.html',
   styleUrls: ['./cubicle-card.component.scss'],
 })
-export class CubicleCardComponent  implements OnInit {
-
-  constructor() { }
+export class CubicleCardComponent implements OnInit {
+  constructor() {}
 
   ngOnInit() {}
-
 }

@@ -5,10 +5,8 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './image-uploader.component.html',
   styleUrls: ['./image-uploader.component.scss'],
 })
-export class ImageUploaderComponent  implements OnInit {
-
-  constructor() { }
+export class ImageUploaderComponent implements OnInit {
+  constructor() {}
 
   ngOnInit() {}
-
 }
