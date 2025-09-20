@@ -1,3 +1,283 @@
-<p>
-  preview works!
-</p>
+<div class="ion-text-center">
+  <h2>{{ pageTitle }}</h2>
+  <p>{{ pageDescription }}</p>
+</div>
+
+<!-- Basic Information -->
+@if (getSectionAsFormGroup('basicInformation'); as section) {
+  <div class="preview-section" [formGroup]="section">
+    <div class="section-header">
+      <h4>
+        Basic Information
+        <ion-icon
+          [name]="section.valid ? 'checkmark-circle' : 'warning'"
+          [color]="section.valid ? 'success' : 'warning'"
+        ></ion-icon>
+      </h4>
+      <ion-button fill="clear" (click)="navigateToSection(0)">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+    </div>
+    <div class="section-content">
+      <h3>{{ section.value.libraryName }}</h3>
+      <p>{{ section.value.fullAddress }}</p>
+      <ion-chip>{{ section.value.genderCategory }}</ion-chip>
+      <ion-chip>{{ section.value.operatingHours }}</ion-chip>
+    </div>
+  </div>
+}
+@if (getSectionAsFormGroup('libraryImages'); as section) {
+  <div class="preview-section" [formGroup]="section">
+    <div class="section-header">
+      <h4>
+        Library Images
+        <ion-icon
+          [name]="section.valid ? 'checkmark-circle' : 'warning'"
+          [color]="section.valid ? 'success' : 'warning'"
+        ></ion-icon>
+      </h4>
+      <ion-button fill="clear" (click)="navigateToSection(1)">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+    </div>
+    <div class="section-content">
+      <ion-grid class="preview-grid">
+        <ion-row>
+          @for (photo of asFormArray(section.get('libraryPhotos')).controls; track $index) {
+            <ion-col size="6" size-md="4">
+              <div class="image-preview-wrapper">
+                <ion-img [src]="photo.get('previewUrl')?.value"></ion-img>
+              </div>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    </div>
+  </div>
+}
+@if (getSectionAsFormGroup('hostProfile'); as section) {
+  <div class="preview-section" [formGroup]="section">
+    <div class="section-header">
+      <h4>
+        Meet the Host
+        <ion-icon
+          [name]="section.valid ? 'checkmark-circle' : 'warning'"
+          [color]="section.valid ? 'success' : 'warning'"
+        ></ion-icon>
+      </h4>
+      <ion-button fill="clear" (click)="navigateToSection(1)">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+    </div>
+    <div class="section-content">
+      <h4>{{ section.value.fullName }}</h4>
+      <p>{{ section.value.visionStatement }}</p>
+      @if (!section.value.maskPhoneNumber) {
+        <p>
+          <strong>Phone:</strong>
+          {{ section.value.phoneNumber }}
+        </p>
+      }
+      @if (!section.value.maskEmail) {
+        <p>
+          <strong>Email:</strong>
+          {{ section.value.email }}
+        </p>
+      }
+    </div>
+  </div>
+}
+
+@if (getSectionAsFormGroup('seatManagement'); as section) {
+  <div class="preview-section" [formGroup]="section">
+    <div class="section-header">
+      <h4>
+        Seating Arrangement
+        <ion-icon
+          [name]="section.valid ? 'checkmark-circle' : 'warning'"
+          [color]="section.valid ? 'success' : 'warning'"
+        ></ion-icon>
+      </h4>
+      <ion-button fill="clear" (click)="navigateToSection(2)">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+    </div>
+    <div class="section-content">
+      <h4>{{ section.value.totalSeats }} Total Seats</h4>
+      <h5>Facility Ranges:</h5>
+      <ul>
+        @for (range of section.value.facilityRanges; track $index) {
+          <li>Seats {{ range.from }}-{{ range.to }}: {{ range.facility }}</li>
+        }
+      </ul>
+    </div>
+  </div>
+}
+
+@if (getSectionAsFormGroup('amenities'); as section) {
+  <div class="preview-section">
+    <div class="section-header">
+      <h4>
+        Facilities & Amenities
+        <ion-icon
+          [name]="section.valid ? 'checkmark-circle' : 'warning'"
+          [color]="section.valid ? 'success' : 'warning'"
+        ></ion-icon>
+      </h4>
+      <ion-button fill="clear" (click)="navigateToSection(3)">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+    </div>
+    <div class="section-content info-chip-grid">
+      @for (key of getTrueKeys('amenities'); track key) {
+        <div class="info-chip">
+          <ion-icon name="wifi-outline"></ion-icon>
+          <span>{{ amenitiesLabels[key] }}</span>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+@if (getSectionAsFormGroup('bookCollection'); as section) {
+  <div class="preview-section">
+    <div class="section-header">
+      <h4>
+        Book Collection
+        <ion-icon
+          [name]="section.valid ? 'checkmark-circle' : 'warning'"
+          [color]="section.valid ? 'success' : 'warning'"
+        ></ion-icon>
+      </h4>
+      <ion-button fill="clear" (click)="navigateToSection(4)">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+    </div>
+    <div class="section-content info-chip-grid">
+      @for (key of getTrueKeys('bookCollection'); track key) {
+        <div class="info-chip">
+          <ion-icon name="book-outline"></ion-icon>
+          <span>{{ bookCategoriesLabels[key] }}</span>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+@if (getSectionAsFormGroup('pricingPlans'); as section) {
+  <div class="preview-section" [formGroup]="section">
+    <div class="section-header">
+      <h4>
+        Pricing Plans
+        <ion-icon
+          [name]="section.valid ? 'checkmark-circle' : 'warning'"
+          [color]="section.valid ? 'success' : 'warning'"
+        ></ion-icon>
+      </h4>
+      <ion-button fill="clear" (click)="navigateToSection(5)">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+    </div>
+    <div class="section-content">
+      <ion-grid>
+        <ion-row>
+          @for (plan of section.value.pricingPlans; track $index) {
+            <ion-col size="12" size-md="6">
+              <ion-card class="pricing-card-grid">
+                <ion-card-header class="card-header">
+                  <span>{{ plan.timeSlot }}</span>
+                  <span>₹{{ plan.rate }}</span>
+                </ion-card-header>
+                <ion-card-content>
+                  <div class="plan-type">{{ plan.planType }}</div>
+                  <p>{{ plan.description }}</p>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    </div>
+  </div>
+}
+
+@if (getSectionAsFormGroup('requirements'); as section) {
+  <div class="preview-section" [formGroup]="section">
+    <div class="section-header">
+      <h4>
+        Joining Requirements
+        <ion-icon
+          [name]="section.valid ? 'checkmark-circle' : 'warning'"
+          [color]="section.valid ? 'success' : 'warning'"
+        ></ion-icon>
+      </h4>
+      <ion-button fill="clear" (click)="navigateToSection(6)">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+    </div>
+    <div class="section-content">
+      @for (req of section.value.selectedRequirements; track $index) {
+        <div class="requirement-item">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <div>
+            <p>
+              <strong>{{ req.description }}</strong>
+            </p>
+            @if (req.sampleFile) {
+              <ion-note>Sample document: {{ req.sampleFile.name }}</ion-note>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+@if (getSectionAsFormGroup('codeOfConduct'); as section) {
+  <div class="preview-section" [formGroup]="section">
+    <div class="section-header">
+      <h4>
+        Code of Conduct
+        <ion-icon
+          [name]="section.valid ? 'checkmark-circle' : 'warning'"
+          [color]="section.valid ? 'success' : 'warning'"
+        ></ion-icon>
+      </h4>
+      <ion-button fill="clear" (click)="navigateToSection(7)">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+    </div>
+    <div class="section-content" [innerHTML]="section.value.conductText"></div>
+  </div>
+}
+
+<!-- Registration Status -->
+<div class="preview-section">
+  <div class="section-header">
+    <h4>{{ registrationStatusTitle }}</h4>
+  </div>
+  <div class="section-content registration-status">
+    @for (step of lrfService.steps; track step.key) {
+      @if (getSection(step.key); as section) {
+        <div class="status-item">
+          <ion-icon
+            [name]="section.valid ? 'checkmark-circle' : 'warning'"
+            [color]="section.valid ? 'success' : 'warning'"
+          ></ion-icon>
+          <span>{{ step.label }}</span>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<ion-button expand="block" (click)="submitRegistration()" [disabled]="mainForm.invalid">Submit Registration</ion-button>
