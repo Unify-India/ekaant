@@ -1,3 +1,32 @@
-<p>
-  book-collection works!
-</p>
+<ion-card class="registration-section-card">
+  <h2 class="section-title">{{ pageTitle }}</h2>
+  <p class="section-subtitle">{{ sectionDescription }}</p>
+
+  @if (bookCollectionForm.invalid && bookCollectionForm.touched) {
+    <div class="ion-padding-start ion-padding-end glass-box warning-glass-box">
+      <ion-icon name="warning-outline" color="warning"></ion-icon>
+      <ion-note color="warning">{{ completionWarning }}</ion-note>
+    </div>
+  }
+
+  <form [formGroup]="bookCollectionForm">
+    <ion-grid>
+      <ion-row>
+        @for (category of bookCategories; track category.formControlName) {
+          <ion-col size="12" size-md="6">
+            <ion-item class="amenity-item" lines="none">
+              <ion-checkbox [formControlName]="category.formControlName" labelPlacement="end">
+                {{ category.label }}
+              </ion-checkbox>
+            </ion-item>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+
+    <div class="select-prompt">
+      <ion-icon name="book-outline"></ion-icon>
+      <ion-note>{{ selectPrompt }}</ion-note>
+    </div>
+  </form>
+</ion-card>
