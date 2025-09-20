@@ -1,3 +1,75 @@
-<p>
-  basic-information works!
-</p>
+<ion-card class="registration-section-card">
+  <h2 class="section-title">{{ pageTitle }}</h2>
+  <p class="section-subtitle">{{ sectionDescription }}</p>
+
+  @if (basicInfoForm.invalid && basicInfoForm.touched) {
+    <div class="ion-padding-start ion-padding-end glass-box warning-glass-box">
+      <ion-icon name="warning-outline" color="warning"></ion-icon>
+      <ion-note color="warning">
+        {{ completionWarning }}
+      </ion-note>
+    </div>
+  }
+  <form [formGroup]="basicInfoForm">
+    <ion-item lines="none">
+      <ion-label position="stacked">
+        {{ libraryNameLabel }}
+        <span class="required-star">*</span>
+      </ion-label>
+      <ion-input
+        [placeholder]="libraryNamePlaceholder"
+        formControlName="libraryName"
+        [class.ion-invalid]="libraryName?.invalid && libraryName?.touched"
+        errorText="{{ requiredFieldError }}"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="stacked">
+        {{ addressLabel }}
+        <span class="required-star">*</span>
+      </ion-label>
+      <ion-textarea
+        [placeholder]="addressPlaceholder"
+        formControlName="fullAddress"
+        [autoGrow]="true"
+        [class.ion-invalid]="fullAddress?.invalid && fullAddress?.touched"
+        errorText="{{ requiredFieldError }}"
+      ></ion-textarea>
+    </ion-item>
+
+    <ion-list>
+      <ion-radio-group formControlName="genderCategory">
+        <ion-list-header>
+          <ion-label>
+            {{ genderCategoryLabel }}
+            <span class="required-star">*</span>
+          </ion-label>
+        </ion-list-header>
+
+        @for (option of genderCategoryOptions; track option.value) {
+          <ion-item lines="none">
+            <ion-radio [value]="option.value">
+              <strong>{{ option.label }}</strong>
+              <p>{{ option.description }}</p>
+            </ion-radio>
+          </ion-item>
+        }
+      </ion-radio-group>
+    </ion-list>
+
+    <ion-item lines="none">
+      <ion-label position="stacked">
+        {{ operatingHoursLabel }}
+        <span class="required-star">*</span>
+      </ion-label>
+      <ion-input
+        [placeholder]="operatingHoursPlaceholder"
+        formControlName="operatingHours"
+        [class.ion-invalid]="operatingHours?.invalid && operatingHours?.touched"
+        errorText="{{ requiredFieldError }}"
+      ></ion-input>
+      <ion-note slot="helper">{{ operatingHoursHelper }}</ion-note>
+    </ion-item>
+  </form>
+</ion-card>
