@@ -1,0 +1,63 @@
+.price-card-container {
+  border-radius: 8px;
+  box-shadow: 0 0 2px 0 var(--ion-color-medium-tint);
+  margin-bottom: 16px;
+}
+
+ion-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 8px;
+}
+
+.header-content {
+  ion-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  ion-card-subtitle {
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+}
+
+.price-info {
+  text-align: right;
+  white-space: nowrap;
+  color: var(--ion-color-primary);
+  font-weight: bold;
+  font-size: 1rem;
+  margin-top: 0.25rem;
+}
+
+ion-card-content {
+  padding-top: 0;
+
+  ion-list {
+    padding: 0;
+  }
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    padding: 0;
+    font-size: 0.9rem;
+    max-height: 32px;
+    background-color: aqua;
+  }
+  ion-label {
+    // height: 20px;
+    padding: 0;
+  }
+
+  ion-icon {
+    margin-right: 8px;
+    font-size: 1.1rem;
+  }
+
+  .unavailable {
+    text-decoration: line-through;
+    color: #999;
+  }
+}

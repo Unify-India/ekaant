@@ -1,0 +1,33 @@
+<ion-card class="price-card-container">
+  <ion-card-header>
+    <div class="header-content">
+      <ion-card-title>{{ pricing.pricingName }}</ion-card-title>
+      <!-- Conditionally render timeRange only if it exists -->
+      @if (pricing.timeRange) {
+        <ion-card-subtitle>{{ pricing.timeRange }}</ion-card-subtitle>
+      }
+    </div>
+    <div class="price-info">
+      <span class="price">₹{{ pricing.price }}</span>
+      <span class="unit">/{{ pricing.unit }}</span>
+    </div>
+  </ion-card-header>
+
+  <ion-card-content>
+    <ion-list lines="none">
+      <!-- Loop through amenities -->
+      @for (amenity of pricing.amenities; track $index) {
+        <div class="ion-align-items-center ion-justify-content-start ion-flex">
+          <ion-icon
+            slot="start"
+            [name]="amenity.isAvailable ? 'checkmark-circle-outline' : 'close-circle-outline'"
+            [color]="amenity.isAvailable ? 'success' : 'danger'"
+          ></ion-icon>
+          <ion-label class="no-margin" [class.unavailable]="!amenity.isAvailable">
+            {{ amenity.amenityName }}
+          </ion-label>
+        </div>
+      }
+    </ion-list>
+  </ion-card-content>
+</ion-card>
