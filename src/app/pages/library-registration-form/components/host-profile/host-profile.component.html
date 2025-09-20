@@ -1,3 +1,89 @@
-<p>
-  host-profile works!
-</p>
+<ion-card class="registration-section-card">
+  <h2 class="section-title">{{ pageTitle }}</h2>
+  <p class="section-subtitle">{{ subTitle }}</p>
+
+  @if (hostProfileForm.invalid && hostProfileForm.touched) {
+    <div class="glass-box warning-glass-box">
+      <ion-icon name="warning-outline" color="warning"></ion-icon>
+      <ion-note color="warning">{{ completionWarning }}</ion-note>
+    </div>
+  }
+
+  <form [formGroup]="hostProfileForm">
+    <h3 class="ion-margin-top">Profile Photo</h3>
+    <input type="file" hidden #fileInput (change)="onFileSelected($event)" accept="image/*" />
+    <div class="upload-area" (click)="triggerFileInput(fileInput)">
+      @if (hostProfileForm.get('profilePhoto')?.value; as file) {
+        <p>✅ {{ file.name }} selected</p>
+      } @else {
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <p>Upload a professional photo of yourself or your library</p>
+      }
+    </div>
+
+    <ion-item class="ion-margin-top" fill="outline">
+      <ion-label position="stacked">Full Name *</ion-label>
+      <ion-input formControlName="fullName" placeholder="Enter your full name"></ion-input>
+    </ion-item>
+
+    <ion-item class="ion-margin-top" fill="outline">
+      <ion-label position="stacked">Vision Statement *</ion-label>
+      <ion-textarea
+        formControlName="visionStatement"
+        [autoGrow]="true"
+        placeholder="Share your vision for providing a great study environment..."
+      ></ion-textarea>
+    </ion-item>
+    <ion-note class="char-counter">{{ hostProfileForm.get('visionStatement')?.value?.length || 0 }} / 500</ion-note>
+
+    <ion-item class="ion-margin-top" fill="outline">
+      <ion-label position="stacked">Experience (Optional)</ion-label>
+      <ion-textarea
+        formControlName="experience"
+        [autoGrow]="true"
+        placeholder="Briefly describe your experience..."
+      ></ion-textarea>
+    </ion-item>
+    <ion-note class="char-counter">{{ hostProfileForm.get('experience')?.value?.length || 0 }} / 300</ion-note>
+
+    <h3 class="ion-margin-top">Contact Information</h3>
+
+    <ion-item fill="outline">
+      <ion-label position="stacked">Phone Number *</ion-label>
+      <ion-input formControlName="phoneNumber" type="tel" placeholder="+91 1234567890"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-checkbox formControlName="maskPhoneNumber" labelPlacement="end">Mask phone number for privacy</ion-checkbox>
+    </ion-item>
+    <ion-note class="ion-padding-start">
+      Students will see:
+      <strong>{{ maskedPhoneNumber() }}</strong>
+    </ion-note>
+
+    <ion-item class="ion-margin-top" fill="outline">
+      <ion-label position="stacked">Email Address *</ion-label>
+      <ion-input formControlName="email" type="email" placeholder="your.email@example.com"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-checkbox formControlName="maskEmail" labelPlacement="end">Mask email address for privacy</ion-checkbox>
+    </ion-item>
+    <ion-note class="ion-padding-start">
+      Students will see:
+      <strong>{{ maskedEmail() }}</strong>
+    </ion-note>
+
+    <ion-item class="ion-margin-top" fill="outline">
+      <ion-label position="stacked">Address (Optional)</ion-label>
+      <ion-textarea
+        formControlName="address"
+        [autoGrow]="true"
+        placeholder="Your address (this will be public)"
+      ></ion-textarea>
+    </ion-item>
+  </form>
+
+  <div class="privacy-note">
+    <ion-icon name="shield-checkmark-outline"></ion-icon>
+    <ion-note>{{ privacyNote }}</ion-note>
+  </div>
+</ion-card>

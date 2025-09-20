@@ -9,8 +9,8 @@ describe('HostProfileComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ HostProfileComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [HostProfileComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HostProfileComponent);
