@@ -1,0 +1,36 @@
+<!-- This component loops through the provided reviews array -->
+@for (review of reviews; track review.name + review.timestamp) {
+  <div class="review-item" lines="none">
+    <div class="review-content">
+      <div class="review-header">
+        <div class="user-info">
+          <h3>{{ review.name }}</h3>
+          @if (review.isVerified) {
+            <span>
+              <ion-icon name="checkmark-circle" color="primary"></ion-icon>
+              Verified member
+            </span>
+          }
+        </div>
+        <div class="rating-info">
+          <div class="stars">
+            @for (i of starArray; track i) {
+              <ion-icon [name]="i <= review.rating ? 'star' : 'star-outline'"></ion-icon>
+            }
+          </div>
+          <span>{{ review.timestamp }}</span>
+        </div>
+      </div>
+
+      <p class="review-comment">{{ review.comment }}</p>
+
+      @if (review.tags && review.tags.length > 0) {
+        <div class="review-tags">
+          @for (tag of review.tags; track tag.text) {
+            <ion-chip [color]="getTagTypeColor(tag.type)">{{ tag.text }}</ion-chip>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

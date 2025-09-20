@@ -1,0 +1,90 @@
+.review-item {
+  box-sizing: border-box;
+  margin: 0.8rem auto;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+.review-content {
+  border-left: 4px solid var(--ion-color-tertiary-shade);
+  padding: 1rem;
+  box-shadow: 0 0 1.5px var(--ion-color-medium-tint);
+  border-radius: 0.5rem;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+.rating-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ion-color-medium-shade);
+}
+
+.stars {
+  color: #ffc409;
+}
+
+.review-comment {
+  margin: 0 0 12px 0;
+  color: var(--ion-text-color);
+}
+
+.review-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  ion-chip {
+    &.ion-color-danger {
+      background-color: rgba(var(--ion-color-danger-rgb), 0.05);
+      color: var(--ion-color-danger-tint);
+    }
+  }
+}
+
+.tag-chip {
+  font-size: 0.8em;
+  height: 20px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+
+  &.positive {
+    --background: var(--ion-color-success-tint);
+    --color: var(--ion-color-success-shade);
+  }
+  &.negative {
+    --background: var(--ion-color-danger-tint);
+    --color: var(--ion-color-danger-shade);
+  }
+  &.neutral {
+    --background: var(--ion-color-medium-tint);
+    --color: var(--ion-color-medium-shade);
+  }
+}
+
+// Styling for the 'Verified Member' badge
+.verified-chip {
+  --background: var(--ion-color-tertiary-tint);
+  --color: var(--ion-color-tertiary-shade);
+  font-size: 0.75em;
+  height: 22px;
+}
