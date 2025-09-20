@@ -9,8 +9,8 @@ describe('SeatManagementComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SeatManagementComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [SeatManagementComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SeatManagementComponent);
