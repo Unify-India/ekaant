@@ -1,3 +1,32 @@
-<p>
-  amenities works!
-</p>
+<ion-card class="registration-section-card">
+  <h2 class="section-title">{{ pageTitle }}</h2>
+  <p class="section-subtitle">{{ sectionDescription }}</p>
+
+  @if (amenitiesForm.invalid && amenitiesForm.touched) {
+    <div class="ion-padding-start ion-padding-end glass-box warning-glass-box">
+      <ion-icon name="warning-outline" color="warning"></ion-icon>
+      <ion-note color="warning">{{ completionWarning }}</ion-note>
+    </div>
+  }
+
+  <form [formGroup]="amenitiesForm">
+    <ion-grid>
+      <ion-row>
+        @for (amenity of amenities; track amenity.formControlName) {
+          <ion-col size="12" size-md="6">
+            <ion-item class="amenity-item" lines="none">
+              <ion-checkbox [formControlName]="amenity.formControlName" labelPlacement="end">
+                {{ amenity.label }}
+              </ion-checkbox>
+            </ion-item>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+
+    <div class="select-prompt">
+      <ion-icon name="wifi-outline"></ion-icon>
+      <ion-note>{{ selectPrompt }}</ion-note>
+    </div>
+  </form>
+</ion-card>
