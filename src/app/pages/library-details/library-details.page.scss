@@ -1,0 +1,298 @@
+.details-container {
+  max-width: 960px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+
+  h2 {
+    margin-bottom: 1rem;
+  }
+}
+
+// Styling for the top overview card
+.overview-card {
+  --padding-start: 1.5rem;
+  --padding-end: 1.5rem;
+  --padding-top: 1.5rem;
+  --padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 1rem rgba(0, 0, 0, 0.08);
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid var(--ion-color-step-150);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    flex-grow: 1 1;
+  }
+
+  .secondary-header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    @media screen and (max-width: 560px) {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+  .info-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+}
+
+// Styling for the main Ratings & Reviews card
+.ratings-card {
+  --padding-start: 1.5rem;
+  --padding-end: 1.5rem;
+  --padding-top: 1rem;
+  --padding-bottom: 1.5rem;
+  box-shadow: 0 4px 1rem rgba(0, 0, 0, 0.08);
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.rating-summary {
+  .average {
+    font-size: 3rem;
+    font-weight: 600;
+  }
+  .stars {
+    color: #ffc409;
+    font-size: 1.2rem;
+  }
+}
+
+.rating-breakdown {
+  padding: 0.8rem;
+  .breakdown-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    span {
+      display: inline-flex;
+    }
+    ion-progress-bar {
+      height: 8px;
+      border-radius: 4px;
+    }
+  }
+}
+
+.most-mentioned {
+  padding: 0.8rem;
+  h4 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .aspect-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+    ion-chip {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.5rem;
+
+      &.ion-color-danger {
+        background-color: rgba(var(--ion-color-danger-rgb), 0.05);
+        color: var(--ion-color-danger-tint);
+      }
+      &.ion-color-success {
+        background-color: rgba(var(--ion-color-success-rgb), 0.02);
+        color: var(--ion-color-success);
+        box-shadow: 0 0 1px rgba(var(--ion-color-success-rgb));
+      }
+    }
+  }
+}
+
+// Utility class for info items
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ion-color-medium-shade);
+
+  ion-icon {
+    font-size: 1.5rem;
+    color: var(--ion-color-primary);
+  }
+}
+
+.book-category-grid {
+  display: grid;
+  gap: 1rem; // Adjust the spacing between cards
+
+  // Mobile (default): 1 column
+  grid-template-columns: 1fr;
+}
+
+// Small screens and up: 2 columns
+@media (min-width: 576px) {
+  .book-category-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// Large screens and up: 4 columns
+@media (min-width: 992px) {
+  .book-category-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// Ensure the ion-card inside the grid takes up the full space
+.book-category-grid ion-card {
+  margin: 0; // Override default card margins
+  width: 100%;
+}
+
+.pricing-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.section-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+// On larger screens, use a two-column layout
+@media (min-width: 768px) {
+  .pricing-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// Own CSS
+.enroll-action {
+  text-align: center;
+  color: white;
+  background-image: linear-gradient(to right, var(--ion-color-primary), var(--ion-color-tertiary));
+}
+
+.sub-section-heading {
+  text-align: center;
+  margin: auto;
+  color: var(--ion-color-dark-shade);
+  font-size: 1.2rem;
+}
+
+// .amenities-container {
+//   display: inline-flex;
+//   gap: 1rem;
+//   height: auto;
+//   flex-wrap: wrap;
+//   align-items: stretch;
+//   flex-basis: auto;
+// }
+// .amenity-blocks {
+//   position: relative;
+//   height: 100%;
+//   flex: 1;
+//   align-self: stretch;
+//   height: 100%;
+//   min-width: 130px;
+//   background-color: lightblue;
+// }
+
+// @media screen and (max-width: 768px) {
+//   .amenity-blocks {
+//     flex: 1 1 calc(50% - 0.5rem);
+//     box-sizing: border-box;
+//     height: 100%;
+//   }
+// }
+
+.amenities-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.amenity-blocks {
+  flex: 1;
+  min-width: 150px;
+  max-width: calc(25% - 1rem);
+  flex-basis: calc(25% - 1rem);
+  box-sizing: border-box;
+
+  display: flex;
+}
+
+.amenity-blocks app-amenities-card {
+  flex: 1;
+  height: 100%;
+}
+
+@media (max-width: 1024px) {
+  .amenity-blocks {
+    max-width: calc(33% - 1rem);
+    flex-basis: calc(33% - 1rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .amenity-blocks {
+    max-width: calc(50% - 1rem);
+    flex-basis: calc(50% - 1rem);
+  }
+}
+
+.location-info {
+  h2 {
+    display: flex;
+    align-items: center;
+  }
+  ion-icon {
+    margin-right: 0.8rem;
+  }
+}
+
+.code-of-conduct {
+  margin: 10px;
+  border-radius: 0.25rem;
+  box-shadow:
+    0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.host-details-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  .img-container {
+    display: flex;
+    align-items: center;
+    width: 15%;
+    text-align: center;
+    ion-avatar {
+      width: min(120px, 100%);
+      height: auto;
+    }
+  }
+  @media screen and (max-width: 568px) {
+    .img-container {
+      width: 100%;
+      text-align: center;
+      ion-avatar {
+        align-self: center;
+        text-align: center;
+        margin: auto;
+      }
+    }
+  }
+}
