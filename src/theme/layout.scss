@@ -31,10 +31,60 @@
 .section-subtitle {
   font-size: 1rem;
   color: var(--ion-text-color-step-600);
-  margin-bottom: 24px;
-  padding: 0 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .no-margin {
   margin: 0;
+}
+
+.form-section-container,
+.form-section-navigator {
+  position: relative;
+  box-sizing: border-box;
+  max-width: 900px;
+  height: fit-content;
+  width: min(calc(100% - 2rem), 900px);
+  margin: 1rem auto;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  p {
+    margin-top: 0.5rem;
+  }
+}
+
+.registration-section-card {
+  margin: 0;
+  padding: 1.5rem;
+  color: var(--ion-color-dark-shade);
+}
+.form-section-navigator {
+  display: flex;
+  flex-direction: column;
+}
+
+.glass-box {
+  display: flex;
+  gap: 0.3rem;
+  border-radius: 0.5rem;
+  border: 1px solid;
+  padding: 0.5rem;
+}
+
+.primary-glass-box {
+  background-color: color-mix(in srgb, var(--ion-color-primary) 2%, #fff 2%);
+  border-color: var(--ion-color-primary);
+  color: var(--ion-color-primary);
+}
+.secondary-glass-box {
+  background-color: color-mix(in srgb, var(--ion-color-secondary) 10%, #fff 10%);
+  border-color: var(--ion-color-secondary);
+}
+.success-glass-box {
+  background-color: color-mix(in srgb, var(--ion-color-success) 10%, #fff 10%);
+  border-color: var(--ion-color-success);
+}
+.warning-glass-box {
+  background-color: color-mix(in srgb, var(--ion-color-warning) 10%, #fff 10%);
+  border-color: var(--ion-color-warning);
 }

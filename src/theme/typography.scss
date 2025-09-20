@@ -1,5 +1,18 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  margin: 0;
+}
 .text-bold {
   font-weight: bold;
+}
+
+.text-normal {
+  font-weight: normal !important;
 }
 .text-italic {
   font-style: italic;
@@ -10,4 +23,18 @@
 
 ion-button {
   text-transform: none;
+}
+
+.required-star {
+  color: var(--ion-color-danger);
+  margin-left: 0.1rem;
+}
+
+.text-success {
+  color: var(--ion-color-success);
+  // Note: contrast color code #00c500
+}
+
+.text-danger {
+  color: var(--ion-color-danger);
 }
