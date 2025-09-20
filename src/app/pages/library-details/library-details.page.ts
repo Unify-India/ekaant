@@ -27,7 +27,7 @@ import {
   closeCircleOutline,
 } from 'ionicons/icons';
 import { AmenitiesCardComponent } from 'src/app/components/amenities-card/amenities-card.component';
-import { CodeOfConductComponent } from 'src/app/components/code-of-conduct/code-of-conduct.component';
+import { ListCodeOfConductComponent } from 'src/app/components/list-code-of-conduct/list-code-of-conduct.component';
 import { PriceCardComponent } from 'src/app/components/price-card/price-card.component';
 import { RequirementsListComponent } from 'src/app/components/requirements-list/requirements-list.component';
 import { ReviewCardComponent } from 'src/app/components/review-card/review-card.component';
@@ -47,7 +47,7 @@ import { BookCategory } from 'src/app/models/library-registration-request';
     PriceCardComponent,
     AmenitiesCardComponent,
     RequirementsListComponent,
-    CodeOfConductComponent,
+    ListCodeOfConductComponent,
   ],
 })
 export class LibraryDetailsPage {
@@ -184,6 +184,15 @@ export class LibraryDetailsPage {
         { amenityName: 'Reserved Seat', isAvailable: false }, // Example of unavailable
       ],
     },
+  ];
+
+  codeOfConduct = [
+    'Maintain complete silence in study areas',
+    'Keep your assigned seat clean and organized',
+    'No food or beverages at study desks',
+    'Internet Usage Policy: Visiting illegal, adult, or pornographic websites is strictly prohibited. Violation will result in a fine of ₹500 and immediate termination of membership.',
+    'Mobile phones must be on silent mode',
+    "Respect other students' study time and space",
   ];
 
   payPerUsePlans!: IPricingDetails[];
