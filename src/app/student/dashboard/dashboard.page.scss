@@ -1,0 +1,91 @@
+// Main hero/header section
+.hero-header {
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+  color: var(--ion-color-primary-contrast);
+  text-align: center;
+  padding: 3rem 1.5rem 4rem 1.5rem;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  position: relative;
+
+  .hero-icon {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 0.8rem;
+    display: inline-block;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-weight: 700;
+    margin-top: 0;
+  }
+
+  p {
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0.5rem auto 0 auto;
+  }
+}
+
+.dashboard-content {
+  padding: 1rem;
+  // Move the content up to overlap slightly with the header
+}
+
+// Styling for all cards on the page
+ion-card {
+  margin: 0 0 1.5rem 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+}
+
+// Today's Assignment Card
+.assignment-card {
+  display: flex;
+  flex-wrap: wrap; // Allows wrapping on small screens
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+
+  .seat-number {
+    flex-shrink: 0;
+    // todo : add opacity to background
+    background: var(--ion-color-primary-tint);
+    color: var(--ion-color-primary);
+    border-radius: 12px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .details {
+    flex-grow: 1;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+// Attendance History Card
+.attendance-links {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+// Empty state for today's assignment
+.no-assignment {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}

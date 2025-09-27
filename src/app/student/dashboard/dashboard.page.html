@@ -1,13 +1,95 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>dashboard</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ pageTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">dashboard</ion-title>
+      <ion-title size="large">{{ pageTitle }}</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div class="dashboard-content">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Today's Assignment</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <!-- Show assigned seat if it exists -->
+        @if (seatAssignment) {
+          <div class="assignment-card">
+            <div class="seat-number">{{ seatAssignment.seatNumber }}</div>
+            <div class="details">
+              <h4>Auto-Assigned Seat</h4>
+              <ion-label color="medium">
+                <p>Your seat for {{ seatAssignment.date }}</p>
+              </ion-label>
+              <div class="ion-margin-top">
+                @for (amenity of seatAssignment.amenities; track amenity) {
+                  <ion-chip>{{ amenity }}</ion-chip>
+                }
+              </div>
+            </div>
+            <div class="actions">
+              <ion-button color="success">
+                <ion-icon slot="start" name="log-in-outline"></ion-icon>
+                Check In
+              </ion-button>
+              <ion-button color="danger" fill="outline">
+                <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+                Report Absence
+              </ion-button>
+            </div>
+          </div>
+        } @else {
+          <!-- Show empty state if no seat is assigned -->
+          <div class="no-assignment">
+            <ion-item lines="none">
+              <ion-icon name="location-outline" slot="start" color="primary"></ion-icon>
+              <ion-label>
+                <h4>Today's Assignment</h4>
+                <p>No seat assigned for today</p>
+              </ion-label>
+            </ion-item>
+            <ion-note color="medium">
+              <ion-icon name="time-outline"></ion-icon>
+              Not Checked In
+            </ion-note>
+          </div>
+        }
+      </ion-card-content>
+    </ion-card>
+
+    <ion-grid class="ion-no-padding">
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+          <ion-card-title>Attendance & History</ion-card-title>
+        </ion-col>
+        <ion-col class="ion-text-end attendance-links">
+          <ion-button fill="clear" size="small" color="success" routerLink="/student/payments">
+            <ion-icon slot="start" name="card-outline"></ion-icon>
+            Payment History
+          </ion-button>
+          <ion-button fill="clear" size="small" color="medium" routerLink="/student/profile">
+            <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+            Manage Profile
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-card>
+      <ion-card-content>
+        <ion-list-header>
+          <ion-label>Attendance History</ion-label>
+          <ion-note>{{ attendanceHistory.length }} sessions</ion-note>
+        </ion-list-header>
+        <app-attendance-card [attendanceRecords]="attendanceHistory"></app-attendance-card>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
