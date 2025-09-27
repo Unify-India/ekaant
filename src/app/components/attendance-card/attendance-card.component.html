@@ -1,0 +1,19 @@
+<!-- Todo: Add handling for active status -->
+<ion-list [inset]="true" lines="none">
+  @for (item of attendanceRecords; track item.date) {
+    <ion-item class="history-item">
+      <div class="item-content">
+        <ion-label>
+          <h4>{{ item.date }}</h4>
+          <p>{{ item.timeRange }}</p>
+        </ion-label>
+        <ion-note class="ion-text-end">
+          <div class="status">{{ item.status }}</div>
+          @if (item.duration) {
+            <small>{{ item.duration }}</small>
+          }
+        </ion-note>
+      </div>
+    </ion-item>
+  }
+</ion-list>
