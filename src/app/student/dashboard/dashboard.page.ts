@@ -54,8 +54,6 @@ interface Attendance {
     IonCardHeader,
     IonCard,
     IonLabel,
-    IonAvatar,
-    IonList,
     IonItem,
     IonNote,
     BaseUiComponents,
