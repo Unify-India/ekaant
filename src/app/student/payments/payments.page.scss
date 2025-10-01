@@ -1,0 +1,131 @@
+.payments-container {
+  max-width: 1200px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+// Flex container for summary cards
+.summary-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+
+  .subscription-wrapper,
+  .stats-wrapper {
+    flex: 1 1 400px;
+    min-width: 0;
+  }
+
+  .stats-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 1rem;
+
+    ion-card {
+      flex: 1;
+      margin: 0;
+    }
+  }
+}
+
+// Header section with title and button
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; // Allows button to wrap to the next line on small screens
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  div {
+    h1,
+    p {
+      margin: 0;
+    }
+  }
+}
+
+// Styling for the summary cards
+.summary-card {
+  height: 100%; // Ensures all cards in a row have the same height
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: none;
+  border: 1px solid var(--ion-color-step-200);
+
+  .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--ion-color-primary);
+    margin: 1rem 0;
+  }
+
+  .subscription-details {
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+// Payment history card
+.history-card {
+  box-shadow: none;
+  border: 1px solid var(--ion-color-step-200);
+
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+// Styles for the payment history "table" grid
+.history-grid {
+  // Hide header on small screens
+  .grid-header {
+    display: none;
+  }
+  // Show header on medium screens and up
+  @media (min-width: 768px) {
+    .grid-header {
+      display: contents; // Makes the row part of the grid
+      font-weight: bold;
+      ion-col {
+        border-bottom: 2px solid var(--ion-color-step-200);
+      }
+    }
+  }
+
+  ion-row {
+    border-bottom: 1px solid var(--ion-color-step-150);
+  }
+}
+
+// Status chip styling
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: 500;
+
+  &.paid {
+    background-color: var(--ion-color-success-tint);
+    color: var(--ion-color-success-shade);
+  }
+  &.overdue {
+    background-color: var(--ion-color-warning-tint);
+    color: var(--ion-color-warning-shade);
+  }
+  &.failed {
+    background-color: var(--ion-color-danger-tint);
+    color: var(--ion-color-danger-shade);
+  }
+}

@@ -10,4 +10,144 @@
       <ion-title size="large">payments</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div class="payments-container">
+    <div class="page-header">
+      <div>
+        <h1>My Payments</h1>
+        <p>Review your subscription details and payment history.</p>
+      </div>
+      <ion-button>Manage Profile</ion-button>
+    </div>
+
+    <!-- Flex Container for Summary Cards -->
+    <div class="ion-padding summary-container">
+      <!-- Current Subscription Card -->
+      <div class="ion-flex-grow-1 subscription-wrapper ion-margin-end">
+        <ion-card class="summary-card ion-height-100">
+          <ion-card-header>
+            <ion-card-title>Current Subscription</ion-card-title>
+          </ion-card-header>
+          <ion-card-content class="subscription-details">
+            <div class="detail-item">
+              <span>Plan:</span>
+              <strong>{{ currentSubscription.plan }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Status:</span>
+              <ion-chip [color]="currentSubscription.status === 'Active' ? 'success' : 'danger'">
+                {{ currentSubscription.status }}
+              </ion-chip>
+            </div>
+            <div class="detail-item">
+              <span>Next Billing Date:</span>
+              <strong>
+                <ion-icon name="calendar-outline"></ion-icon>
+                {{ currentSubscription.nextBillingDate }}
+              </strong>
+            </div>
+            <div class="detail-item">
+              <span>Next Amount:</span>
+              <strong>
+                <ion-icon name="cash-outline"></ion-icon>
+                ${{ currentSubscription.nextAmount.toFixed(2) }}
+              </strong>
+            </div>
+            <ion-button expand="block" class="ion-margin-top">Change Plan</ion-button>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- Stats Cards Column -->
+      <div class="ion-flex-grow-1 stats-wrapper">
+        <div class="stats-container ion-justify-content-between">
+          <ion-card class="summary-card ion-text-center ion-margin-bottom">
+            <ion-card-header>
+              <ion-card-title>Total Paid</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="stat-value">${{ totalPaid.toFixed(2) }}</div>
+              <ion-note>Across all successful payments.</ion-note>
+            </ion-card-content>
+          </ion-card>
+          <ion-card class="summary-card ion-text-center">
+            <ion-card-header>
+              <ion-card-title>Payments Made</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="stat-value">{{ paymentsMade }}</div>
+              <ion-note>Total transactions recorded.</ion-note>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment History Card -->
+    <ion-card class="history-card">
+      <ion-card-header class="history-header">
+        <ion-card-title>Payment History</ion-card-title>
+        <ion-item lines="none">
+          <ion-select placeholder="All Statuses">
+            <ion-select-option value="all">All Statuses</ion-select-option>
+            <ion-select-option value="paid">Paid</ion-select-option>
+            <ion-select-option value="overdue">Overdue</ion-select-option>
+            <ion-select-option value="failed">Failed</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="history-grid">
+          <!-- Table Header for Medium and Larger Screens -->
+          <ion-row class="grid-header">
+            <ion-col>INVOICE</ion-col>
+            <ion-col>DATE</ion-col>
+            <ion-col>PLAN</ion-col>
+            <ion-col>AMOUNT</ion-col>
+            <ion-col>STATUS</ion-col>
+            <ion-col>ACTION</ion-col>
+          </ion-row>
+
+          <!-- Payment History Rows -->
+          @for (payment of paymentHistory; track payment.invoice) {
+            <ion-row class="ion-align-items-center">
+              <ion-col size="12" size-md>
+                <strong>{{ payment.invoice }}</strong>
+              </ion-col>
+              <ion-col size="12" size-md>{{ payment.date }}</ion-col>
+              <ion-col size="12" size-md>{{ payment.plan }}</ion-col>
+              <ion-col size="12" size-md>${{ payment.amount.toFixed(2) }}</ion-col>
+              <ion-col size="12" size-md>
+                @switch (payment.status) {
+                  @case ('Paid') {
+                    <div class="status-chip paid">
+                      <ion-icon name="checkmark-circle"></ion-icon>
+                      <span>Paid</span>
+                    </div>
+                  }
+                  @case ('Overdue') {
+                    <div class="status-chip overdue">
+                      <ion-icon name="alert-circle"></ion-icon>
+                      <span>Overdue</span>
+                    </div>
+                  }
+                  @case ('Failed') {
+                    <div class="status-chip failed">
+                      <ion-icon name="close-circle"></ion-icon>
+                      <span>Failed</span>
+                    </div>
+                  }
+                }
+              </ion-col>
+              <ion-col size="12" size-md>
+                <ion-button fill="clear" size="small">
+                  <ion-icon slot="start" name="download-outline"></ion-icon>
+                  Download
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          }
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
