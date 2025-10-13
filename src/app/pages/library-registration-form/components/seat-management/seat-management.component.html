@@ -14,13 +14,13 @@
       <div class="total-seats-control">
         <ion-label>{{ totalSeatsLabel }}</ion-label>
         <div class="seat-counter">
-          <ion-button (click)="decrementSeats()" [disabled]="totalSeats() <= 0" fill="clear">
+          <ion-button (click)="decrementSeats()" [disabled]="totalSeats() <= 0" fill="clear" color="danger">
             <ion-icon name="remove-outline" slot="icon-only"></ion-icon>
           </ion-button>
-
+          <!-- FIXME: REMOVE AQUA COLOR AND MAKE TEXT CENTER -->
           <ion-input type="number" formControlName="totalSeats" class="seat-count-input"></ion-input>
 
-          <ion-button (click)="incrementSeats()" fill="clear">
+          <ion-button (click)="incrementSeats()" color="success" fill="clear">
             <ion-icon name="add-outline" slot="icon-only"></ion-icon>
           </ion-button>
         </div>
@@ -31,6 +31,7 @@
     <div *ngIf="totalSeats() > 0" class="outlined-box">
       <h4>{{ facilityRangesTitle }}</h4>
       <p class="description">{{ facilityRangesDescription }}</p>
+      <!-- Fixme: Add range button should be in line with heading and description , floating towards right -->
       <div formArrayName="facilityRanges">
         <div
           *ngFor="let rangeGroup of facilityRanges.controls; let i = index"
@@ -52,7 +53,6 @@
           </ion-buttons>
         </div>
       </div>
-
       <div [formGroup]="newRangeForm" class="ion-margin-top">
         <div class="range-row">
           <ion-label>{{ seatsLabel }}</ion-label>
@@ -79,7 +79,7 @@
               </ion-select-option>
             </ion-select>
           </ion-item>
-
+          <!-- Fixme: here we should have green save button with outline just like we have edit/delete button above. Add range button should be on top as described in above fix me -->
           <ion-button (click)="addFacilityRange()" expand="block" fill="solid">
             <ion-icon slot="start" name="add-outline"></ion-icon>
             {{ addRangeButtonText }}
@@ -91,7 +91,7 @@
     <div *ngIf="totalSeats() > 0" class="outlined-box">
       <h4>{{ individualSeatConfigTitle }}</h4>
       <p class="description">{{ individualSeatConfigDescription }}</p>
-
+      <!-- fixme: check why every 3rd seat is already has checkmark option -->
       <div class="seat-grid">
         <ng-container *ngFor="let seatNum of seatNumbers()">
           <ion-button
