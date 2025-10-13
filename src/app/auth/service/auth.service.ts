@@ -35,6 +35,18 @@ export class AuthService {
     return !!this.currentUser;
   }
 
+  isStudent(): boolean {
+    return this.currentUser?.role === 'Student';
+  }
+
+  isAdmin(): boolean {
+    return this.currentUser?.role === 'Admin';
+  }
+
+  isManager(): boolean {
+    return this.currentUser?.role === 'Manager';
+  }
+
   private getUserDataPath(role: string): string {
     if (role === 'Student' || role === 'Admin') {
       return `users/${role.toLowerCase()}`;
