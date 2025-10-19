@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
 
+import { adminGuard } from './auth/guards/admin.guard';
+import { unauthGuard } from './auth/guards/unauth.guard';
+
 export const routes: Routes = [
   {
     path: '',
@@ -37,6 +40,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     loadChildren: () => import('./admin/admin-routing.module').then((m) => m.AdminRoutingModule),
+    canActivate: [adminGuard],
   },
   {
     path: 'home',
@@ -71,6 +75,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/application-form/application-form.page').then((m) => m.ApplicationFormPage),
   },
   {
+    path: 'apply-library/:id',
+    loadComponent: () => import('./pages/application-form/application-form.page').then((m) => m.ApplicationFormPage),
+  },
+  {
     path: 'library-registration-form',
     loadComponent: () =>
       import('./pages/library-registration-form/library-registration-form.page').then(
@@ -87,6 +95,10 @@ export const routes: Routes = [
   {
     path: 'library-details',
     loadComponent: () => import('./pages/library-details/library-details.page').then((m) => m.LibraryDetailsPage),
+  },
+  {
+    path: 'admin-login',
+    loadComponent: () => import('./admin/admin-login/admin-login.page').then((m) => m.AdminLoginPage),
   },
 ];
 
