@@ -109,11 +109,8 @@ ion-card {
   text-align: center;
   width: 100%;
   ion-button {
-    box-sizing: border-box;
-    --border-radius: 0.5rem;
-    font-size: 1rem;
+    // font-size: 1rem;
     font-weight: bold;
-    color: white;
     span {
       padding: 1rem;
     }
