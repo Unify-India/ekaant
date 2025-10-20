@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, computed } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { IonProgressBar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   warningOutline,
@@ -11,6 +12,7 @@ import {
   documentTextOutline,
 } from 'ionicons/icons';
 
+import { createRequirementGroup } from '../../helpers/library-form-definitions';
 import { LibraryRegistrationFormService } from '../../service/library-registration-form.service';
 
 @Component({
@@ -18,7 +20,7 @@ import { LibraryRegistrationFormService } from '../../service/library-registrati
   templateUrl: './requirements.component.html',
   styleUrls: ['./requirements.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, ReactiveFormsModule],
+  imports: [IonicModule, CommonModule, ReactiveFormsModule, IonProgressBar],
 })
 export class RequirementsComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -78,12 +80,12 @@ export class RequirementsComponent implements OnInit {
   }
 
   addCommonRequirement(requirementText: string): void {
-    const newReqGroup = this.createRequirementGroup(requirementText, false);
+    const newReqGroup = createRequirementGroup(this.fb, requirementText, false);
     this.selectedRequirements.push(newReqGroup);
   }
 
   addCustomRequirement(): void {
-    const newReqGroup = this.createRequirementGroup('', true);
+    const newReqGroup = createRequirementGroup(this.fb, '', true);
     this.selectedRequirements.push(newReqGroup);
   }
 
@@ -100,7 +102,7 @@ export class RequirementsComponent implements OnInit {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       // Patch the value of the 'sampleFile' control at the specific index in the FormArray
-      this.selectedRequirements.at(index).patchValue({ sampleFile: file });
+      this.selectedRequirements.at(index).patchValue({ sampleFile: file, sampleFileProgress: 0 });
       console.log(`File for requirement ${index + 1}:`, file.name);
     }
   }

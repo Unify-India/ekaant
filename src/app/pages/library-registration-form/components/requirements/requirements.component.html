@@ -23,7 +23,7 @@
       <ion-icon slot="start" name="add-outline"></ion-icon>
       {{ addCustomButtonText }}
     </ion-button>
-
+    <!-- fixme: once a requirement is added then it should be removed from available requirement and once a selected requirement is removed it comes back to available requirement -->
     <h3 class="ion-margin-top">{{ selectedTitle }}</h3>
 
     <div [formArrayName]="'selectedRequirements'">
@@ -60,6 +60,14 @@
                   @if (control.get('sampleFile')?.value; as file) {
                     <ion-icon name="checkmark-circle" color="success"></ion-icon>
                     <p>{{ file.name }}</p>
+                    @if (control.get('sampleFileProgress')?.value; as progress) {
+                      @if (progress > 0 && progress < 100) {
+                        <div class="req-progress">
+                          <ion-progress-bar [value]="progress / 100"></ion-progress-bar>
+                          <div class="progress-text">{{ progress }}%</div>
+                        </div>
+                      }
+                    }
                   } @else {
                     <ion-icon name="document-attach-outline"></ion-icon>
                     <p>Click to upload document</p>
