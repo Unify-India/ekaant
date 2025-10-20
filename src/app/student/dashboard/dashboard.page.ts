@@ -16,6 +16,7 @@ import {
   IonGrid,
   IonCardContent,
   IonListHeader,
+  ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -29,6 +30,8 @@ import {
 } from 'ionicons/icons';
 import { AttendanceCardComponent } from 'src/app/components/attendance-card/attendance-card.component';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
+
+import { ReportAbsenceModalComponent } from '../components/report-absence/report-absence.component';
 
 interface Attendance {
   date: string;
@@ -95,7 +98,10 @@ export class DashboardPage implements OnInit {
     },
   ];
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private modalController: ModalController,
+  ) {
     addIcons({
       logInOutline,
       closeCircleOutline,
@@ -123,4 +129,24 @@ export class DashboardPage implements OnInit {
     this.router.navigate(['/profile']);
   }
   ngOnInit() {}
+
+  async openReportAbsenceModal() {
+    const modal = await this.modalController.create({
+      component: ReportAbsenceModalComponent,
+      cssClass: 'report-absence-modal', // Apply custom CSS to the modal wrapper if needed
+      breakpoints: [0, 0.5, 0.8], // Optional: Define breakpoints for sheet modal
+      initialBreakpoint: 0.8, // Optional: Initial size of the sheet modal
+    });
+
+    modal.onDidDismiss().then((data) => {
+      if (data.role === 'submit' && data.data) {
+        console.log('Absence submitted:', data.data);
+        // Handle the submitted absence data
+      } else {
+        console.log('Modal dismissed without submission or cancelled.');
+      }
+    });
+
+    return await modal.present();
+  }
 }
