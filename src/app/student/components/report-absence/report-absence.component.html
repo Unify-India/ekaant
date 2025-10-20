@@ -1,0 +1,79 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>
+      <div class="modal-title-container">
+        <ion-icon name="calendar-outline" class="title-icon"></ion-icon>
+        <div class="text-content">
+          Report Absence
+          <p class="subtitle">Let us know when you won't be available</p>
+        </div>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card class="info-card">
+    <ion-item lines="none">
+      <ion-icon name="information-circle-outline" slot="start"></ion-icon>
+      <ion-label>
+        <h2>Seat Optimization</h2>
+        <p>Reporting your absence helps us reassign your seat to other students on the waitlist.</p>
+      </ion-label>
+    </ion-item>
+  </ion-card>
+
+  <ion-list class="absence-form-list">
+    <ion-item lines="none" class="form-item">
+      <ion-label position="stacked">
+        Absence Date
+        <span class="required">*</span>
+      </ion-label>
+      <div class="custom-input-wrapper">
+        <ion-input
+          placeholder="dd/mm/yyyy"
+          value="{{ selectedDate | date: 'dd/MM/yyyy' }}"
+          readonly
+          id="absenceDateInput"
+        ></ion-input>
+        <ion-icon name="calendar-outline" class="input-icon" (click)="datePickerModal.present()"></ion-icon>
+      </div>
+      <ion-modal #datePickerModal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime
+            #datetimePicker
+            presentation="date"
+            [(ngModel)]="selectedDate"
+            (ionChange)="onDateChange($event)"
+            [min]="today"
+            [max]="maxDate"
+          ></ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </ion-item>
+
+    <ion-item lines="none" class="form-item">
+      <ion-label position="stacked">Reason (Optional)</ion-label>
+      <ion-textarea
+        placeholder="e.g., Medical appointment, family event, conference..."
+        rows="4"
+        [(ngModel)]="absenceReason"
+        class="reason-textarea"
+      ></ion-textarea>
+    </ion-item>
+  </ion-list>
+
+  <p class="reason-hint">Providing a reason helps us better understand attendance patterns.</p>
+
+  <ion-button fill="clear" color="medium" class="cancel-button" (click)="dismissModal()">Cancel</ion-button>
+
+  <ion-button class="submit-button" (click)="submitAbsence()" [disabled]="!selectedDate">
+    <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+    Submit Absence
+  </ion-button>
+</ion-content>

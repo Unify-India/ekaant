@@ -1,0 +1,165 @@
+ion-header {
+  ion-toolbar {
+    --background: var(--ion-color-light); // Match header background to content
+    padding: 10px 10px 0 20px; // Adjust padding to match visual
+  }
+
+  ion-title {
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+    .modal-title-container {
+      display: flex;
+      align-items: center;
+
+      .title-icon {
+        font-size: 24px;
+        color: var(--ion-color-warning); // Use warning color for the calendar icon
+        padding: 8px;
+        border-radius: 8px;
+        margin-right: 12px;
+        min-width: 40px; // Ensure icon box is consistent
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .text-content {
+        line-height: 1.2;
+        font-weight: 600;
+        font-size: 1.2rem; // Main title size
+        color: var(--ion-text-color);
+
+        .subtitle {
+          font-size: 0.8rem;
+          color: var(--ion-color-medium-shade);
+          margin-top: 2px;
+          word-wrap: break-word;
+          font-weight: normal;
+        }
+      }
+    }
+  }
+
+  ion-buttons {
+    ion-button {
+      --padding-end: 0;
+      --padding-start: 0;
+      --min-width: 44px; // Make close button clickable
+      --min-height: 44px;
+      ion-icon {
+        font-size: 24px;
+        color: var(--ion-color-medium);
+      }
+    }
+  }
+}
+
+// Info card styling
+.info-card {
+  --background: var(--ion-color-primary-contrast); // Light blue background
+  box-shadow: none; // Remove default shadow
+  border-radius: 12px;
+  margin: 16px 0; // Vertical spacing
+
+  ion-item {
+    --background: transparent; // Ensure item background is transparent
+    --inner-padding-end: 0;
+    --padding-start: 0;
+    align-items: flex-start; // Align content to top
+
+    ion-icon {
+      font-size: 24px;
+      color: var(--ion-color-primary); // Blue icon color
+      margin-top: 2px;
+      margin-inline-end: 12px;
+    }
+
+    ion-label {
+      h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--ion-color-primary);
+        margin-top: 0;
+        margin-bottom: 4px;
+      }
+      p {
+        font-size: 0.85rem;
+        color: var(--ion-color-primary-shade);
+        line-height: 1.4;
+      }
+    }
+  }
+}
+
+// Form list and items styling
+.absence-form-list {
+  background: transparent; // No background for the list
+  margin: 0;
+  padding: 0;
+
+  .form-item {
+    --inner-padding-end: 0;
+    --padding-start: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 16px; // Space between form items
+
+    ion-label {
+      font-weight: 600;
+      color: var(--ion-text-color);
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+
+      .required {
+        color: var(--ion-color-danger); // Red asterisk for required fields
+        margin-left: 2px;
+      }
+    }
+
+    .custom-input-wrapper {
+      position: relative;
+      width: 100%;
+
+      ion-input {
+        --padding-start: 16px;
+        --padding-end: 16px;
+        --padding-top: 14px;
+        --padding-bottom: 14px;
+        border-radius: 8px;
+        border: 1px solid var(--ion-color-medium-tint);
+        font-size: 1rem;
+        color: var(--ion-text-color);
+        caret-color: var(--ion-color-primary); // Custom caret color
+      }
+
+      .input-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 22px;
+        color: var(--ion-color-medium);
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.reason-hint {
+  font-size: 0.75rem;
+  color: var(--ion-color-medium-shade);
+  margin-top: -10px; // Adjust spacing relative to the textarea
+  padding-left: 16px; // Align with input padding
+  padding-right: 16px;
+}
+
+// Styling for ion-modal containing ion-datetime
+ion-modal {
+  --width: fit-content;
+  --height: fit-content;
+  --border-radius: 16px;
+  --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
