@@ -1,13 +1,76 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>library-requests</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Library Registration Management</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">library-requests</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <div class="page-header">
+    <div>
+      <p>Full administrative access to review and manage new library submissions.</p>
+    </div>
+    <div class="header-actions">
+      <ion-button color="success" (click)="exportCsv()">
+        <ion-icon slot="start" name="cloud-download-outline"></ion-icon>
+        Export CSV
+      </ion-button>
+      <ion-button color="primary" (click)="addNewRequest()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Add New
+      </ion-button>
+    </div>
+  </div>
+
+  <ion-card class="table-card">
+    <div class="table-container">
+      <ion-grid class="data-grid">
+        <!-- Header Row -->
+        <ion-row class="grid-header">
+          <ion-col size="1.5" class="ion-text-center">Actions</ion-col>
+          <ion-col size="2">Library Name</ion-col>
+          <ion-col size="2">Library Manager</ion-col>
+          <ion-col size="3">Address</ion-col>
+          <ion-col size="1.5" class="ion-text-center">Total Seats</ion-col>
+          <ion-col size="2">Application Status</ion-col>
+        </ion-row>
+
+        <!-- Data Rows -->
+        @for (req of requests; track req.id) {
+          <ion-row class="grid-row">
+            <ion-col size="1.5" class="action-buttons ion-text-center">
+              <ion-button fill="clear" size="small" (click)="viewRequest(req.id)">
+                <ion-icon slot="icon-only" name="eye-outline" color="success"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" size="small" (click)="editRequest(req.id)">
+                <ion-icon slot="icon-only" name="create-outline" color="primary"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" size="small" (click)="deleteRequest(req.id)">
+                <ion-icon slot="icon-only" name="trash-outline" color="danger"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="2">{{ req.libraryName }}</ion-col>
+            <ion-col size="2">{{ req.libraryManager }}</ion-col>
+            <ion-col size="3" class="address-col">{{ req.address }}</ion-col>
+            <ion-col size="1.5" class="ion-text-center">{{ req.totalSeats }}</ion-col>
+            <ion-col size="2">
+              <ion-chip
+                [color]="
+                  req.applicationStatus === 'approved'
+                    ? 'success'
+                    : req.applicationStatus === 'pending'
+                      ? 'warning'
+                      : 'danger'
+                "
+              >
+                {{ req.applicationStatus.replace('_', ' ') | titlecase }}
+              </ion-chip>
+            </ion-col>
+          </ion-row>
+        }
+      </ion-grid>
+    </div>
+  </ion-card>
 </ion-content>

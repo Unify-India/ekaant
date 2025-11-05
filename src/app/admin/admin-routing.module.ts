@@ -22,7 +22,7 @@ const routes: Routes = [
         loadComponent: () => import('./library-requests/library-requests.page').then((m) => m.LibraryRequestsPage),
       },
       {
-        path: 'library-request-detail',
+        path: 'library-request-detail/:id',
         loadComponent: () =>
           import('./library-request-detail/library-request-detail.page').then((m) => m.LibraryRequestDetailPage),
       },
