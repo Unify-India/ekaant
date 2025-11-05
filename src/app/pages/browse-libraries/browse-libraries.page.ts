@@ -33,6 +33,7 @@ export class BrowseLibrariesPage implements OnInit {
   private router = inject(Router);
   libraries = [
     {
+      id: 'lib-1',
       name: 'Gyanoday Pustakalay',
       address: '123 Lalpur Main Road, Ranchi, Jharkhand',
       availableSeats: 35,
@@ -41,6 +42,7 @@ export class BrowseLibrariesPage implements OnInit {
       type: 'co-ed',
     },
     {
+      id: 'lib-2',
       name: 'Jamshedpur Reading Hall',
       address: '456 Sakchi Market, Jamshedpur, Jharkhand',
       availableSeats: 0,
@@ -49,6 +51,7 @@ export class BrowseLibrariesPage implements OnInit {
       isFull: true,
     },
     {
+      id: 'lib-3',
       name: 'Vidya Sagar Library',
       address: '789 Morabadi, Ranchi, Jharkhand',
       availableSeats: 15,
@@ -57,6 +60,7 @@ export class BrowseLibrariesPage implements OnInit {
       isFull: false,
     },
     {
+      id: 'lib-4',
       name: 'Dhanbad Study Circle',
       address: '101 Bank More, Dhanbad, Jharkhand',
       availableSeats: 0,
@@ -65,6 +69,7 @@ export class BrowseLibrariesPage implements OnInit {
       isFull: true,
     },
     {
+      id: 'lib-5',
       name: 'Bokaro Digital Library',
       address: '202 Sector 4, Bokaro Steel City, Jharkhand',
       availableSeats: 50,
@@ -73,6 +78,7 @@ export class BrowseLibrariesPage implements OnInit {
       isFull: false,
     },
     {
+      id: 'lib-6',
       name: 'Kanke Reading Room',
       address: '333 Kanke Road, Ranchi, Jharkhand',
       availableSeats: 8,
@@ -87,14 +93,13 @@ export class BrowseLibrariesPage implements OnInit {
 
   ngOnInit() {}
 
-  handleLibraryAction(event: { type: 'enroll' | 'waitlist'; library: Library }) {
-    if (event.type === 'enroll') {
-      // navigate or open enrollment modal
-      this.router.navigate(['/application-form', event.library.id, 'enroll']);
-    } else {
-      // open waitlist flow
-      // this.openWaitlistModal(event.library);
+  handleLibraryAction(library: Library) {
+    console.log('event', library);
+    if (!library) {
+      console.warn('No library data in action event');
+      return;
     }
+    this.router.navigate(['/apply-library', library.id]);
   }
 
   onSearch() {
