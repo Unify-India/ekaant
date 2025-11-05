@@ -1,29 +1,31 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>payments</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ pageTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">payments</ion-title>
+      <ion-title size="large">{{ pageTitle }}</ion-title>
     </ion-toolbar>
   </ion-header>
-  <div class="payments-container">
+  <div class="ion-padding payments-container">
     <div class="page-header">
       <div>
-        <h1>My Payments</h1>
-        <p>Review your subscription details and payment history.</p>
+        <h4>Review your subscription details and payment history.</h4>
       </div>
       <ion-button>Manage Profile</ion-button>
     </div>
 
     <!-- Flex Container for Summary Cards -->
-    <div class="ion-padding summary-container">
+    <div class="summary-container">
       <!-- Current Subscription Card -->
-      <div class="ion-flex-grow-1 subscription-wrapper ion-margin-end">
-        <ion-card class="summary-card ion-height-100">
+      <div class="subscription-wrapper">
+        <ion-card class="summary-card">
           <ion-card-header>
             <ion-card-title>Current Subscription</ion-card-title>
           </ion-card-header>
@@ -58,7 +60,7 @@
       </div>
 
       <!-- Stats Cards Column -->
-      <div class="ion-flex-grow-1 stats-wrapper">
+      <div class="stats-wrapper">
         <div class="stats-container ion-justify-content-between">
           <ion-card class="summary-card ion-text-center ion-margin-bottom">
             <ion-card-header>
@@ -113,10 +115,10 @@
               <ion-col size="12" size-md>
                 <strong>{{ payment.invoice }}</strong>
               </ion-col>
-              <ion-col size="12" size-md>{{ payment.date }}</ion-col>
-              <ion-col size="12" size-md>{{ payment.plan }}</ion-col>
-              <ion-col size="12" size-md>${{ payment.amount.toFixed(2) }}</ion-col>
-              <ion-col size="12" size-md>
+              <ion-col size="12" size-md sizeSm>{{ payment.date }}</ion-col>
+              <ion-col size="12" size-md sizeSm>{{ payment.plan }}</ion-col>
+              <ion-col size="12" size-md sizeSm>${{ payment.amount.toFixed(2) }}</ion-col>
+              <ion-col size="12" size-md sizeSm>
                 @switch (payment.status) {
                   @case ('Paid') {
                     <div class="status-chip paid">

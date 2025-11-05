@@ -37,7 +37,8 @@ interface Payment {
   imports: [IonChip, BaseUiComponents, UiEssentials, FormEssentials],
 })
 export class PaymentsPage implements OnInit {
-  // --- Mock Data ---
+  pageTitle = 'Payments';
+
   public currentSubscription: Subscription = {
     plan: 'Premium Plan',
     status: 'Active',
