@@ -1,9 +1,6 @@
 import tseslint from 'typescript-eslint';
 import perfectionist from 'eslint-plugin-perfectionist';
-import prettierPlugin from 'eslint-plugin-prettier';
-import jasmine from 'eslint-plugin-jasmine';
-import html from 'eslint-plugin-html';
-import css from 'eslint-plugin-css';
+import prettier from 'eslint-config-prettier';
 
 export default [
   {
@@ -23,14 +20,13 @@ export default [
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
-        project: './tsconfig.json',
-        sourceType: 'module',
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     plugins: {
       '@typescript-eslint': tseslint.plugin,
       perfectionist,
-      prettier: prettierPlugin,
     },
     rules: {
       ...tseslint.configs.recommendedTypeChecked.rules,
@@ -45,29 +41,7 @@ export default [
           newlinesBetween: 'always',
         },
       ],
-      'prettier/prettier': 'error',
     },
   },
-  {
-    files: ['src/**/*.spec.ts'],
-    languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        project: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    plugins: { jasmine, prettier: prettierPlugin },
-    rules: {
-      ...jasmine.configs.recommended.rules,
-      'prettier/prettier': 'error',
-    },
-  },
-  {
-    files: ['src/**/*.html'],
-    plugins: { html, prettier: prettierPlugin },
-    rules: {
-      'prettier/prettier': 'error',
-    },
-  },
+  prettier,
 ];
