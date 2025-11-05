@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   IonHeader,
@@ -31,6 +31,7 @@ import {
   chevronForward,
   chevronBack,
 } from 'ionicons/icons';
+import { DraftService } from 'src/app/services/draft.service';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 
 import { AmenitiesComponent } from './components/amenities/amenities.component';
@@ -75,24 +76,32 @@ import { LibraryRegistrationFormService } from './service/library-registration-f
   templateUrl: './library-registration-form.page.html',
   styleUrls: ['./library-registration-form.page.scss'],
 })
-export class LibraryRegistrationFormPage {
+export class LibraryRegistrationFormPage implements OnInit {
   private router = inject(Router);
   private lrfService = inject(LibraryRegistrationFormService);
+  private draftService = inject(DraftService);
 
   pageTitle = 'Register your library';
   sections = this.lrfService.steps;
+
+  ngOnInit() {
+    console.log('Library Registration Form initialized');
+    this.draftService.loadDraft(this.masterForm).catch((e) => {
+      console.error('Failed to load draft', e);
+    });
+  }
   masterForm = this.lrfService.mainForm;
   currentSectionIndex = this.lrfService.currentSectionIndex;
   maxReachedIndex = this.lrfService.maxReachedIndex;
 
   currentSectionId = computed(() => this.sections[this.currentSectionIndex()].key);
   progress = computed(() => {
-    const controls = Object.values(this.masterForm.controls) as AbstractControl[];
-    const completedSections = controls.filter((control) => control.valid).length;
     const totalFormSections = this.sections.length;
     if (totalFormSections <= 0) return 0;
-    return completedSections / totalFormSections;
+    // Calculate progress based on the current step index
+    return this.currentSectionIndex() / totalFormSections;
   });
+
   isAlertOpen = false;
   public alertButtons = [
     {
@@ -154,9 +163,17 @@ export class LibraryRegistrationFormPage {
 
   onSubmit() {
     if (this.masterForm.valid) {
-      console.log('Final Form Data:', this.masterForm.value);
-      alert('Registration Submitted!');
-      this.router.navigate(['/registration-acknowledgement']);
+      this.lrfService
+        .submitLibrary()
+        .then((id) => {
+          // console.log('Library created with id:', id);
+          // alert('Registration Submitted!');
+          this.router.navigate(['/registration-acknowledgement']);
+        })
+        .catch((err) => {
+          console.error('Failed to create library', err);
+          alert('Failed to create library. See console.');
+        });
     } else {
       console.error('Form is invalid', this.masterForm);
       alert('Please complete all required sections.');

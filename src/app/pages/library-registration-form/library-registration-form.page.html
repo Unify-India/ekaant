@@ -14,22 +14,26 @@
     </ion-toolbar>
   </ion-header>
   <div id="content">
-    <div class="ion-padding">
-      <h4 class="section-subtitle">Step {{ currentSectionIndex() + 1 }} of {{ sections.length }}</h4>
-      <ion-progress-bar [value]="progress()" color="success"></ion-progress-bar>
-    </div>
-    <div id="segment-container" class="ion-padding">
-      <ion-segment [value]="currentSectionId()" (ionChange)="onSegmentChange($event)" scrollable swipeGesture="true">
-        @for (section of sections; track section.key; let i = $index) {
-          <ion-segment-button [value]="section.key" [disabled]="i > maxReachedIndex()">
-            <ion-icon [name]="section.icon"></ion-icon>
-            @if (isSectionComplete(section.key)) {
-              <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-            }
-            <ion-label>{{ section.label }}</ion-label>
-          </ion-segment-button>
-        }
-      </ion-segment>
+    <div class="form-section-navigator">
+      <div>
+        <ion-progress-bar [value]="progress()" color="success" aria-label="step-progress"></ion-progress-bar>
+        <p class="section-subtitle step-progress">Step {{ currentSectionIndex() + 1 }} of {{ sections.length }}</p>
+      </div>
+      <div id="segment-container">
+        <ion-segment [value]="currentSectionId()" (ionChange)="onSegmentChange($event)" scrollable swipeGesture="true">
+          @for (section of sections; track section.key; let i = $index) {
+            <ion-segment-button [value]="section.key" [disabled]="i > maxReachedIndex()">
+              @if (isSectionComplete(section.key)) {
+                <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+              } @else {
+                <ion-icon [name]="section.icon"></ion-icon>
+              }
+
+              <ion-label>{{ section.label }}</ion-label>
+            </ion-segment-button>
+          }
+        </ion-segment>
+      </div>
     </div>
 
     <div class="form-section-container">
@@ -106,7 +110,7 @@
         }
       }
     </div>
-    <div class="ion-padding">
+    <div class="form-section-navigator">
       <ion-toolbar fill="none" color="none">
         @if (currentSectionIndex() > 0) {
           <ion-button (click)="prevSection()" color="secondary" class="previous-button" slot="start">
@@ -129,6 +133,7 @@
             <ion-icon slot="end" name="chevron-forward"></ion-icon>
           </ion-button>
         } @else {
+          <!-- Todo: add recaptcha before submission and add email/phone verification -->
           <ion-button
             class="next-button"
             color="success"
