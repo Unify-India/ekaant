@@ -1,13 +1,106 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>library-request-detail</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/pending-requests"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isViewOnly ? 'View' : 'Edit' }} Library Request</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">library-request-detail</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <div class="form-container">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Request Details</ion-card-title>
+        <ion-card-subtitle>Review and update the library registration application.</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content [formGroup]="requestForm">
+        <div class="form-group">
+          <ion-input
+            label="Library Manager"
+            labelPlacement="floating"
+            fill="outline"
+            formControlName="libraryManager"
+          ></ion-input>
+          <ion-input
+            label="Library Name"
+            labelPlacement="floating"
+            fill="outline"
+            formControlName="libraryName"
+          ></ion-input>
+          <ion-textarea
+            label="Address"
+            labelPlacement="floating"
+            fill="outline"
+            formControlName="address"
+            [autoGrow]="true"
+          ></ion-textarea>
+          <ion-input
+            label="Total Seats"
+            labelPlacement="floating"
+            fill="outline"
+            type="number"
+            formControlName="totalSeats"
+          ></ion-input>
+          <ion-select
+            label="Application Status"
+            labelPlacement="floating"
+            fill="outline"
+            formControlName="applicationStatus"
+          >
+            <ion-select-option value="pending">Pending</ion-select-option>
+            <ion-select-option value="revision_requested">Revision Requested</ion-select-option>
+            <ion-select-option value="approved">Approved</ion-select-option>
+            <ion-select-option value="rejected">Rejected</ion-select-option>
+          </ion-select>
+          <ion-input
+            label="Contact Email"
+            labelPlacement="floating"
+            fill="outline"
+            type="email"
+            formControlName="contactEmail"
+          ></ion-input>
+          <ion-input
+            label="Contact Phone"
+            labelPlacement="floating"
+            fill="outline"
+            formControlName="contactPhone"
+          ></ion-input>
+          <ion-textarea
+            label="Admin Comments"
+            labelPlacement="floating"
+            fill="outline"
+            formControlName="adminComments"
+            [autoGrow]="true"
+          ></ion-textarea>
+          <ion-input
+            label="Created At"
+            labelPlacement="floating"
+            fill="outline"
+            formControlName="createdAt"
+          ></ion-input>
+          <ion-input
+            label="Updated At"
+            labelPlacement="floating"
+            fill="outline"
+            formControlName="updatedAt"
+          ></ion-input>
+        </div>
+
+        @if (!isViewOnly) {
+        <div class="form-actions">
+          <ion-button fill="outline" color="medium" (click)="cancel()">
+            <ion-icon slot="start" name="close-outline"></ion-icon>
+            Cancel
+          </ion-button>
+          <ion-button color="primary" (click)="update()">
+            <ion-icon slot="start" name="save-outline"></ion-icon>
+            Update
+          </ion-button>
+        </div>
+        }
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
