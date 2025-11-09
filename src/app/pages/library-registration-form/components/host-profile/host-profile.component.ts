@@ -3,6 +3,7 @@ import { Component, OnInit, inject, computed, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { IonProgressBar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { warningOutline, personCircleOutline, shieldCheckmarkOutline } from 'ionicons/icons';
 
@@ -13,7 +14,7 @@ import { LibraryRegistrationFormService } from '../../service/library-registrati
   templateUrl: './host-profile.component.html',
   styleUrls: ['./host-profile.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, ReactiveFormsModule],
+  imports: [IonicModule, CommonModule, ReactiveFormsModule, IonProgressBar],
 })
 export class HostProfileComponent implements OnInit {
   private lrfService = inject(LibraryRegistrationFormService);
@@ -82,7 +83,7 @@ export class HostProfileComponent implements OnInit {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      this.hostProfileForm.patchValue({ profilePhoto: input.files[0] });
+      this.hostProfileForm.patchValue({ profilePhoto: input.files[0], profilePhotoProgress: 0 });
     }
   }
 }

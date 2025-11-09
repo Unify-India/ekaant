@@ -10,6 +10,7 @@ import {
   IonImg,
   IonFab,
   IonFabButton,
+  IonProgressBar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { imageOutline, warningOutline, closeCircle } from 'ionicons/icons';
@@ -34,6 +35,7 @@ import { LibraryRegistrationFormService } from '../../service/library-registrati
     BaseUiComponents,
     IonIcon,
     IonNote,
+    IonProgressBar,
     FormEssentials,
   ],
 })
@@ -54,7 +56,7 @@ export class LibraryImagesComponent implements OnInit {
   public readonly uploadAreaTitle = 'Upload Library Images';
   public readonly uploadAreaHint = 'Add photos of study areas, facilities, and library interior';
   public readonly uploadAreaConstraints = 'JPEG, PNG, or WebP up to 5MB each';
-  public readonly maxImages = 10;
+  public readonly maxImages = 5;
 
   tipsTitle = 'Photo Tips:';
   photoTips: string[] = [
@@ -76,18 +78,16 @@ export class LibraryImagesComponent implements OnInit {
     return this.imagesForm.get('libraryPhotos') as FormArray;
   }
 
-  // Updated file selection handler
+  // TODO: add file size limit to 5MB. Implement compression if needed
   async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files) return;
 
     for (let i = 0; i < input.files.length; i++) {
-      // ...
       const file = input.files[i];
       const previewUrl = await this.readFileAsDataURL(file);
 
-      // This is where you would use the helper function
-      const photoGroup = createPhotoGroup(this.fb); // Assuming createPhotoGroup is exported and imported
+      const photoGroup = createPhotoGroup(this.fb);
       photoGroup.patchValue({
         file: file,
         previewUrl: previewUrl,
@@ -97,7 +97,6 @@ export class LibraryImagesComponent implements OnInit {
     }
   }
 
-  // Helper function to read a file and return a Promise with the Data URL
   private readFileAsDataURL(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

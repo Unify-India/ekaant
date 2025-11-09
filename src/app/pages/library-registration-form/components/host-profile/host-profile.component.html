@@ -15,12 +15,24 @@
     <div class="upload-area" (click)="triggerFileInput(fileInput)">
       @if (hostProfileForm.get('profilePhoto')?.value; as file) {
         <p>✅ {{ file.name }} selected</p>
+        <div
+          *ngIf="
+            hostProfileForm.get('profilePhotoProgress')?.value > 0 &&
+            hostProfileForm.get('profilePhotoProgress')?.value < 100
+          "
+          class="host-photo-progress"
+        >
+          <ion-progress-bar
+            [value]="(hostProfileForm.get('profilePhotoProgress')?.value || 0) / 100"
+          ></ion-progress-bar>
+          <div class="progress-text">{{ hostProfileForm.get('profilePhotoProgress')?.value }}%</div>
+        </div>
       } @else {
         <ion-icon name="person-circle-outline"></ion-icon>
         <p>Upload a professional photo of yourself or your library</p>
       }
     </div>
-
+    <!-- TODO: add validation feedback by green color to ensure that user has entered correct values and add error messages for possible cases -->
     <ion-item class="ion-margin-top" fill="outline">
       <ion-label position="stacked">Full Name *</ion-label>
       <ion-input formControlName="fullName" placeholder="Enter your full name"></ion-input>
