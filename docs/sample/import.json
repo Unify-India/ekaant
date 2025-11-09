@@ -1,0 +1,323 @@
+{
+  "users": {
+    "user_student_arjun": {
+      "email": "arjun.sharma@email.com",
+      "displayName": "Arjun Sharma",
+      "photoURL": "https://dummyimage.com/200x200/000/fff&text=AS",
+      "createdAt": {
+        "_seconds": 1726890000,
+        "_nanoseconds": 0
+      }
+    },
+    "user_student_priya": {
+      "email": "priya.patel@email.com",
+      "displayName": "Priya Patel",
+      "photoURL": "https://dummyimage.com/200x200/000/fff&text=PP",
+      "createdAt": {
+        "_seconds": 1726891000,
+        "_nanoseconds": 0
+      }
+    },
+    "user_manager_vikram": {
+      "email": "vikram.singh@email.com",
+      "displayName": "Vikram Singh",
+      "photoURL": "https://dummyimage.com/200x200/000/fff&text=VS",
+      "createdAt": {
+        "_seconds": 1726880000,
+        "_nanoseconds": 0
+      }
+    }
+  },
+  "libraries": {
+    "lib_gyan_mandir": {
+      "name": "Gyan Mandir Study Hall",
+      "address": "12B, Koramangala 4th Block, Bengaluru, Karnataka 560034",
+      "totalSeats": 20,
+      "occupiedSeats": 1,
+      "ownerInfo": {
+        "name": "Rakesh Gupta",
+        "phone": "+919876543210"
+      },
+      "amenities": {
+        "amenity_1": {
+          "name": "High-Speed Wi-Fi",
+          "description": "100 Mbps fiber optic internet"
+        },
+        "amenity_2": {
+          "name": "Air Conditioning",
+          "description": "Fully air-conditioned space"
+        }
+      },
+      "pricingPlans": {
+        "plan_daily": {
+          "name": "Daily Pass",
+          "price": 250,
+          "duration": "day"
+        },
+        "plan_monthly": {
+          "name": "Monthly Subscription",
+          "price": 3000,
+          "duration": "month"
+        }
+      },
+      "bookCategories": {
+        "cat_fiction": {
+          "name": "Fiction"
+        },
+        "cat_competitive_exams": {
+          "name": "Competitive Exams"
+        }
+      }
+    },
+    "lib_vidya_sagar": {
+      "name": "Vidya Sagar Library",
+      "address": "Shop 5, Andheri West, Mumbai, Maharashtra 400058",
+      "totalSeats": 30,
+      "occupiedSeats": 0,
+      "ownerInfo": {
+        "name": "Sunita Desai",
+        "phone": "+919123456789"
+      },
+      "amenities": {
+        "amenity_1": {
+          "name": "High-Speed Wi-Fi",
+          "description": "200 Mbps fiber optic internet"
+        },
+        "amenity_2": {
+          "name": "Pantry Access",
+          "description": "Access to microwave and coffee machine"
+        }
+      },
+      "pricingPlans": {
+        "plan_hourly": {
+          "name": "Hourly Pass",
+          "price": 50,
+          "duration": "hour"
+        },
+        "plan_monthly": {
+          "name": "Monthly Subscription",
+          "price": 3500,
+          "duration": "month"
+        }
+      },
+      "bookCategories": {
+        "cat_engg": {
+          "name": "Engineering"
+        },
+        "cat_medical": {
+          "name": "Medical"
+        }
+      }
+    }
+  },
+  "__collections__": {
+    "libraries": {
+      "lib_gyan_mandir": {
+        "members": {
+          "user_student_arjun": {
+            "role": "student",
+            "displayName": "Arjun Sharma",
+            "email": "arjun.sharma@email.com",
+            "joinedAt": {
+              "_seconds": 1726890100,
+              "_nanoseconds": 0
+            }
+          },
+          "user_manager_vikram": {
+            "role": "manager",
+            "displayName": "Vikram Singh",
+            "email": "vikram.singh@email.com",
+            "joinedAt": {
+              "_seconds": 1726881000,
+              "_nanoseconds": 0
+            }
+          }
+        },
+        "books": {
+          "book_chem_01": {
+            "title": "Modern Approach to Chemical Calculations",
+            "author": "R.C. Mukherjee",
+            "isbn": "9788177099899",
+            "genre": "Competitive Exams",
+            "totalCopies": 3,
+            "availableCopies": 2
+          },
+          "book_fic_01": {
+            "title": "The Palace of Illusions",
+            "author": "Chitra Banerjee Divakaruni",
+            "isbn": "9780330458547",
+            "genre": "Fiction",
+            "totalCopies": 5,
+            "availableCopies": 5
+          }
+        },
+        "issuedBooks": {
+          "issue_001": {
+            "bookId": "book_chem_01",
+            "bookTitle": "Modern Approach to Chemical Calculations",
+            "studentId": "user_student_arjun",
+            "studentName": "Arjun Sharma",
+            "issuedAt": {
+              "_seconds": 1724219400,
+              "_nanoseconds": 0
+            },
+            "dueDate": {
+              "_seconds": 1725429000,
+              "_nanoseconds": 0
+            },
+            "returnedAt": null,
+            "status": "overdue"
+          }
+        },
+        "payments": {
+          "payment_gm_001": {
+            "studentId": "user_student_arjun",
+            "studentName": "Arjun Sharma",
+            "amount": 3000,
+            "paymentDate": {
+              "_seconds": 1725169800,
+              "_nanoseconds": 0
+            },
+            "paymentFor": "Monthly Subscription - September 2025",
+            "transactionId": "txn_gm_arjun_sep25"
+          }
+        },
+        "seats": {
+          "seat_c1": {
+            "seatNumber": "C1",
+            "type": "cubicle",
+            "status": "available"
+          },
+          "seat_c2": {
+            "seatNumber": "C2",
+            "type": "cubicle",
+            "status": "occupied"
+          }
+        },
+        "seatBookings": {
+          "booking_001": {
+            "seatId": "seat_c2",
+            "seatNumber": "C2",
+            "studentId": "user_student_arjun",
+            "studentName": "Arjun Sharma",
+            "startTime": {
+              "_seconds": 1726905000,
+              "_nanoseconds": 0
+            },
+            "endTime": {
+              "_seconds": 1726926600,
+              "_nanoseconds": 0
+            },
+            "status": "active"
+          }
+        }
+      },
+      "lib_vidya_sagar": {
+        "members": {
+          "user_student_priya": {
+            "role": "student",
+            "displayName": "Priya Patel",
+            "email": "priya.patel@email.com",
+            "joinedAt": {
+              "_seconds": 1726891100,
+              "_nanoseconds": 0
+            }
+          },
+          "user_student_arjun": {
+            "role": "student",
+            "displayName": "Arjun Sharma",
+            "email": "arjun.sharma@email.com",
+            "joinedAt": {
+              "_seconds": 1724000000,
+              "_nanoseconds": 0
+            }
+          }
+        },
+        "books": {
+          "book_engg_01": {
+            "title": "Concepts of Physics",
+            "author": "H.C. Verma",
+            "isbn": "9788177091879",
+            "genre": "Engineering",
+            "totalCopies": 10,
+            "availableCopies": 10
+          }
+        },
+        "payments": {
+          "payment_vs_001": {
+            "studentId": "user_student_priya",
+            "studentName": "Priya Patel",
+            "amount": 3500,
+            "paymentDate": {
+              "_seconds": 1725170000,
+              "_nanoseconds": 0
+            },
+            "paymentFor": "Monthly Subscription - September 2025",
+            "transactionId": "txn_vs_priya_sep25"
+          },
+          "payment_vs_002": {
+            "studentId": "user_student_arjun",
+            "studentName": "Arjun Sharma",
+            "amount": 3500,
+            "paymentDate": {
+              "_seconds": 1722577800,
+              "_nanoseconds": 0
+            },
+            "paymentFor": "Monthly Subscription - August 2025",
+            "transactionId": "txn_vs_arjun_aug25"
+          }
+        },
+        "seats": {
+          "seat_d1": {
+            "seatNumber": "D1",
+            "type": "open-desk",
+            "status": "available"
+          }
+        }
+      }
+    },
+    "userPayments": {
+      "user_student_arjun": {
+        "payments": {
+          "payment_gm_001": {
+            "libraryId": "lib_gyan_mandir",
+            "libraryName": "Gyan Mandir Study Hall",
+            "amount": 3000,
+            "paymentDate": {
+              "_seconds": 1725169800,
+              "_nanoseconds": 0
+            },
+            "paymentFor": "Monthly Subscription - September 2025",
+            "transactionId": "txn_gm_arjun_sep25"
+          },
+          "payment_vs_002": {
+            "libraryId": "lib_vidya_sagar",
+            "libraryName": "Vidya Sagar Library",
+            "amount": 3500,
+            "paymentDate": {
+              "_seconds": 1722577800,
+              "_nanoseconds": 0
+            },
+            "paymentFor": "Monthly Subscription - August 2025",
+            "transactionId": "txn_vs_arjun_aug25"
+          }
+        }
+      },
+      "user_student_priya": {
+        "payments": {
+          "payment_vs_001": {
+            "libraryId": "lib_vidya_sagar",
+            "libraryName": "Vidya Sagar Library",
+            "amount": 3500,
+            "paymentDate": {
+              "_seconds": 1725170000,
+              "_nanoseconds": 0
+            },
+            "paymentFor": "Monthly Subscription - September 2025",
+            "transactionId": "txn_vs_priya_sep25"
+          }
+        }
+      }
+    }
+  }
+}

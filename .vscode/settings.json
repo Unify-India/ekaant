@@ -65,6 +65,7 @@
   ],
   "todohighlight.maxFilesForSearch": 5120,
   "cSpell.words": [
+    "Aadhaar",
     "bazel",
     "chatbubbles",
     "checkmark",
@@ -72,6 +73,7 @@
     "Firestore",
     "libpeerconnection",
     "mnpcod",
+    "ngsw",
     "runtimeconfig",
     "styleext",
     "testem",
