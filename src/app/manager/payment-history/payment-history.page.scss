@@ -1,0 +1,46 @@
+.stats-grid ion-card {
+  border-radius: 14px;
+  padding: 18px;
+  text-align: left;
+
+  ion-icon {
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+  h3 {
+    font-size: 22px;
+    margin: 4px 0;
+  }
+  p {
+    font-weight: 600;
+  }
+  small {
+    color: var(--ion-color-medium);
+  }
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  padding: 14px 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.records-card {
+  padding: 20px;
+}
+
+.record-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1.4fr 1fr 0.7fr 1fr auto;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.insights {
+  background: #f8fbff;
+  padding: 18px;
+  border-radius: 12px;
+}

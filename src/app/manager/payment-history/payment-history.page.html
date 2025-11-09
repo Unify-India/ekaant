@@ -10,4 +10,85 @@
       <ion-title size="large">payment-history</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div id="content">
+    <!-- Header -->
+    <div class="ion-padding">
+      <p>View all student payments and manage invoices</p>
+    </div>
+
+    <!-- Stats -->
+    <ion-grid class="stats-grid">
+      <ion-row>
+        <ion-col size="12" sizeMd="3" *ngFor="let s of stats">
+          <ion-card class="stat-card" [style.background]="s.color">
+            <ion-icon [name]="s.icon"></ion-icon>
+            <h3>{{ s.value }}</h3>
+            <p>{{ s.title }}</p>
+            <small>{{ s.sub }}</small>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Filters -->
+    <div class="filters">
+      <ion-segment value="all">
+        <ion-segment-button value="all">All Payments</ion-segment-button>
+        <ion-segment-button value="paid">Paid</ion-segment-button>
+        <ion-segment-button value="pending">Pending</ion-segment-button>
+      </ion-segment>
+
+      <ion-searchbar placeholder="Search students, plans..."></ion-searchbar>
+
+      <ion-button fill="solid" color="success">
+        <ion-icon name="download-outline"></ion-icon>
+        Export All
+      </ion-button>
+    </div>
+
+    <!-- Payments Table -->
+    <ion-card class="records-card">
+      <h3>Payment Records</h3>
+      <p>{{ payments.length }} payments found</p>
+
+      <div class="record-row" *ngFor="let p of payments">
+        <div class="left">
+          <h4>{{ p.name }}</h4>
+          <small>{{ p.email }}</small>
+        </div>
+
+        <div class="plan">
+          <strong>{{ p.plan }}</strong>
+          <small>{{ p.period }} • {{ p.details }}</small>
+        </div>
+
+        <div class="amount">
+          <strong>{{ p.amount }}</strong>
+          <small>{{ p.method }}</small>
+        </div>
+
+        <div>
+          <ion-badge [color]="getStatusColor(p.status)">{{ p.status }}</ion-badge>
+        </div>
+
+        <div class="date">{{ p.date }}</div>
+
+        <ion-button size="small" fill="solid" color="primary">
+          <ion-icon name="receipt-outline"></ion-icon>
+          &nbsp;Invoice
+        </ion-button>
+      </div>
+    </ion-card>
+
+    <!-- Insights -->
+    <ion-card class="insights">
+      <h4>Revenue Insights</h4>
+      <ul>
+        <li>Average payment per student: $150</li>
+        <li>Monthly recurring revenue: $150</li>
+        <li>Payment success rate: 100%</li>
+        <li>Total hours purchased: 60 hours</li>
+      </ul>
+    </ion-card>
+  </div>
 </ion-content>
