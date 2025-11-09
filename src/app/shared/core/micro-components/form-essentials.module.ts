@@ -7,6 +7,8 @@ import {
   IonRadioGroup,
   IonSelect,
   IonSelectOption,
+  IonDatetime,
+  IonDatetimeButton,
 } from '@ionic/angular/standalone';
 @NgModule({
   declarations: [],
@@ -19,6 +21,8 @@ import {
     IonRadioGroup,
     IonSelect,
     IonSelectOption,
+    IonDatetime,
+    IonDatetimeButton,
   ],
   exports: [
     FormsModule,
@@ -29,6 +33,8 @@ import {
     IonRadioGroup,
     IonSelect,
     IonSelectOption,
+    IonDatetime,
+    IonDatetimeButton,
   ],
 })
 export class FormEssentials {}
