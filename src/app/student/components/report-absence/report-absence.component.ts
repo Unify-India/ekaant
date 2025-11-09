@@ -52,7 +52,7 @@ import { calendarOutline, closeOutline, informationCircleOutline, checkmarkCircl
     DatePipe,
   ],
 })
-export class ReportAbsenceModalComponent implements OnInit {
+export class ReportAbsenceModal implements OnInit {
   // ViewChild to access the ion-datetime component
   @ViewChild('datetimePicker') datetimePicker!: IonDatetime;
 
