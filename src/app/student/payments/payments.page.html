@@ -51,7 +51,7 @@
               <span>Next Amount:</span>
               <strong>
                 <ion-icon name="cash-outline"></ion-icon>
-                ${{ currentSubscription.nextAmount.toFixed(2) }}
+                {{ currencySymbol }}{{ currentSubscription.nextAmount.toFixed(2) }}
               </strong>
             </div>
             <ion-button expand="block" class="ion-margin-top">Change Plan</ion-button>
@@ -67,7 +67,7 @@
               <ion-card-title>Total Paid</ion-card-title>
             </ion-card-header>
             <ion-card-content>
-              <div class="stat-value">${{ totalPaid.toFixed(2) }}</div>
+              <div class="stat-value">{{ currencySymbol }}{{ totalPaid.toFixed(2) }}</div>
               <ion-note>Across all successful payments.</ion-note>
             </ion-card-content>
           </ion-card>
@@ -117,7 +117,7 @@
               </ion-col>
               <ion-col size="12" size-md sizeSm>{{ payment.date }}</ion-col>
               <ion-col size="12" size-md sizeSm>{{ payment.plan }}</ion-col>
-              <ion-col size="12" size-md sizeSm>${{ payment.amount.toFixed(2) }}</ion-col>
+              <ion-col size="12" size-md sizeSm>{{ currencySymbol }}{{ payment.amount.toFixed(2) }}</ion-col>
               <ion-col size="12" size-md sizeSm>
                 @switch (payment.status) {
                   @case ('Paid') {

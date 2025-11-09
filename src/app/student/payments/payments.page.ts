@@ -9,6 +9,7 @@ import {
   closeCircle,
   downloadOutline,
 } from 'ionicons/icons';
+import { constants } from 'src/app/constants/constants';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { FormEssentials } from 'src/app/shared/core/micro-components/form-essentials.module';
 import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
@@ -39,6 +40,7 @@ interface Payment {
 export class PaymentsPage implements OnInit {
   pageTitle = 'Payments';
 
+  currencySymbol = constants.currency;
   public currentSubscription: Subscription = {
     plan: 'Premium Plan',
     status: 'Active',
