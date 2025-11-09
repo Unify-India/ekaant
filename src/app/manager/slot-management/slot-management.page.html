@@ -1,13 +1,60 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>slot-management</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Slot Management</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">slot-management</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      @for (cubicle of mockCubicles; track cubicle.id) {
+        <ion-col size="12" size-sm="6" size-lg="4">
+          <ion-card class="cubicle-card" (click)="manageSlot(cubicle)" button>
+            <ion-card-content>
+              <div class="card-header">
+                <div class="cubicle-id">{{ cubicle.id }}</div>
+                <div class="status-badge" [ngClass]="cubicle.status">
+                  <ion-icon
+                    [name]="statusDetails[cubicle.status].icon"
+                    [color]="statusDetails[cubicle.status].color"
+                    class="status-dot"
+                  ></ion-icon>
+                  <ion-label [color]="statusDetails[cubicle.status].color">
+                    {{ statusDetails[cubicle.status].label }}
+                  </ion-label>
+                </div>
+              </div>
+
+              <div class="amenities">
+                @for (amenity of cubicle.amenities; track amenity) {
+                  <ion-chip outline="true">
+                    <ion-label>{{ amenity }}</ion-label>
+                  </ion-chip>
+                }
+              </div>
+
+              <div class="card-footer">
+                <p>
+                  Last maintenance:
+                  <strong>{{ cubicle.lastMaintenance | date: 'mediumDate' }}</strong>
+                </p>
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  class="more-btn"
+                  (click)="moreActions(cubicle, $event)"
+                  [attr.aria-label]="'More actions for ' + cubicle.id"
+                >
+                  <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
 </ion-content>

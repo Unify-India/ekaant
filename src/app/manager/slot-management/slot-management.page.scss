@@ -1,0 +1,91 @@
+ion-grid {
+  padding: 8px;
+}
+
+.cubicle-card {
+  --background: var(--ion-color-light);
+  --border-radius: 16px;
+  --box-shadow: none;
+
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  ion-card-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-grow: 1;
+  }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cubicle-id {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ion-color-dark-tint);
+}
+
+.more-btn {
+  --color: var(--ion-color-medium);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: var(--ion-color-background);
+  width: fit-content;
+
+  &.available {
+    border: 1px solid var(--ion-color-success-tint);
+  }
+  &.occupied {
+    border: 1px solid var(--ion-color-primary-tint);
+  }
+  &.maintenance {
+    border: 1px solid var(--ion-color-warning-tint);
+  }
+
+  .status-dot {
+    font-size: 10px;
+  }
+}
+
+.amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+
+  ion-chip {
+    height: 28px;
+    font-size: 0.75rem;
+    --background: var(--ion-color-background);
+  }
+}
+
+.card-footer {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  color: var(--ion-color-medium-shade);
+  font-size: 0.8rem;
+}
