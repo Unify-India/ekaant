@@ -165,8 +165,10 @@ export class LoginPage implements OnInit {
   }
 
   private async handleSuccessfulAuth() {
-    if (this.selectedRole) {
+    if (this.selectedRole && !this.autoSelectManager) {
       this.router.navigate([`/${this.selectedRole}/dashboard`]);
+    } else if (this.selectedRole && this.autoSelectManager) {
+      this.router.navigate(['library-registration-form']);
     } else {
       this.authService.redirectToDashboard(this.selectedRole || undefined);
     }
