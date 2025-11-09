@@ -10,4 +10,93 @@
       <ion-title size="large">campaign</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div id="content" class="ion-margin">
+    <div class="header-bar">
+      <span class="tagline">🚀 Boost visibility & maximize occupancy</span>
+    </div>
+
+    <!-- Building Together Card -->
+    <ion-card class="ion-card ion-padding info-banner">
+      <ion-icon name="heart-outline"></ion-icon>
+      <div>
+        <h2>Building Together</h2>
+        <p>
+          Your campaign investments help us maintain our servers, support our team, and improve the platform
+          continuously.
+        </p>
+      </div>
+    </ion-card>
+
+    <div class="grid">
+      <!-- Promotional Campaigns -->
+      <ion-card class="ion-card ion-padding">
+        <h3>Promotional Campaigns</h3>
+
+        <div *ngFor="let c of campaigns" class="campaign-item" [ngClass]="c.colorClass">
+          <div>
+            <h4>{{ c.name }}</h4>
+            <p>{{ c.description }}</p>
+            <small>{{ c.benefit }}</small>
+          </div>
+
+          <div class="price-toggle">
+            <span>${{ c.price }}/month</span>
+            <ion-toggle [(ngModel)]="c.active" (ionChange)="toggleCampaign(c)"></ion-toggle>
+          </div>
+        </div>
+      </ion-card>
+
+      <div class="side-cards">
+        <!-- Benefits Card -->
+        <ion-card class="card ion-padding">
+          <h3>Campaign Benefits</h3>
+          <ul class="feature-list">
+            <li>
+              <div class="icon-box" style="background: #3880ff10">
+                <ion-icon name="trending-up-outline" style="color: #3880ff"></ion-icon>
+              </div>
+              <span>Increased Visibility</span>
+            </li>
+            <li>
+              <div class="icon-box" style="background: #2dd36f10">
+                <ion-icon name="people-outline" style="color: #2dd36f"></ion-icon>
+              </div>
+              <span>Higher Occupancy</span>
+            </li>
+            <li>
+              <div class="icon-box" style="background: #ffc40910">
+                <ion-icon name="ribbon-outline" style="color: #ffc409"></ion-icon>
+              </div>
+              <span>Premium Branding</span>
+            </li>
+          </ul>
+        </ion-card>
+
+        <!-- Investment Info Card -->
+        <ion-card class="ion-padding yellow">
+          <h3>Investment Information</h3>
+          <ul class="feature-list">
+            <li>
+              <div class="icon-box" style="background: #80808020">
+                <ion-icon name="build-outline" style="color: #808080"></ion-icon>
+              </div>
+              <span>Platform maintenance included</span>
+            </li>
+            <li>
+              <div class="icon-box" style="background: #80808020">
+                <ion-icon name="analytics-outline" style="color: #808080"></ion-icon>
+              </div>
+              <span>Detailed analytics included</span>
+            </li>
+            <li>
+              <div class="icon-box" style="background: #80808020">
+                <ion-icon name="headset-outline" style="color: #808080"></ion-icon>
+              </div>
+              <span>Priority customer support</span>
+            </li>
+          </ul>
+        </ion-card>
+      </div>
+    </div>
+  </div>
 </ion-content>
