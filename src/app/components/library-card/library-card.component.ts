@@ -31,9 +31,9 @@ export class LibraryCardComponent {
   }
   /**
    * Emits when the bottom action button is pressed.
-   * Payload: { type: 'enroll' | 'waitlist', library }
+   * Payload: { type: 'enroll' | 'waitlist', libraryId?, library }
    */
-  @Output() action = new EventEmitter<{ type: 'enroll' | 'waitlist'; library: Library }>();
+  @Output() action = new EventEmitter<Library>();
 
   /** readable availability text */
   get availabilityText(): string {
@@ -74,7 +74,7 @@ export class LibraryCardComponent {
   }
 
   /** called from template when user clicks the button */
-  onActionClick() {
-    this.action.emit({ type: this.actionType, library: this.library });
+  onActionClick(library: Library) {
+    this.action.emit(library);
   }
 }

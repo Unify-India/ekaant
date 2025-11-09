@@ -31,7 +31,7 @@
       <span>View</span>
       <ion-icon slot="start" name="eye-outline"></ion-icon>
     </ion-button>
-    <ion-button [color]="actionColor" (click)="onActionClick()">
+    <ion-button [color]="actionColor" (click)="onActionClick(library)">
       <span>{{ actionLabel }}</span>
       <ion-icon slot="end" [name]="library.isFull ? 'notifications-outline' : 'arrow-forward'"></ion-icon>
     </ion-button>
