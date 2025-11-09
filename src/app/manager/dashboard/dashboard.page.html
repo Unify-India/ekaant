@@ -1,6 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>dashboard</ion-title>
+    <ion-menu-button></ion-menu-button>
   </ion-toolbar>
 </ion-header>
 
@@ -10,4 +11,80 @@
       <ion-title size="large">dashboard</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div id="content">
+    <ion-card class="ion-padding ion-margin">
+      <div class="library-header">
+        <div>
+          <h3>Library Information</h3>
+          <p>{{ libraryInfo.address }}</p>
+          <small>
+            <span>Total Seats: {{ libraryInfo.totalSeats }}</span>
+            <span class="available">• &nbsp; Available: {{ libraryInfo.availableSeats }}</span>
+            <span class="occupied">• &nbsp; Occupied: {{ libraryInfo.occupiedSeats }}</span>
+          </small>
+        </div>
+
+        <div class="availability-box">
+          <h2>{{ libraryInfo.availabilityPercentage }}%</h2>
+          <span>Availability</span>
+        </div>
+      </div>
+    </ion-card>
+
+    <ion-grid class="stats-grid">
+      <ion-row>
+        <ion-col size="12" sizeMd="3" *ngFor="let item of dashboardStats">
+          <ion-card class="ion-padding">
+            <div class="value">{{ item.value }}</div>
+            <div class="label">{{ item.title }}</div>
+
+            <div class="trend">
+              <ion-icon name="trending-up-outline"></ion-icon>
+              {{ item.trend }} vs last month
+            </div>
+
+            <div class="icon-box" [style.background]="item.color + '20'">
+              <ion-icon [name]="item.icon" [style.color]="item.color"></ion-icon>
+            </div>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-grid class="lower-section">
+      <ion-row>
+        <!-- Recent Bookings -->
+        <ion-col size="12" sizeMd="6">
+          <ion-card class="section-card">
+            <h3>Recent Bookings</h3>
+
+            <div *ngFor="let booking of recentBookings" class="booking-row">
+              <div class="left">
+                <h4>{{ booking.name }}</h4>
+                <small>{{ booking.code }} • {{ booking.date }}</small>
+              </div>
+              <div class="right">
+                <span class="amount">{{ booking.amount }}</span>
+                <span class="status" [ngClass]="booking.status">{{ booking.status }}</span>
+              </div>
+            </div>
+          </ion-card>
+        </ion-col>
+
+        <!-- Quick Actions -->
+        <ion-col size="12" sizeMd="6">
+          <ion-card class="section-card">
+            <h3>Quick Actions</h3>
+
+            <div *ngFor="let action of quickActions" class="action-row" [style.background]="action.bg">
+              <ion-icon [name]="action.icon"></ion-icon>
+              <span>{{ action.label }}</span>
+
+              <ion-badge *ngIf="action.badge">{{ action.badge }}</ion-badge>
+            </div>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
 </ion-content>

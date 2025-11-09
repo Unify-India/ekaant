@@ -1,0 +1,170 @@
+.title-section {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  h2 {
+    font-weight: 700;
+    margin: 0;
+  }
+
+  small {
+    font-size: 13px;
+    color: var(--ion-color-medium);
+  }
+
+  ion-icon {
+    font-size: 28px;
+    color: var(--ion-color-primary);
+  }
+}
+
+.library-card {
+  border-radius: 0.5rem;
+  padding: 18px;
+}
+
+.available {
+  color: #22c55e;
+}
+.occupied {
+  color: #ef4444;
+}
+
+.library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.availability-box {
+  text-align: right;
+
+  h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ion-color-primary);
+  }
+
+  span {
+    font-size: 13px;
+    color: var(--ion-color-medium);
+  }
+}
+
+.stats-grid {
+  margin-top: 1rem;
+}
+
+.stats-card {
+  position: relative;
+  padding: 16px;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 9px rgba(0, 0, 0, 0.05);
+}
+
+.value {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.label {
+  font-size: 14px;
+  margin-top: 4px;
+  color: var(--ion-color-medium);
+}
+
+.trend {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-box {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  padding: 8px;
+  border-radius: 0.5rem;
+  display: flex;
+}
+
+.section-card {
+  border-radius: 0.5rem;
+  padding: 18px;
+}
+
+.section-card h3 {
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+/* Recent Bookings */
+.booking-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f1f1;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 15px;
+  }
+  small {
+    color: var(--ion-color-medium);
+  }
+
+  .amount {
+    font-weight: 600;
+    margin-right: 8px;
+  }
+
+  .status {
+    padding: 3px 8px;
+    border-radius: 0.5rem;
+    font-size: 12px;
+    text-transform: capitalize;
+
+    &.pending {
+      background: #fff7e6;
+      color: #f59e0b;
+    }
+    &.paid {
+      background: #e6fffa;
+      color: #10b981;
+    }
+  }
+}
+
+/* Quick Actions */
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 0.5rem;
+  margin-top: 8px;
+
+  ion-icon {
+    font-size: 20px;
+    color: #6b7280;
+  }
+
+  ion-badge {
+    margin-left: auto;
+    background: #ef4444;
+    color: white;
+  }
+}
+
+.lower-section {
+  margin-top: 25px;
+}
