@@ -37,3 +37,10 @@ export interface IPricingDetails {
   timeRange?: string;
   unit: string;
 }
+
+export interface IAttendanceRecord {
+  date: string;
+  duration?: string;
+  status: 'Completed' | 'Absent';
+  timeRange: string;
+}
