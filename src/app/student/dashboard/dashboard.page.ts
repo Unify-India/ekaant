@@ -1,23 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import {
-  IonNote,
-  IonItem,
-  IonList,
-  IonAvatar,
-  IonLabel,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonIcon,
-  IonCol,
-  IonChip,
-  IonRow,
-  IonGrid,
-  IonCardContent,
-  IonListHeader,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   logInOutline,
@@ -27,11 +10,13 @@ import {
   locationOutline,
   timeOutline,
   calendarOutline,
+  logOutOutline,
 } from 'ionicons/icons';
 import { AttendanceCardComponent } from 'src/app/components/attendance-card/attendance-card.component';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
+import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
 
-import { ReportAbsenceModalComponent } from '../components/report-absence/report-absence.component';
+import { ReportAbsenceModal } from '../components/report-absence/report-absence.component';
 
 interface Attendance {
   date: string;
@@ -45,24 +30,7 @@ interface Attendance {
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [
-    IonListHeader,
-    IonCardContent,
-    IonGrid,
-    IonRow,
-    IonChip,
-    IonCol,
-    IonIcon,
-    IonCardTitle,
-    IonCardHeader,
-    IonCard,
-    IonLabel,
-    IonItem,
-    IonNote,
-    BaseUiComponents,
-    AttendanceCardComponent,
-    RouterLink,
-  ],
+  imports: [BaseUiComponents, UiEssentials, AttendanceCardComponent, RouterLink],
 })
 export class DashboardPage implements OnInit {
   pageTitle = 'Student Dashboard';
@@ -103,12 +71,13 @@ export class DashboardPage implements OnInit {
     private modalController: ModalController,
   ) {
     addIcons({
+      logOutOutline,
       logInOutline,
       closeCircleOutline,
-      cardOutline,
-      personCircleOutline,
       locationOutline,
       timeOutline,
+      cardOutline,
+      personCircleOutline,
       calendarOutline,
     });
   }
@@ -118,6 +87,13 @@ export class DashboardPage implements OnInit {
     this.today.checkedIn = true;
     // e.g. call API or show toast
     console.log('Checked in');
+  }
+
+  onCheckOut() {
+    // implement check-out logic
+    this.today.checkedIn = false;
+    // e.g. call API or show toast
+    console.log('Checked out');
   }
 
   onReportAbsence() {
@@ -132,16 +108,15 @@ export class DashboardPage implements OnInit {
 
   async openReportAbsenceModal() {
     const modal = await this.modalController.create({
-      component: ReportAbsenceModalComponent,
-      cssClass: 'report-absence-modal', // Apply custom CSS to the modal wrapper if needed
-      breakpoints: [0, 0.5, 0.8], // Optional: Define breakpoints for sheet modal
-      initialBreakpoint: 0.8, // Optional: Initial size of the sheet modal
+      component: ReportAbsenceModal,
+      cssClass: 'report-absence-modal',
+      breakpoints: [0, 0.5, 0.8],
+      initialBreakpoint: 0.8,
     });
 
     modal.onDidDismiss().then((data) => {
       if (data.role === 'submit' && data.data) {
         console.log('Absence submitted:', data.data);
-        // Handle the submitted absence data
       } else {
         console.log('Modal dismissed without submission or cancelled.');
       }

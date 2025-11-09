@@ -80,22 +80,17 @@ export class ReportAbsenceModal implements OnInit {
 
   ngOnInit() {}
 
-  // Handles the date change event from ion-datetime
   onDateChange(event: CustomEvent) {
     this.selectedDate = event.detail.value;
-    // Dismiss the date picker modal after selection
     this.modalController.dismiss();
   }
 
-  // Dismisses the modal without submitting
   dismissModal() {
     this.modalController.dismiss(null, 'cancel');
   }
 
-  // Submits the absence report
   submitAbsence() {
     if (!this.selectedDate) {
-      // You might want to show a toast or alert here
       console.warn('Please select an absence date.');
       return;
     }
@@ -104,7 +99,6 @@ export class ReportAbsenceModal implements OnInit {
       date: this.selectedDate,
       reason: this.absenceReason,
     };
-    console.log('Submitting absence:', absenceData);
     this.modalController.dismiss(absenceData, 'submit');
   }
 }
