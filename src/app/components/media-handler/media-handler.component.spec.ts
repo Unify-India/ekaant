@@ -9,8 +9,8 @@ describe('MediaHandlerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MediaHandlerComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [MediaHandlerComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MediaHandlerComponent);

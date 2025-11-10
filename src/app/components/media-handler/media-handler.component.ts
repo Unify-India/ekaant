@@ -5,10 +5,8 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './media-handler.component.html',
   styleUrls: ['./media-handler.component.scss'],
 })
-export class MediaHandlerComponent  implements OnInit {
-
-  constructor() { }
+export class MediaHandlerComponent implements OnInit {
+  constructor() {}
 
   ngOnInit() {}
-
 }
