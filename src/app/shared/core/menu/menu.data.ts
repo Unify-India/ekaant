@@ -6,6 +6,12 @@ export class MenuData {
     { title: 'Login', url: 'login', icon: 'log-in', color: 'medium' },
   ];
 
+  public static libraryRegistrationPending = [
+    { title: 'Dashboard', url: 'home', icon: 'grid', color: 'primary' },
+    { title: 'My Application', url: 'manager/complete-profile', icon: 'document-text', color: 'secondary' },
+    { title: 'Pricing', url: 'pricing', icon: 'cash', color: 'success' },
+  ];
+
   public static adminAppPages = [
     { title: 'Dashboard', url: 'admin/dashboard', icon: 'home' },
     { title: 'Pending Requests', url: 'admin/pending-requests', icon: 'hourglass' },
