@@ -1,6 +1,7 @@
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 
 export function createBasicInformationForm(fb: FormBuilder): FormGroup {
+  // todo: add pattern validation for operation hours like 6AM - 10PM
   return fb.group({
     libraryName: ['', [Validators.required, Validators.minLength(3)]],
     fullAddress: ['', [Validators.required, Validators.minLength(10)]],
@@ -12,6 +13,7 @@ export function createBasicInformationForm(fb: FormBuilder): FormGroup {
 export function createHostProfileForm(fb: FormBuilder): FormGroup {
   return fb.group({
     profilePhoto: [null],
+    profilePhotoProgress: [0],
     fullName: ['', [Validators.required, Validators.minLength(3)]],
     visionStatement: ['', [Validators.required, Validators.maxLength(500)]],
     experience: ['', Validators.maxLength(300)],
@@ -26,9 +28,11 @@ export function createHostProfileForm(fb: FormBuilder): FormGroup {
 //  Validators.pattern('^(\\+91)?[6-9]\\d{9}$')
 
 export function createPhotoGroup(fb: FormBuilder): FormGroup {
+  // todo: add validation to have only image in file type
   return fb.group({
     file: [null, Validators.required], // The raw File object
     previewUrl: ['', Validators.required], // The local Base64 preview URL
+    uploadProgress: [0], // percentage 0-100
   });
 }
 
@@ -103,6 +107,17 @@ export function createPricingPlansForm(fb: FormBuilder): FormGroup {
 export function createRequirementsForm(fb: FormBuilder): FormGroup {
   return fb.group({
     selectedRequirements: fb.array([], [Validators.required, Validators.minLength(1)]),
+  });
+}
+
+// helper to create individual requirement group (if used externally)
+export function createRequirementGroup(fb: FormBuilder, description = '', isCustom = false) {
+  return fb.group({
+    description: [description, Validators.required],
+    isCustom: [isCustom],
+    attachSample: [false],
+    sampleFile: [null],
+    sampleFileProgress: [0],
   });
 }
 
