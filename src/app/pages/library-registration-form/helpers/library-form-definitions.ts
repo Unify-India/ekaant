@@ -27,11 +27,11 @@ export function createHostProfileForm(fb: FormBuilder): FormGroup {
 
 //  Validators.pattern('^(\\+91)?[6-9]\\d{9}$')
 
-export function createPhotoGroup(fb: FormBuilder): FormGroup {
+export function createPhotoGroup(fb: FormBuilder, photoUrl: string = ''): FormGroup {
   // todo: add validation to have only image in file type
   return fb.group({
-    file: [null, Validators.required], // The raw File object
-    previewUrl: ['', Validators.required], // The local Base64 preview URL
+    file: [null], // Not required when just displaying URL
+    previewUrl: [photoUrl, Validators.required],
     uploadProgress: [0], // percentage 0-100
   });
 }
@@ -89,12 +89,20 @@ export function createSeatManagementForm(fb: FormBuilder): FormGroup {
   });
 }
 
-export function createPlanGroup(fb: FormBuilder): FormGroup {
+export function createFacilityRangeGroup(fb: FormBuilder, from = 0, to = 0, facility = ''): FormGroup {
   return fb.group({
-    planType: ['', Validators.required],
-    timeSlot: ['', Validators.required],
-    rate: [null, [Validators.required, Validators.min(0)]],
-    description: [''],
+    from: [from, [Validators.required, Validators.min(1)]],
+    to: [to, [Validators.required, Validators.min(1)]],
+    facility: [facility, Validators.required],
+  });
+}
+
+export function createPricingPlanGroup(fb: FormBuilder, plan: any = {}): FormGroup {
+  return fb.group({
+    planType: [plan.planType || '', Validators.required],
+    timeSlot: [plan.timeSlot || '', Validators.required],
+    rate: [plan.rate || null, [Validators.required, Validators.min(0)]],
+    description: [plan.description || ''],
   });
 }
 

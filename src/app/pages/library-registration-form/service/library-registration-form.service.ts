@@ -1,16 +1,21 @@
 import { Injectable, signal } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { DraftService } from 'src/app/services/draft.service';
 import { FirebaseService } from 'src/app/services/firebase/firebase-service';
+import { LibraryService } from 'src/app/services/library/library.service';
 
 import {
   createAmenitiesForm,
   createBasicInformationForm,
   createBookCollectionForm,
   createCodeOfConductForm,
+  createFacilityRangeGroup,
   createHostProfileForm,
   createLibraryImagesForm,
+  createPhotoGroup,
+  createPricingPlanGroup,
   createPricingPlansForm,
+  createRequirementGroup,
   createRequirementsForm,
   createSeatManagementForm,
 } from '../helpers/library-form-definitions';
@@ -38,11 +43,14 @@ export class LibraryRegistrationFormService {
   public mainForm: FormGroup;
   currentSectionIndex = signal(0);
   maxReachedIndex = signal(0);
+  public editMode = false;
+  public registrationDocId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private firebase: FirebaseService,
     private draft: DraftService,
+    private libraryService: LibraryService,
   ) {
     // Initialize Firebase service (connect emulators if configured)
     try {
@@ -70,6 +78,68 @@ export class LibraryRegistrationFormService {
       }
     })(this.mainForm);
     // console.log('Main Form Structure:', this.mainForm);
+  }
+
+  public setEditMode(status: boolean, docId: string | null) {
+    this.editMode = status;
+    this.registrationDocId = docId;
+  }
+
+  public loadRegistrationData(data: any): void {
+    if (!data) return;
+
+    // Use patchValue for the main form to populate most fields
+    this.mainForm.patchValue(data);
+
+    // Manually handle FormArrays
+    if (data.libraryImages && data.libraryImages.libraryPhotos) {
+      const photosArray = this.mainForm.get('libraryImages.libraryPhotos') as FormArray;
+      photosArray.clear();
+      data.libraryImages.libraryPhotos.forEach((photo: any) => {
+        // Note: The 'file' will be null here, but the previewUrl will be a Firebase Storage URL
+        photosArray.push(createPhotoGroup(this.fb, photo.previewUrl));
+      });
+    }
+
+    if (data.seatManagement && data.seatManagement.facilityRanges) {
+      const rangesArray = this.mainForm.get('seatManagement.facilityRanges') as FormArray;
+      rangesArray.clear();
+      data.seatManagement.facilityRanges.forEach((range: any) => {
+        rangesArray.push(createFacilityRangeGroup(this.fb, range.from, range.to, range.facility));
+      });
+    }
+
+    if (data.pricingPlans && data.pricingPlans.pricingPlans) {
+      const plansArray = this.mainForm.get('pricingPlans.pricingPlans') as FormArray;
+      plansArray.clear();
+      data.pricingPlans.pricingPlans.forEach((plan: any) => {
+        plansArray.push(createPricingPlanGroup(this.fb, plan));
+      });
+    }
+
+    if (data.requirements && data.requirements.selectedRequirements) {
+      const requirementsArray = this.mainForm.get('requirements.selectedRequirements') as FormArray;
+      requirementsArray.clear();
+      data.requirements.selectedRequirements.forEach((req: any) => {
+        // Note: 'sampleFile' will be null, but we might have a URL to the file
+        requirementsArray.push(createRequirementGroup(this.fb, req.description, req.isCustom));
+      });
+    }
+  }
+
+  async updateLibrary(): Promise<void> {
+    if (!this.registrationDocId) {
+      throw new Error('No registration document ID found for updating.');
+    }
+    console.log('Updating library registration form...');
+    const payload = this.mainForm.value;
+    // TODO: Handle file uploads for updates
+    const { initialPayload } = this.prepareInitialPayload(payload);
+
+    await this.libraryService.updateLibrary(this.registrationDocId, initialPayload);
+
+    // Reset edit mode after update
+    this.setEditMode(false, null);
   }
 
   async submitLibrary(): Promise<string> {

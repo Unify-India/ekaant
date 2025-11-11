@@ -2,12 +2,14 @@ import { inject, Injectable } from '@angular/core';
 import { Firestore, collection, query, where, getDocs, limit } from '@angular/fire/firestore';
 import { from, map, Observable } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
+import { FirebaseService } from './firebase/firebase-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LibraryService {
   private firestore = inject(Firestore);
+  private firebase = inject(FirebaseService);
 
   constructor() {}
 
@@ -47,14 +49,23 @@ export class LibraryService {
   }
 
   public getLibraryRegistration(userId: string): Observable<any> {
-    const q = query(collection(this.firestore, 'libraryRegistrationRequests'), where('managerId', '==', userId), limit(1));
+    const q = query(
+      collection(this.firestore, 'libraryRegistrationRequests'),
+      where('managerId', '==', userId),
+      limit(1),
+    );
     return from(getDocs(q)).pipe(
       map((snapshot) => {
         if (snapshot.empty) {
           return null;
         }
-        return snapshot.docs[0].data();
+        const doc = snapshot.docs[0];
+        return { id: doc.id, ...doc.data() };
       }),
     );
+  }
+
+  public async updateLibrary(docId: string, data: any): Promise<void> {
+    return this.firebase.updateLibraryRegistration(docId, data);
   }
 }
