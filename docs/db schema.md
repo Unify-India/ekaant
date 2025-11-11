@@ -1,27 +1,30 @@
 ## Firestore Schema for Ekaant
 
-This document outlines the Firestore database structure. The schema is designed to support the MVP features, including user roles, library registration requests, and the final approved library profiles.
+This document outlines the Firestore database structure. The schema is designed to be scalable and support the platform's features, including user management, a detailed library registration process, cubicle booking, and support systems.
 
 ---
 
 ### **1. `users`**
 
 *   **Path:** `/users/{userId}`
-*   **Description:** Stores the global profile for every user (Student, Manager, Admin). The document ID is the Firebase Auth `uid`.
+*   **Description:** Stores the global profile for every user (Student, Manager, Admin). The document ID is the Firebase Auth `uid`. This collection is the single source of truth for user data.
+*   **When to use:**
+    *   On user sign-up to create a new user profile.
+    *   To fetch user details like name and role for display in the app.
+    *   To check permissions based on the user's role.
 
-*   **Schema:**
-
+*   **Schema Example:**
     ```json
     {
-      "id": "{userId}",
+      "uid": "{userId}",
       "email": "priya.patel@example.com",
       "name": "Priya Patel",
-      "role": "student" | "manager" | "admin",
+      "role": "student",
       "photoURL": "https://firebasestorage.googleapis.com/...",
       "createdAt": "Timestamp",
-      "updatedAt": "Timestamp",
-      "verified": true, // Is the user approved to use their role-specific dashboard?
-      "profileCompleted": true // Has the user filled out their initial profile details?
+      "subscriptionExpiry": "Timestamp",
+      "verified": true,
+      "profileCompleted": true
     }
     ```
 
@@ -30,17 +33,18 @@ This document outlines the Firestore database structure. The schema is designed 
 ### **2. `libraryRegistrationRequests`**
 
 *   **Path:** `/libraryRegistrationRequests/{requestId}`
-*   **Description:** Stores the complete application submitted by a library owner from the multi-step form. This is the primary collection Admins will interact with to approve or reject new libraries.
+*   **Description:** Stores the complete application submitted by a library manager from the multi-step form. This is a temporary "staging" collection that Admins interact with to approve or reject new libraries.
+*   **When to use:**
+    *   When a manager submits the registration form. The entire form's state is saved as a single document here.
+    *   In the Admin dashboard to display and review pending applications.
 
-*   **Schema:** (This mirrors the structure of the registration form)
-
+*   **Schema Example:** (This mirrors the structure of the registration form)
     ```json
     {
-      "status": "pending" | "revision_requested" | "approved" | "rejected",
+      "applicationStatus": "pending",
       "adminComments": "Awaiting verification of ownership documents.",
       "submittedAt": "Timestamp",
-      "updatedAt": "Timestamp",
-      "ownerUid": "{managerUserId}", // The Firebase Auth uid of the manager who submitted it
+      "managerId": "{managerUserId}",
 
       "basicInformation": {
         "libraryName": "The Scholar's Nook",
@@ -61,21 +65,21 @@ This document outlines the Firestore database structure. The schema is designed 
       "seatManagement": {
         "totalSeats": 100,
         "facilityRanges": [
-          { "from": 1, "to": 50, "facility": "Air Conditioning" },
-          { "from": 51, "to": 100, "facility": "No Air Conditioning" }
+          { "from": 1, "to": 50, "facility": "Air Conditioning" }
         ]
       },
       "amenities": {
         "highSpeedWifi": true,
         "airConditioning": true,
         "powerOutlets": true,
+        "coffeeMachine": false,
         "waterCooler": true,
-        // ... other boolean flags
+        "parkingAvailable": false
       },
       "bookCollection": {
         "competitiveExams": true,
         "engineeringTechnology": true,
-        // ... other boolean flags
+        "fictionNovels": false
       },
       "pricingPlans": {
         "pricingPlans": [
@@ -99,8 +103,6 @@ This document outlines the Firestore database structure. The schema is designed 
       "codeOfConduct": {
         "conductText": "<h1>Library Rules</h1><p>Maintain silence...</p>"
       }
-      // Note: File URLs (library images, host photo, requirement samples) will be stored
-      // in sub-collections or added after approval to the final 'libraries' document.
     }
     ```
 
@@ -109,60 +111,133 @@ This document outlines the Firestore database structure. The schema is designed 
 ### **3. `libraries`**
 
 *   **Path:** `/libraries/{libraryId}`
-*   **Description:** Represents an approved and live library. This document is created by an Admin from a `libraryRegistrationRequest`. Data is structured for efficient reading by students.
+*   **Description:** Represents an approved and live library. This document is created by a Cloud Function from a `libraryRegistrationRequest`. Data is structured for efficient reading by students. It contains the same sub-objects as the request, but with URLs for uploaded files.
+*   **When to use:**
+    *   Queried by students to find and view details of nearby libraries.
+    *   As the primary data source for a library's public profile page.
 
-*   **Schema:**
-
+*   **Schema Example:**
     ```json
     {
       "name": "The Scholar's Nook",
       "address": "123 University Ave, Pune, Maharashtra",
-      "status": "active" | "inactive",
-      "ownerUid": "{managerUserId}",
+      "status": "active",
+      "managerId": "{managerUserId}",
       "totalSeats": 100,
-      "occupiedSeats": 0, // Updated by backend functions
-      "rating": {
-        "average": 4.5,
-        "totalReviews": 25
-      },
-      // Denormalized data for quick access
-      "basicInformation": { /* from request */ },
-      "hostProfile": { /* from request, with photo URL */ },
-      "seatManagement": { /* from request */ },
-      "amenities": { /* from request */ },
-      "bookCollection": { /* from request */ },
-      "pricingPlans": { /* from request */ },
-      "requirements": { /* from request, with file URLs */ },
-      "codeOfConduct": { /* from request */ },
+      "occupiedSeats": 25,
+      "rating": { "average": 4.5, "totalReviews": 25 },
       "imageUrls": [
-        "https://firebasestorage.googleapis.com/.../img1.jpg",
-        "https://firebasestorage.googleapis.com/.../img2.jpg"
-      ]
+        "https://firebasestorage.googleapis.com/.../img1.jpg"
+      ],
+      "hostProfile": {
+        "fullName": "Rohan Mehta",
+        "visionStatement": "...",
+        "photoURL": "https://firebasestorage.googleapis.com/.../host.jpg"
+      },
+      "requirements": {
+        "selectedRequirements": [
+          {
+            "description": "Valid Government ID",
+            "sampleFileUrl": "https://firebasestorage.googleapis.com/.../sample.pdf"
+          }
+        ]
+      },
+      "basicInformation": { "...": "..." },
+      "seatManagement": { "...": "..." },
+      "amenities": { "...": "..." },
+      "bookCollection": { "...": "..." },
+      "pricingPlans": { "...": "..." },
+      "codeOfConduct": { "...": "..." }
     }
     ```
 
 #### **Sub-collections within `/libraries/{libraryId}`**
 
-*   **/members/{userId}:** Stores information about students who have joined the library.
+*   **/cubicles/{cubicleId}:** Represents each individual study cubicle.
 *   **/reviews/{reviewId}:** Contains individual reviews and ratings from students.
 *   **/studentApplications/{applicationId}:** Manages applications from students wanting to join this library.
 
 ---
 
-### **4. `studentApplications`**
+### **4. `bookings`**
 
-*   **Path:** `/studentApplications/{applicationId}`
-*   **Description:** A top-level collection for all student applications across all libraries, allowing managers to easily query applications for their specific library.
+*   **Path:** `/bookings/{bookingId}`
+*   **Description:** A record of a student booking a cubicle for a specific duration. Core collection for tracking library usage.
+*   **When to use:** When a student reserves a cubicle; for managers to view booking history.
 
-*   **Schema:**
-
+*   **Schema Example:**
     ```json
     {
-      "studentId": "{studentUid}",
-      "studentName": "Priya Patel",
       "libraryId": "{libraryId}",
-      "libraryName": "The Scholar's Nook",
-      "status": "pending" | "approved" | "rejected" | "waitlisted",
-      "appliedAt": "Timestamp"
+      "cubicleId": "{cubicleId}",
+      "studentId": "{studentId}",
+      "startTime": "Timestamp",
+      "endTime": "Timestamp",
+      "status": "active",
+      "paymentId": "{paymentId}"
+    }
+    ```
+
+---
+
+### **5. `payments`**
+
+*   **Path:** `/payments/{paymentId}`
+*   **Description:** Tracks all financial transactions, including membership fees and booking payments.
+*   **When to use:** After a successful payment; to generate financial reports.
+
+*   **Schema Example:**
+    ```json
+    {
+      "studentId": "{studentId}",
+      "libraryId": "{libraryId}",
+      "amount": 1500,
+      "currency": "INR",
+      "status": "successful",
+      "createdAt": "Timestamp",
+      "relatedTo": { "type": "membership", "id": "{membershipId}" }
+    }
+    ```
+
+---
+
+### **6. `notifications`**
+
+*   **Path:** `/notifications/{notificationId}`
+*   **Description:** Stores in-app notifications for users (e.g., booking confirmations, payment reminders).
+*   **When to use:** Triggered by other actions (new booking, ticket response); queried to display a user's notification list.
+
+*   **Schema Example:**
+    ```json
+    {
+      "userId": "{userId}",
+      "title": "Booking Confirmed!",
+      "message": "Your booking for cubicle A-01 is confirmed.",
+      "isRead": false,
+      "createdAt": "Timestamp",
+      "link": "/student/my-bookings/{bookingId}"
+    }
+    ```
+
+---
+
+### **7. `tickets`**
+
+*   **Path:** `/tickets/{ticketId}`
+*   **Description:** A support ticket system for students and managers to report and resolve issues.
+*   **When to use:** When a user submits a support request; for managers/admins to manage and respond to tickets.
+
+*   **Schema Example:**
+    ```json
+    {
+      "title": "Wi-Fi not working",
+      "status": "open",
+      "priority": "high",
+      "createdBy": "{userId}",
+      "libraryId": "{libraryId}",
+      "createdAt": "Timestamp",
+      "comments": [
+        { "comment": "We are looking into it.", "author": "{managerId}", "timestamp": "Timestamp" }
+      ]
     }
     ```

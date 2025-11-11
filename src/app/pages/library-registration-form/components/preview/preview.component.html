@@ -108,6 +108,7 @@
     </div>
     <div class="section-content">
       <h4>{{ section.value.totalSeats }} Total Seats</h4>
+      <!-- fixme: if no facility range hide h5 also -->
       <h5>Facility Ranges:</h5>
       <ul>
         @for (range of section.value.facilityRanges; track $index) {
