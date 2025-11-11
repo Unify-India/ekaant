@@ -7,7 +7,7 @@ export class MenuData {
   ];
 
   public static libraryRegistrationPending = [
-    { title: 'Dashboard', url: 'home', icon: 'grid', color: 'primary' },
+    { title: 'Dashboard', url: 'manager/application-status', icon: 'grid', color: 'primary' },
     { title: 'My Application', url: 'manager/complete-profile', icon: 'document-text', color: 'secondary' },
     { title: 'Pricing', url: 'pricing', icon: 'cash', color: 'success' },
   ];

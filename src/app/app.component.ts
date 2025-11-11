@@ -20,7 +20,7 @@ import { addIcons } from 'ionicons';
 import { Subscription } from 'rxjs';
 
 import { AuthService } from './auth/service/auth.service';
-import { IMenuOptions } from './models/global.interface';
+import { IMenuOptions, IUser } from './models/global.interface';
 import { LibraryService } from './services/library/library.service';
 import { TranslateConfigService } from './services/translation/translation.service';
 import { UsedIcons } from './shared/core/icons/used-icons';
@@ -67,11 +67,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     addIcons(this.icons);
   }
   ngOnInit() {
-    this.updateMenu();
     this.isLoggedIn = this.authService.isLoggedIn();
     this.authListenerSubs = this.authService.getAuthStatusListener().subscribe((user) => {
       this.isLoggedIn = !!user;
-      this.updateMenu();
+      this.updateMenu(user);
     });
     this.apiService
       .getDataFromRealtimeDB('/translations')
@@ -81,6 +80,8 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       .catch((error) => {
         console.warn('Error fetching data from RTDB:', error);
       });
+
+    console.info('isLoggedIn', this.isLoggedIn);
   }
 
   ngAfterViewInit() {
@@ -91,8 +92,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.authListenerSubs.unsubscribe();
   }
 
-  async updateMenu() {
-    const user = this.authService.getCurrentUser();
+  async updateMenu(user: IUser | null) {
     this.isLoggedIn = !!user;
     if (!user) {
       this.appPages = MenuData.defaultAppPages;
