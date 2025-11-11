@@ -50,6 +50,8 @@ import {
   bookOutline,
   bookSharp,
   arrowBack,
+  documentTextSharp,
+  documentTextOutline,
 } from 'ionicons/icons';
 
 export class UsedIcons {
@@ -105,5 +107,7 @@ export class UsedIcons {
     bookOutline,
     bookSharp,
     arrowBack,
+    documentTextSharp,
+    documentTextOutline,
   };
 }
