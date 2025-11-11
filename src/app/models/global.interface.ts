@@ -4,3 +4,14 @@ export interface IMenuOptions {
   title: string;
   url: string;
 }
+
+export interface IUser {
+  createdAt: Date;
+  email: string;
+  name: string;
+  profileCompleted: boolean;
+  role: string | 'admin' | 'manager' | 'student';
+  subscriptionExpiry: Date;
+  uid: string;
+  verified: boolean;
+}
