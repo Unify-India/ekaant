@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs';
 
 import { AuthService } from './auth/service/auth.service';
 import { IMenuOptions } from './models/global.interface';
+import { LibraryService } from './services/library/library.service';
 import { TranslateConfigService } from './services/translation/translation.service';
 import { UsedIcons } from './shared/core/icons/used-icons';
 import { MenuData } from './shared/core/menu/menu.data';
@@ -51,6 +52,7 @@ import { ApiService } from './shared/services/api/api.service';
 })
 export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   private translate = inject(TranslateService);
+  private libraryService = inject(LibraryService);
 
   appPages: IMenuOptions[] = MenuData.defaultAppPages;
   icons = UsedIcons.icons;
@@ -68,7 +70,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.updateMenu();
     this.isLoggedIn = this.authService.isLoggedIn();
     this.authListenerSubs = this.authService.getAuthStatusListener().subscribe((user) => {
-      // this.isLoggedIn = !!user;
+      this.isLoggedIn = !!user;
       this.updateMenu();
     });
     this.apiService
@@ -89,20 +91,29 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.authListenerSubs.unsubscribe();
   }
 
-  updateMenu() {
+  async updateMenu() {
     const user = this.authService.getCurrentUser();
     this.isLoggedIn = !!user;
     if (!user) {
       this.appPages = MenuData.defaultAppPages;
     } else {
       switch (user.role) {
-        case 'Admin':
+        case 'admin':
           this.appPages = MenuData.adminAppPages;
           break;
-        case 'Manager':
-          this.appPages = MenuData.managerAppPages;
+        case 'manager': {
+          await this.libraryService.hasLibrary(user);
+          const libraryString = localStorage.getItem('library');
+          const library = libraryString ? JSON.parse(libraryString) : {};
+          if (library.registration === 'registered') {
+            this.appPages = MenuData.managerAppPages;
+          } else if (library.registration === 'pending') {
+            this.appPages = [...MenuData.defaultAppPages, ...MenuData.managerAppPages.slice(-1)];
+          }
           break;
-        case 'Student':
+        }
+
+        case 'student':
           this.appPages = MenuData.studentAppPages;
           break;
         default:
