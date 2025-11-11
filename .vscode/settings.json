@@ -1,5 +1,8 @@
 {
-  "typescript.preferences.autoImportFileExcludePatterns": ["@ionic/angular/common", "@ionic/angular"],
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "@ionic/angular/common",
+    "@ionic/angular"
+  ],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "[javascript]": {
@@ -50,7 +53,14 @@
     }
   ],
   // "todohighlight.keywordsPattern": "//\\s+(TODO:|NOTE:|FIXME:|CHORE:|INFO:)|<!--\\s+(TODO:|NOTE:|FIXME:|CHORE:INFO:).*?-->",
-  "todohighlight.include": ["**/*.js", "**/*.ts", "**/*.html", "**/*.css", "**/*.json", "**/*.scss"],
+  "todohighlight.include": [
+    "**/*.js",
+    "**/*.ts",
+    "**/*.html",
+    "**/*.css",
+    "**/*.json",
+    "**/*.scss"
+  ],
   "todohighlight.exclude": [
     "**/node_modules/**",
     "**/bower_components/**",
@@ -74,6 +84,7 @@
     "libpeerconnection",
     "mnpcod",
     "ngsw",
+    "RTDB",
     "runtimeconfig",
     "styleext",
     "testem",

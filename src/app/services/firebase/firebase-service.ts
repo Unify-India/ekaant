@@ -20,7 +20,7 @@ export class FirebaseService {
       if (environment.useEmulators && environment.emulatorUrls?.firestore) {
         const url = new URL(environment.emulatorUrls.firestore);
         const host = url.hostname;
-        const port = Number(url.port) || environment.ports?.firestore || 8080;
+        const port = Number(url.port) || environment.ports?.firestore || 9100;
         connectFirestoreEmulator(this.firestore, host, port);
         console.log('FirebaseService: connected Firestore to emulator at', host + ':' + port);
       }
@@ -36,7 +36,7 @@ export class FirebaseService {
 
   async addLibrary(libraryData: any): Promise<string> {
     try {
-      const docRef = await addDoc(collection(this.firestore, 'libraries'), {
+      const docRef = await addDoc(collection(this.firestore, 'library-registrations'), {
         ...libraryData,
         createdAt: serverTimestamp(),
       });
@@ -54,7 +54,7 @@ export class FirebaseService {
     onProgress?: (percent: number) => void,
   ): Promise<string> {
     const name = fileName || `${Date.now()}_${file.name}`;
-    const ref = storageRef(this.storage, `libraries/${libraryId}/${name}`);
+    const ref = storageRef(this.storage, `library-registrations/${libraryId}/${name}`);
 
     return new Promise((resolve, reject) => {
       const uploadTask = uploadBytesResumable(ref, file);
