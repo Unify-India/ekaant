@@ -14,19 +14,9 @@ import { connectAuthEmulator } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { BehaviorSubject, map, Observable } from 'rxjs';
+import { IUser } from 'src/app/models/global.interface';
 import { ToasterService } from 'src/app/services/toaster/toaster.service';
 import { environment } from 'src/environments/environment';
-
-export interface AppUser {
-  createdAt: Date;
-  email: string;
-  id: string;
-  name?: string;
-  profileCompleted?: boolean;
-  role: string;
-  subscriptionExpiry?: Date;
-  verified: boolean;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -37,8 +27,8 @@ export class AuthService {
   private auth = inject(Auth);
   private firestore = inject(Firestore);
 
-  private currentUser: AppUser | null = null;
-  private authStatusListener = new BehaviorSubject<AppUser | null>(null);
+  private currentUser: IUser | null = null;
+  private authStatusListener = new BehaviorSubject<IUser | null>(null);
   private authState$ = authState(this.auth);
 
   constructor() {
@@ -74,10 +64,10 @@ export class AuthService {
     try {
       const userDoc = await getDoc(doc(this.firestore, 'users', uid));
       if (userDoc.exists()) {
-        const userData = userDoc.data() as AppUser;
+        const userData = userDoc.data() as IUser;
         this.currentUser = {
           ...userData,
-          id: uid,
+          uid,
         };
         sessionStorage.setItem('currentUser', JSON.stringify(this.currentUser));
         this.authStatusListener.next(this.currentUser);
@@ -100,7 +90,7 @@ export class AuthService {
     }
   }
 
-  getCurrentUser(): AppUser | null {
+  getCurrentUser(): IUser | null {
     return this.currentUser;
   }
 
@@ -124,7 +114,7 @@ export class AuthService {
     return this.currentUser?.verified === true;
   }
 
-  getAuthStatusListener(): Observable<AppUser | null> {
+  getAuthStatusListener(): Observable<IUser | null> {
     return this.authStatusListener.asObservable();
   }
 
@@ -139,8 +129,8 @@ export class AuthService {
     name: string,
     verified: boolean = false,
   ): Promise<void> {
-    const userData: AppUser = {
-      id: uid,
+    const userData: IUser = {
+      uid,
       email,
       role,
       name,
@@ -225,7 +215,7 @@ export class AuthService {
         this.toaster.showToast('Account not found. Please register first.', 'danger');
         return;
       }
-      const userData = userDoc.data() as AppUser;
+      const userData = userDoc.data() as IUser;
       this.currentUser = userData;
 
       // Check role match
@@ -289,7 +279,7 @@ export class AuthService {
 
     if (userDoc.exists()) {
       // Existing user - verify role and status
-      const userData = userDoc.data() as AppUser;
+      const userData = userDoc.data() as IUser;
 
       if (userData.role !== role) {
         await this.auth.signOut();
@@ -346,13 +336,13 @@ export class AuthService {
     }
   }
 
-  async updateUserProfile(updates: Partial<AppUser>): Promise<void> {
+  async updateUserProfile(updates: Partial<IUser>): Promise<void> {
     if (!this.currentUser) {
       throw new Error('No user logged in');
     }
 
     try {
-      const userRef = doc(this.firestore, 'users', this.currentUser.id);
+      const userRef = doc(this.firestore, 'users', this.currentUser.uid);
       await updateDoc(userRef, {
         ...updates,
         updatedAt: new Date(),
