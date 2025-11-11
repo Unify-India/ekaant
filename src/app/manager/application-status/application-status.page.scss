@@ -1,0 +1,23 @@
+.admin-comments {
+  white-space: pre-wrap;
+  background-color: var(--ion-color-light-tint);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.status-pending {
+  color: var(--ion-color-warning);
+  font-weight: bold;
+}
+
+.status-approved {
+  color: var(--ion-color-success);
+  font-weight: bold;
+}
+
+.status-rejected,
+.status-changes-required {
+  color: var(--ion-color-danger);
+  font-weight: bold;
+}

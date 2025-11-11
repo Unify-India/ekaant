@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Firestore, collection, query, where, getDocs, limit } from '@angular/fire/firestore';
+import { from, map, Observable } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
 
 @Injectable({
@@ -43,5 +44,17 @@ export class LibraryService {
     // 3. If nothing is found, clear any stale data and return false
     localStorage.removeItem('library');
     return false;
+  }
+
+  public getLibraryRegistration(userId: string): Observable<any> {
+    const q = query(collection(this.firestore, 'libraryRegistrationRequests'), where('managerId', '==', userId), limit(1));
+    return from(getDocs(q)).pipe(
+      map((snapshot) => {
+        if (snapshot.empty) {
+          return null;
+        }
+        return snapshot.docs[0].data();
+      }),
+    );
   }
 }
