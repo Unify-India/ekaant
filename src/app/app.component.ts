@@ -109,6 +109,8 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
             this.appPages = MenuData.managerAppPages;
           } else if (library.registration === 'pending') {
             this.appPages = MenuData.libraryRegistrationPending;
+          } else {
+            this.appPages = MenuData.libraryRegistrationPending;
           }
           break;
         }
