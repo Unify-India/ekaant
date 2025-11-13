@@ -24,6 +24,11 @@ const routes: Routes = [
           import('./student-applications/student-applications.page').then((m) => m.StudentApplicationsPage),
       },
       {
+        path: 'application-status',
+        loadComponent: () =>
+          import('./application-status/application-status.page').then((m) => m.ApplicationStatusPage),
+      },
+      {
         path: 'performance-report',
         loadComponent: () =>
           import('./performance-report/performance-report.page').then((m) => m.PerformanceReportPage),
