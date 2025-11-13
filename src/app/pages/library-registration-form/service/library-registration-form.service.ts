@@ -1,5 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
+import { take } from 'rxjs/operators';
+import { AuthService } from 'src/app/auth/service/auth.service'; // Import AuthService
 import { DraftService } from 'src/app/services/draft.service';
 import { FirebaseService } from 'src/app/services/firebase/firebase-service';
 import { LibraryService } from 'src/app/services/library/library.service';
@@ -32,10 +34,8 @@ export class LibraryRegistrationFormService {
     { key: 'seatManagement', icon: 'people-outline', label: 'Seating' },
     { key: 'bookCollection', icon: 'book-outline', label: 'Book Collection' },
     { key: 'amenities', icon: 'wifi-outline', label: 'Amenities' },
-    { key: 'seatManagement', icon: 'people-outline', label: 'Seating' },
     { key: 'pricingPlans', icon: 'cash-outline', label: 'Pricing' },
     { key: 'requirements', icon: 'document-outline', label: 'Requirements' },
-    { key: 'hostProfile', icon: 'person-outline', label: 'Host Profile' },
     { key: 'codeOfConduct', icon: 'document-lock-outline', label: 'Conduct Code' },
     { key: 'preview', icon: 'eye-outline', label: 'Preview & Submit' },
   ];
@@ -51,6 +51,7 @@ export class LibraryRegistrationFormService {
     private firebase: FirebaseService,
     private draft: DraftService,
     private libraryService: LibraryService,
+    private authService: AuthService, // Inject AuthService
   ) {
     // Initialize Firebase service (connect emulators if configured)
     try {
@@ -78,6 +79,31 @@ export class LibraryRegistrationFormService {
       }
     })(this.mainForm);
     // console.log('Main Form Structure:', this.mainForm);
+
+    // Subscribe to auth status to load library registration data
+    this.authService.getAuthStatusListener().subscribe((user) => {
+      if (user && user.role === 'manager') {
+        this.libraryService
+          .getLibraryRegistration(user.uid)
+          .pipe(take(1)) // Take only the first emission
+          .subscribe((data) => {
+            if (data) {
+              this.loadRegistrationData(data);
+              this.registrationDocId = data.id;
+              this.editMode = true;
+              console.log('Library registration data loaded:', data);
+            } else {
+              this.editMode = false;
+              this.registrationDocId = null;
+              console.log('No existing library registration found for manager.');
+            }
+          });
+      } else {
+        this.editMode = false;
+        this.registrationDocId = null;
+        console.log('User is not a manager or not logged in. Clearing registration data.');
+      }
+    });
   }
 
   public setEditMode(status: boolean, docId: string | null) {
@@ -217,7 +243,7 @@ export class LibraryRegistrationFormService {
       };
       const fileName = `host_profile_${Date.now()}_${hostProfileFile.name}`;
       const url = await this.firebase.uploadFile(libraryId, hostProfileFile, fileName, onProgress);
-      await this.firebase.updateLibrary(libraryId, { 'hostProfile.photoURL': url });
+      await this.firebase.updateLibraryRegistration(libraryId, { 'hostProfile.photoURL': url });
       try {
         hostForm?.patchValue({ profilePhotoProgress: 100 });
       } catch (e) {
