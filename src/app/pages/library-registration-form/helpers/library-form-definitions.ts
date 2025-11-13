@@ -14,6 +14,7 @@ export function createHostProfileForm(fb: FormBuilder): FormGroup {
   return fb.group({
     profilePhoto: [null],
     profilePhotoProgress: [0],
+    photoURL: [null],
     fullName: ['', [Validators.required, Validators.minLength(3)]],
     visionStatement: ['', [Validators.required, Validators.maxLength(500)]],
     experience: ['', Validators.maxLength(300)],

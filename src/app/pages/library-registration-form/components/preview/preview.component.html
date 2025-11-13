@@ -72,21 +72,38 @@
         Edit
       </ion-button>
     </div>
-    <div class="section-content">
-      <h4>{{ section.value.fullName }}</h4>
-      <p>{{ section.value.visionStatement }}</p>
-      @if (!section.value.maskPhoneNumber) {
-        <p>
-          <strong>Phone:</strong>
-          {{ section.value.phoneNumber }}
-        </p>
-      }
-      @if (!section.value.maskEmail) {
-        <p>
-          <strong>Email:</strong>
-          {{ section.value.email }}
-        </p>
-      }
+    <div class="section-content host-profile">
+      <ion-avatar>
+        <img [src]="section.value.photoURL || 'assets/icon/favicon.png'" alt="Host Photo" />
+      </ion-avatar>
+      <div class="host-details">
+        <h4>{{ section.value.fullName }}</h4>
+        <p class="vision-statement">"{{ section.value.visionStatement }}"</p>
+        @if (section.value.experience) {
+          <p>
+            <strong>Experience:</strong>
+            {{ section.value.experience }}
+          </p>
+        }
+        @if (section.value.address) {
+          <p>
+            <strong>Address:</strong>
+            {{ section.value.address }}
+          </p>
+        }
+        @if (!section.value.maskPhoneNumber) {
+          <p>
+            <strong>Phone:</strong>
+            {{ section.value.phoneNumber }}
+          </p>
+        }
+        @if (!section.value.maskEmail) {
+          <p>
+            <strong>Email:</strong>
+            {{ section.value.email }}
+          </p>
+        }
+      </div>
     </div>
   </div>
 }
@@ -281,4 +298,6 @@
   </div>
 </div>
 
-<ion-button expand="block" (click)="submitRegistration()" [disabled]="mainForm.invalid">Submit Registration</ion-button>
+<ion-button expand="block" (click)="submitRegistration()" [disabled]="mainForm.invalid">
+  {{ lrfService.editMode ? 'Update Application' : 'Submit Registration' }}
+</ion-button>
