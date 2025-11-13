@@ -13,7 +13,7 @@ import {
   checkmarkOutline,
 } from 'ionicons/icons';
 
-import { createPlanGroup } from '../../helpers/library-form-definitions';
+import { createPricingPlanGroup } from '../../helpers/library-form-definitions';
 import { LibraryRegistrationFormService } from '../../service/library-registration-form.service';
 
 @Component({
@@ -62,7 +62,7 @@ export class PricingPlansComponent implements OnInit {
   }
 
   addPlan(): void {
-    const newPlan = createPlanGroup(this.fb);
+    const newPlan = createPricingPlanGroup(this.fb);
     this.pricingPlans.push(newPlan);
     this.editingIndex.set(this.pricingPlans.length - 1);
   }
