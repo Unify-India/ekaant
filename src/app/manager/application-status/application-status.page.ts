@@ -1,20 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { Observable } from 'rxjs';
 import { AuthService } from 'src/app/auth/service/auth.service';
+import { LibraryRegistrationFormService } from 'src/app/pages/library-registration-form/service/library-registration-form.service';
 import { LibraryService } from 'src/app/services/library/library.service';
+import { PreviewComponent } from 'src/app/pages/library-registration-form/components/preview/preview.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-application-status',
   templateUrl: './application-status.page.html',
   styleUrls: ['./application-status.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, PreviewComponent, RouterModule],
 })
 export class ApplicationStatusPage implements OnInit {
   private authService = inject(AuthService);
   private libraryService = inject(LibraryService);
+  private lrfService = inject(LibraryRegistrationFormService);
 
   isLoading = true;
   application: any;
@@ -30,6 +33,10 @@ export class ApplicationStatusPage implements OnInit {
       this.libraryService.getLibraryRegistration(user.uid).subscribe({
         next: (data) => {
           this.application = data;
+          if (data) {
+            this.lrfService.loadRegistrationData(data);
+            this.lrfService.setEditMode(true, data.id);
+          }
           this.isLoading = false;
         },
         error: (err) => {
