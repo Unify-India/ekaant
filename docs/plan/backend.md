@@ -186,3 +186,174 @@ export const scheduledDailySeatAllocator = functions.pubsub
 ```
 
 ---
+
+
+# Ekaant — ER Diagram & Schema Visualization (v2)
+
+Below is the updated ER-style diagram (Mermaid) of the Firestore schema. This version incorporates feedback to support multiple managers per library and to prepare for managers overseeing multiple libraries in the future.
+
+```mermaid
+erDiagram
+    USERS ||--o{ STUDENT_REQUESTS : "creates (if student)"
+    USERS ||--o{ PAYMENTS : "makes (if student)"
+    USERS ||--o{ ATTENDANCE_LOGS : "attends (if student)"
+    USERS ||--o{ WAITING_LIST : "queues (if student)"
+    LIBRARIES ||--o{ STUDENT_REQUESTS : receives
+    LIBRARIES ||--o{ PAYMENTS : receives
+    LIBRARIES ||--o{ ATTENDANCE_LOGS : hosts
+    LIBRARIES ||--o{ WAITING_LIST : holds
+    LIBRARIES ||--o{ REPORTS : has
+    FEEDBACK_SUPPORT }o--|| USERS : authored_by
+
+    USERS {
+      string userId PK
+      string role "student, manager, admin"
+      string name
+      string email
+      string phone
+      bool verificationStatus
+      string linkedLibraryId "For students"
+      string managedLibraryIds "Array, for managers"
+      timestamp createdAt
+    }
+
+    LIBRARIES {
+      string libraryId PK
+      string name
+      string ownerId FK "Primary owner"
+      string managerIds "Array of userIds"
+      map location
+      map seatConfig
+      string status
+      timestamp createdAt
+    }
+
+    STUDENT_REQUESTS {
+      string requestId PK
+      string studentId FK
+      string libraryId FK
+      string status
+      timestamp appliedAt
+      boolean conflictFlag
+    }
+
+    PAYMENTS {
+      string paymentId PK
+      string studentId FK
+      string libraryId FK
+      number amount
+      string mode
+      string status
+      timestamp createdAt
+    }
+
+    ATTENDANCE_LOGS {
+      string sessionId PK
+      string studentId FK
+      string libraryId FK
+      number seatNo
+      timestamp checkIn
+      timestamp checkOut
+      number duration
+      boolean quotaDeducted
+      boolean overOccupancy
+    }
+
+    WAITING_LIST {
+      string waitId PK
+      string studentId FK
+      string libraryId FK
+      number position
+      timestamp createdAt
+      timestamp expiresAt
+      string status
+    }
+
+    FEEDBACK_SUPPORT {
+      string feedbackId PK
+      string userId FK
+      string role
+      string message
+      boolean isAnonymous
+      timestamp createdAt
+      string status
+    }
+
+    REPORTS {
+      string reportId PK
+      string libraryId FK
+      date date
+      map utilization
+      map paymentsSummary
+      number waitingListCount
+    }
+```
+
+---
+
+## Notes & Index Recommendations
+
+*   **Composite Indexes**:
+    *   `libraries` by `location.pincode` and `status`.
+    *   `libraries` by `managerIds` (array-contains query).
+    *   `student_requests` composite index: `libraryId, status, appliedAt`.
+    *   `waiting_list` composite index: `libraryId, status, createdAt`.
+    *   `attendance_logs` composite: `libraryId, checkIn (desc)`.
+    *   `payments` composite: `libraryId, status, createdAt`.
+
+*   **TTL / Cleanup:** Use `expiresAt` on `waiting_list` and a scheduled Cloud Function to remove expired entries.
+
+*   **Denormalization Tips:**
+    *   Store `studentName`, `studentPhone` inside `student_requests` & `waiting_list` to avoid extra reads when rendering manager dashboards.
+    *   Store `libraryName` and `libraryLogoUrl` inside `payments` and `attendance_logs` for quicker reporting.
+
+---
+
+## Sample Document (student user)
+
+```json
+{
+  "userId": "UID123",
+  "role": "student",
+  "name": "Sandeep Kumar",
+  "email": "sandeep@example.com",
+  "phone": "+919999999999",
+  "verificationStatus": true,
+  "linkedLibraryId": "LIB001",
+  "managedLibraryIds": null,
+  "createdAt": "2025-11-04T00:00:00Z"
+}
+```
+
+## Sample Document (manager user)
+
+```json
+{
+  "userId": "UID999",
+  "role": "manager",
+  "name": "Aarav Patel",
+  "email": "manager@example.com",
+  "phone": "+918888888888",
+  "verificationStatus": true,
+  "linkedLibraryId": null,
+  "managedLibraryIds": ["LIB001"],
+  "createdAt": "2025-11-01T00:00:00Z"
+}
+```
+
+## Sample Document (library)
+
+```json
+{
+  "libraryId": "LIB001",
+  "name": "Ranchi Study Hub",
+  "ownerId": "UID999",
+  "managerIds": ["UID999", "UID998"],
+  "location": {"city":"Ranchi","pincode":"834001","mapUrl":"..."},
+  "seatConfig": {"totalSeats":50,"slots":[{"slotType":"4hr","price":40}]},
+  "status":"approved",
+  "createdAt":"2025-11-01T00:00:00Z"
+}
+```
+
+---
