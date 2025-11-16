@@ -48,6 +48,7 @@
     "singleProjectMode": true
   },
   "storage": {
-    "rules": "firebase/storage.rules"
+    "rules": "firebase/storage.rules",
+    "cors": "storage.cors.json"
   }
 }
