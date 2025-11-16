@@ -2,7 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { Firestore, collection, query, where, getDocs, limit } from '@angular/fire/firestore';
 import { from, map, Observable } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
-import { FirebaseService } from './firebase/firebase-service';
+
+import { FirebaseService } from '../firebase/firebase-service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +28,7 @@ export class LibraryService {
 
     // 2. If no approved library, check for a registration request
     const pendingQuery = query(
-      collection(this.firestore, 'libraryRegistrationRequests'),
+      collection(this.firestore, 'library-registrations'),
       where('managerId', '==', user.uid),
       limit(1),
     );
@@ -49,11 +50,8 @@ export class LibraryService {
   }
 
   public getLibraryRegistration(userId: string): Observable<any> {
-    const q = query(
-      collection(this.firestore, 'libraryRegistrationRequests'),
-      where('managerId', '==', userId),
-      limit(1),
-    );
+    console.log('user id', userId);
+    const q = query(collection(this.firestore, 'library-registrations'), where('managerId', '==', userId), limit(1));
     return from(getDocs(q)).pipe(
       map((snapshot) => {
         if (snapshot.empty) {

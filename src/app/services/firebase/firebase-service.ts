@@ -82,7 +82,12 @@ export class FirebaseService {
     });
   }
 
-  async updateLibrary(libraryId: string, data: any): Promise<void> {
+  async updateLibraryRegistration(docId: string, data: any): Promise<void> {
+    const ref = doc(this.firestore, 'library-registrations', docId);
+    await updateDoc(ref, data);
+  }
+
+  async updateApprovedLibrary(libraryId: string, data: any): Promise<void> {
     const ref = doc(this.firestore, 'libraries', libraryId);
     await updateDoc(ref, data);
   }
@@ -96,7 +101,7 @@ export class FirebaseService {
     const fileName = `${Date.now()}_${file.name}`;
     const url = await this.uploadFile(libraryId, file, fileName, onProgress);
 
-    const imagesCol = collection(this.firestore, 'libraries', libraryId, 'libraryImages');
+    const imagesCol = collection(this.firestore, 'library-registrations', libraryId, 'libraryImages');
     const imageDoc = doc(imagesCol);
     await setDoc(imageDoc, {
       imageURL: url,
@@ -115,7 +120,7 @@ export class FirebaseService {
   ) {
     const fileName = `requirement_${Date.now()}_${file.name}`;
     const url = await this.uploadFile(libraryId, file, fileName, onProgress);
-    const reqCol = collection(this.firestore, 'libraries', libraryId, 'requirements');
+    const reqCol = collection(this.firestore, 'library-registrations', libraryId, 'requirements');
     const reqDoc = doc(reqCol);
     await setDoc(reqDoc, {
       fileURL: url,
