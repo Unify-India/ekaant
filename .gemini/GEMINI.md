@@ -1,3 +1,7 @@
+# Instructions
+- Do not assume changes, always ask user with change proposal.
+- Do not test shell commands automatically, give proposal to user for confirmation then start planning.
+
 # Project Context Saved (November 5, 2025)
 
 This document summarizes the current state of the Ekaant project and the ongoing development plan, as discussed with the Gemini CLI agent.
