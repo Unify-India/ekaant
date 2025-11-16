@@ -298,6 +298,8 @@
   </div>
 </div>
 
-<ion-button expand="block" (click)="submitRegistration()" [disabled]="mainForm.invalid">
-  {{ lrfService.editMode ? 'Update Application' : 'Submit Registration' }}
-</ion-button>
+@if (lrfService.editMode) {
+  <ion-button expand="block" (click)="updateRegistration()" [disabled]="mainForm.invalid">
+    Update Application
+  </ion-button>
+}

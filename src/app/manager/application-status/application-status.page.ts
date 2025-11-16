@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { AuthService } from 'src/app/auth/service/auth.service';
+import { PreviewComponent } from 'src/app/pages/library-registration-form/components/preview/preview.component';
 import { LibraryRegistrationFormService } from 'src/app/pages/library-registration-form/service/library-registration-form.service';
 import { LibraryService } from 'src/app/services/library/library.service';
-import { PreviewComponent } from 'src/app/pages/library-registration-form/components/preview/preview.component';
-import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-application-status',

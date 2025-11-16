@@ -88,6 +88,7 @@ export class PreviewComponent implements OnInit {
 
   ngOnInit() {
     this.mainForm = this.lrfService.mainForm;
+    console.info('mainForm', this.mainForm.value);
   }
 
   // Helper to get a specific section's FormGroup
@@ -112,7 +113,7 @@ export class PreviewComponent implements OnInit {
   navigateToSection(sectionIndex: number): void {
     this.lrfService.goToStep(sectionIndex);
     // You might need to adjust the route based on your app's routing setup
-    // this.router.navigate(['/library-registration']);
+    this.router.navigate(['/library-registration-form']);
   }
 
   // Final submission logic
@@ -124,6 +125,25 @@ export class PreviewComponent implements OnInit {
       // this.router.navigate(['/home']);
     } else {
       alert('Please complete all required sections before submitting.');
+    }
+  }
+
+  async updateRegistration(): Promise<void> {
+    if (this.mainForm.invalid) {
+      alert('Please complete all required sections before submitting.');
+      return;
+    }
+
+    try {
+      if (this.lrfService.editMode) {
+        await this.lrfService.updateLibrary();
+        alert('Application Updated Successfully!');
+      }
+      // Navigate to a success page or home
+      this.router.navigate(['/manager/application-status']);
+    } catch (error) {
+      console.error('Error during submission:', error);
+      alert('There was an error during submission. Please try again.');
     }
   }
 }

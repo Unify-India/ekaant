@@ -2,18 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonSegment,
-  IonSegmentButton,
-  IonLabel,
-  IonIcon,
-  IonProgressBar,
-  IonAlert,
-} from '@ionic/angular/standalone';
+import { IonSegment, IonSegmentButton, IonLabel, IonIcon, IonProgressBar, IonAlert } from '@ionic/angular/standalone';
 import type { OverlayEventDetail } from '@ionic/core';
 import { addIcons } from 'ionicons';
 import {

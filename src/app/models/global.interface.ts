@@ -8,6 +8,7 @@ export interface IMenuOptions {
 export interface IUser {
   createdAt: Date;
   email: string;
+  linkedLibraryId?: string;
   name: string;
   profileCompleted: boolean;
   role: string | 'admin' | 'manager' | 'student';
