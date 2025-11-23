@@ -165,13 +165,14 @@ export class LibraryRegistrationFormService {
     }
     console.log('Updating library registration form...');
     const payload = this.mainForm.value;
-    // TODO: Handle file uploads for updates
-    const { initialPayload } = this.prepareInitialPayload(payload);
+    const { initialPayload, requirementsArray } = this.prepareInitialPayload(payload);
 
+    // Upload new files that might have been added during the edit
+    await this.uploadRequirements(this.registrationDocId, requirementsArray);
+    // TODO: Handle uploads for images and host profile picture on update
+
+    // Update the main document with cleaned data
     await this.libraryService.updateLibrary(this.registrationDocId, initialPayload);
-
-    // Reset edit mode after update
-    this.setEditMode(false, null);
   }
 
   async submitLibrary(): Promise<string> {
@@ -207,18 +208,35 @@ export class LibraryRegistrationFormService {
   private prepareInitialPayload(payload: any) {
     const imagesArray = payload.libraryImages?.libraryPhotos ?? [];
     const hostProfileFile: File | null = payload.hostProfile?.profilePhoto ?? null;
+    const requirementsArray = payload.requirements?.selectedRequirements ?? [];
 
     const initialPayload = { ...payload };
+
+    // Clean libraryImages to not store File objects
     if (initialPayload.libraryImages) {
       initialPayload.libraryImages = { libraryPhotos: [] };
     }
+
+    // Clean hostProfile to not store File object
     if (initialPayload.hostProfile) {
       const hp = { ...initialPayload.hostProfile };
       delete (hp as any).profilePhoto;
       delete (hp as any).profilePhotoProgress;
       initialPayload.hostProfile = hp;
     }
-    const requirementsArray = payload.requirements?.selectedRequirements ?? [];
+
+    // Clean requirements to not store File objects in the main document
+    if (initialPayload.requirements && initialPayload.requirements.selectedRequirements) {
+      initialPayload.requirements.selectedRequirements = initialPayload.requirements.selectedRequirements.map(
+        (req: any) => {
+          const cleanReq = { ...req };
+          delete cleanReq.sampleFile;
+          delete cleanReq.sampleFileProgress;
+          return cleanReq;
+        },
+      );
+    }
+
     return { initialPayload, imagesArray, hostProfileFile, requirementsArray };
   }
 
