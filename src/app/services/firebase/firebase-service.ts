@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, doc, setDoc, updateDoc, addDoc, serverTimestamp } from '@angular/fire/firestore';
+import { Firestore } from '@angular/fire/firestore';
 import { connectFirestoreEmulator } from '@angular/fire/firestore';
 import { Storage, ref as storageRef, uploadBytesResumable, getDownloadURL } from '@angular/fire/storage';
 import { FirebaseError } from 'firebase/app';
@@ -34,27 +34,8 @@ export class FirebaseService {
     this.connectEmulatorIfNeeded();
   }
 
-  async addLibrary(libraryData: any): Promise<string> {
-    try {
-      const docRef = await addDoc(collection(this.firestore, 'library-registrations'), {
-        ...libraryData,
-        createdAt: serverTimestamp(),
-      });
-      return docRef.id;
-    } catch (error) {
-      console.error('Error adding library:', error);
-      throw error;
-    }
-  }
-
-  async uploadFile(
-    libraryId: string,
-    file: File,
-    fileName?: string,
-    onProgress?: (percent: number) => void,
-  ): Promise<string> {
-    const name = fileName || `${Date.now()}_${file.name}`;
-    const ref = storageRef(this.storage, `library-registrations/${libraryId}/${name}`);
+  async uploadFile(path: string, file: File, onProgress?: (percent: number) => void): Promise<string> {
+    const ref = storageRef(this.storage, path);
 
     return new Promise((resolve, reject) => {
       const uploadTask = uploadBytesResumable(ref, file);
@@ -80,53 +61,5 @@ export class FirebaseService {
         },
       );
     });
-  }
-
-  async updateLibraryRegistration(docId: string, data: any): Promise<void> {
-    const ref = doc(this.firestore, 'library-registrations', docId);
-    await updateDoc(ref, data);
-  }
-
-  async updateApprovedLibrary(libraryId: string, data: any): Promise<void> {
-    const ref = doc(this.firestore, 'libraries', libraryId);
-    await updateDoc(ref, data);
-  }
-
-  async addLibraryImage(
-    libraryId: string,
-    file: File,
-    metadata: { caption?: string; order?: number } = {},
-    onProgress?: (percent: number) => void,
-  ) {
-    const fileName = `${Date.now()}_${file.name}`;
-    const url = await this.uploadFile(libraryId, file, fileName, onProgress);
-
-    const imagesCol = collection(this.firestore, 'library-registrations', libraryId, 'libraryImages');
-    const imageDoc = doc(imagesCol);
-    await setDoc(imageDoc, {
-      imageURL: url,
-      caption: metadata.caption || null,
-      order: metadata.order ?? null,
-      uploadedAt: serverTimestamp(),
-    });
-    return { id: imageDoc.id, url };
-  }
-
-  async addRequirementDocument(
-    libraryId: string,
-    file: File,
-    metadata: { description?: string } = {},
-    onProgress?: (percent: number) => void,
-  ) {
-    const fileName = `requirement_${Date.now()}_${file.name}`;
-    const url = await this.uploadFile(libraryId, file, fileName, onProgress);
-    const reqCol = collection(this.firestore, 'library-registrations', libraryId, 'requirements');
-    const reqDoc = doc(reqCol);
-    await setDoc(reqDoc, {
-      fileURL: url,
-      description: metadata.description || null,
-      uploadedAt: serverTimestamp(),
-    });
-    return { id: reqDoc.id, url };
   }
 }

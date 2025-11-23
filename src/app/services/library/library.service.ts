@@ -1,5 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { Firestore, collection, query, where, getDocs, limit } from '@angular/fire/firestore';
+import {
+  Firestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  limit,
+  addDoc,
+  serverTimestamp,
+  updateDoc,
+  doc,
+  setDoc,
+} from '@angular/fire/firestore';
 import { from, map, Observable } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
 
@@ -10,7 +22,7 @@ import { FirebaseService } from '../firebase/firebase-service';
 })
 export class LibraryService {
   private firestore = inject(Firestore);
-  private firebase = inject(FirebaseService);
+  private firebaseService = inject(FirebaseService);
 
   constructor() {}
 
@@ -51,7 +63,7 @@ export class LibraryService {
 
   public getLibraryRegistration(userId: string): Observable<any> {
     console.log('user id', userId);
-    const q = query(collection(this.firestore, 'library-registrations'), where('managerId', '==', userId), limit(1));
+    const q = query(collection(this.firestore, 'library-registrations'), where('ownerId', '==', userId), limit(1));
     return from(getDocs(q)).pipe(
       map((snapshot) => {
         if (snapshot.empty) {
@@ -63,7 +75,65 @@ export class LibraryService {
     );
   }
 
-  public async updateLibrary(docId: string, data: any): Promise<void> {
-    return this.firebase.updateLibraryRegistration(docId, data);
+  async addLibrary(libraryData: any): Promise<string> {
+    try {
+      const docRef = await addDoc(collection(this.firestore, 'library-registrations'), {
+        ...libraryData,
+        createdAt: serverTimestamp(),
+      });
+      return docRef.id;
+    } catch (error) {
+      console.error('Error adding library:', error);
+      throw error;
+    }
+  }
+
+  public async updateLibrary(docId: string, data: any, isApproved = false): Promise<void> {
+    const collectionName = isApproved ? 'libraries' : 'library-registrations';
+    const ref = doc(this.firestore, collectionName, docId);
+    return await updateDoc(ref, data);
+  }
+
+  async addLibraryImage(
+    libraryId: string,
+    file: File,
+    isApproved = false,
+    metadata: { caption?: string; order?: number } = {},
+    onProgress?: (percent: number) => void,
+  ) {
+    const collectionName = isApproved ? 'libraries' : 'library-registrations';
+    const path = `${collectionName}/${libraryId}/${Date.now()}_${file.name}`;
+    const url = await this.firebaseService.uploadFile(path, file, onProgress);
+
+    const imagesCol = collection(this.firestore, collectionName, libraryId, 'libraryImages');
+    const imageDoc = doc(imagesCol);
+    await setDoc(imageDoc, {
+      imageURL: url,
+      caption: metadata.caption || null,
+      order: metadata.order ?? null,
+      uploadedAt: serverTimestamp(),
+    });
+    return { id: imageDoc.id, url };
+  }
+
+  async addRequirementDocument(
+    libraryId: string,
+    file: File,
+    isApproved = false,
+    metadata: { description?: string } = {},
+    onProgress?: (percent: number) => void,
+  ) {
+    const collectionName = isApproved ? 'libraries' : 'library-registrations';
+    const path = `${collectionName}/${libraryId}/requirements/${Date.now()}_${file.name}`;
+    const url = await this.firebaseService.uploadFile(path, file, onProgress);
+
+    const reqCol = collection(this.firestore, collectionName, libraryId, 'requirements');
+    const reqDoc = doc(reqCol);
+    await setDoc(reqDoc, {
+      fileURL: url,
+      description: metadata.description || null,
+      uploadedAt: serverTimestamp(),
+    });
+    return { id: reqDoc.id, url };
   }
 }
