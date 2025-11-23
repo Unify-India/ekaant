@@ -2,8 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonSegment, IonSegmentButton, IonLabel, IonIcon, IonProgressBar, IonAlert } from '@ionic/angular/standalone';
-import type { OverlayEventDetail } from '@ionic/core';
+import {
+  IonSegment,
+  IonSegmentButton,
+  IonLabel,
+  IonIcon,
+  IonProgressBar,
+  AlertController,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   eyeOutline,
@@ -21,6 +27,7 @@ import {
   chevronBack,
 } from 'ionicons/icons';
 import { DraftService } from 'src/app/services/draft.service';
+import { ToasterService } from 'src/app/services/toaster/toaster.service';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 
 import { AmenitiesComponent } from './components/amenities/amenities.component';
@@ -56,24 +63,27 @@ import { LibraryRegistrationFormService } from './service/library-registration-f
     IonLabel,
     IonIcon,
     IonProgressBar,
-    IonAlert,
   ],
   templateUrl: './library-registration-form.page.html',
   styleUrls: ['./library-registration-form.page.scss'],
 })
 export class LibraryRegistrationFormPage implements OnInit {
   private router = inject(Router);
-  private lrfService = inject(LibraryRegistrationFormService);
+  lrfService = inject(LibraryRegistrationFormService);
   private draftService = inject(DraftService);
+  private toaster = inject(ToasterService);
+  private alertController = inject(AlertController);
 
   pageTitle = 'Register your library';
   sections = this.lrfService.steps;
 
   ngOnInit() {
     console.log('Library Registration Form initialized');
-    this.draftService.loadDraft(this.masterForm).catch((e) => {
-      console.error('Failed to load draft', e);
-    });
+    if (!this.lrfService.editMode) {
+      this.draftService.loadDraft(this.masterForm).catch((e) => {
+        console.error('Failed to load draft', e);
+      });
+    }
   }
   masterForm = this.lrfService.mainForm;
   currentSectionIndex = this.lrfService.currentSectionIndex;
@@ -83,29 +93,8 @@ export class LibraryRegistrationFormPage implements OnInit {
   progress = computed(() => {
     const totalFormSections = this.sections.length;
     if (totalFormSections <= 0) return 0;
-    // Calculate progress based on the current step index
     return this.currentSectionIndex() / totalFormSections;
   });
-
-  isAlertOpen = false;
-  public alertButtons = [
-    {
-      text: 'Cancel',
-      role: 'cancel',
-      handler: () => {},
-    },
-    {
-      text: 'OK',
-      role: 'confirm',
-      handler: () => {
-        this.router.navigate(['/home']);
-      },
-    },
-  ];
-
-  setResult(event: CustomEvent<OverlayEventDetail>) {
-    console.log(`Dismissed with role: ${event.detail.role}`);
-  }
 
   constructor() {
     addIcons({
@@ -146,35 +135,48 @@ export class LibraryRegistrationFormPage implements OnInit {
     this.lrfService.prevStep();
   }
 
-  onSubmit() {
-    if (this.masterForm.valid) {
-      this.lrfService
-        .submitLibrary()
-        .then((id) => {
-          // console.log('Library created with id:', id);
-          // alert('Registration Submitted!');
-          this.router.navigate(['/registration-acknowledgement']);
-        })
-        .catch((err) => {
-          console.error('Failed to create library', err);
-          alert('Failed to create library. See console.');
-        });
-    } else {
+  async onFinalSubmit() {
+    if (!this.masterForm.valid) {
       console.error('Form is invalid', this.masterForm);
-      alert('Please complete all required sections.');
+      alert('Please complete all required sections before submitting.');
+      return;
+    }
+
+    try {
+      if (this.lrfService.editMode) {
+        await this.lrfService.updateLibrary();
+        this.toaster.showToast('Application updated successfully!', 'success');
+        this.router.navigate(['/manager/application-status']);
+      } else {
+        await this.lrfService.submitLibrary();
+        this.router.navigate(['/registration-acknowledgement']);
+      }
+    } catch (err: any) {
+      this.toaster.showToast(err.message, 'danger');
     }
   }
 
-  onCancel() {
-    if (confirm('Are you sure you want to cancel the registration? All data will be lost.')) {
-      this.masterForm.reset();
-      this.currentSectionIndex.set(0);
-      this.setOpen(true);
+  async onCancel() {
+    if (this.lrfService.editMode) {
+      this.router.navigate(['/manager/application-status']);
+    } else {
+      const alert = await this.alertController.create({
+        header: 'Cancel Registration?',
+        message: 'Are you sure you want to cancel the registration process? All entered data will be lost.',
+        buttons: [
+          { text: 'Stay', role: 'cancel' },
+          {
+            text: 'Leave',
+            role: 'confirm',
+            handler: () => {
+              this.lrfService.reset();
+              this.router.navigate(['/home']);
+            },
+          },
+        ],
+      });
+      await alert.present();
     }
-  }
-  handleCancelConfirm() {
-    this.lrfService.reset();
-    this.router.navigate(['/home']);
   }
 
   isCurrentSectionValid(): boolean {
@@ -183,9 +185,5 @@ export class LibraryRegistrationFormPage implements OnInit {
 
   isSectionComplete(sectionId: string): boolean {
     return this.lrfService.getFormGroup(sectionId)?.valid ?? false;
-  }
-
-  setOpen(isOpen: boolean) {
-    this.isAlertOpen = isOpen;
   }
 }

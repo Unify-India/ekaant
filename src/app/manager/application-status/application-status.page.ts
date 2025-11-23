@@ -26,7 +26,7 @@ export class ApplicationStatusPage implements OnInit {
     this.loadApplicationStatus();
   }
 
-  async loadApplicationStatus() {
+  loadApplicationStatus() {
     this.isLoading = true;
     const user = this.authService.getCurrentUser();
     if (user) {

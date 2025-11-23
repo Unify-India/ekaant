@@ -115,35 +115,4 @@ export class PreviewComponent implements OnInit {
     // You might need to adjust the route based on your app's routing setup
     this.router.navigate(['/library-registration-form']);
   }
-
-  // Final submission logic
-  submitRegistration(): void {
-    if (this.mainForm.valid) {
-      console.log('Submitting Final Form:', this.mainForm.value);
-      alert('Library Registration Submitted Successfully!');
-      // Navigate to a success page or home
-      // this.router.navigate(['/home']);
-    } else {
-      alert('Please complete all required sections before submitting.');
-    }
-  }
-
-  async updateRegistration(): Promise<void> {
-    if (this.mainForm.invalid) {
-      alert('Please complete all required sections before submitting.');
-      return;
-    }
-
-    try {
-      if (this.lrfService.editMode) {
-        await this.lrfService.updateLibrary();
-        alert('Application Updated Successfully!');
-      }
-      // Navigate to a success page or home
-      this.router.navigate(['/manager/application-status']);
-    } catch (error) {
-      console.error('Error during submission:', error);
-      alert('There was an error during submission. Please try again.');
-    }
-  }
 }

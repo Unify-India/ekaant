@@ -119,29 +119,22 @@
           </ion-button>
         }
 
-        <ion-button id="present-alert" fill="clear" color="dark">Cancel</ion-button>
-        <ion-alert
-          trigger="present-alert"
-          header="Cancel Registration?"
-          message="Are you sure you want to cancel the registration process? All entered data will be lost."
-          [buttons]="alertButtons"
-        ></ion-alert>
+        <ion-button (click)="onCancel()" fill="clear" color="dark">Cancel</ion-button>
+
         @if (currentSectionIndex() < sections.length - 1) {
           <ion-button (click)="nextSection()" [disabled]="!isCurrentSectionValid()" color="primary" slot="end">
             <span>Next</span>
-
             <ion-icon slot="end" name="chevron-forward"></ion-icon>
           </ion-button>
         } @else {
-          <!-- Todo: add recaptcha before submission and add email/phone verification -->
           <ion-button
             class="next-button"
             color="success"
             slot="end"
-            (click)="onSubmit()"
+            (click)="onFinalSubmit()"
             [disabled]="!masterForm.valid"
           >
-            <span>Submit Registration</span>
+            <span>{{ lrfService.editMode ? 'Update Registration' : 'Submit Registration' }}</span>
             <ion-icon slot="start" name="checkmark-done-outline"></ion-icon>
           </ion-button>
         }
