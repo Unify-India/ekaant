@@ -1,6 +1,8 @@
 # Instructions
 - Do not assume changes, always ask user with change proposal.
 - Do not test shell commands automatically, give proposal to user for confirmation then start planning.
+- Ask doubts in case the instructions are not clear
+  
 
 # Project Context Saved (November 5, 2025)
 
