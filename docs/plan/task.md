@@ -92,3 +92,26 @@ Return:
 ✔ `.scss` file
 for **both** screens.
 
+# Task list
+
+## 23 Nov 2025
+
+### Backend Implementation Plan
+
+**Phase 1: Project Scaffolding & Core Setup**
+- [ ] Create the recommended directory structure within `functions/src/`.
+- [ ] Create placeholder files for each module (e.g., `registration/approveLibrary.ts`, `auth/onStudentSignup.ts`, etc.).
+- [ ] Implement the shared Firebase Admin SDK instance in `lib/firebaseAdmin.ts`.
+- [ ] Define initial TypeScript interfaces for Firestore documents (`users`, `libraries`, `libraryRegistrationRequests`, etc.) in `types/index.d.ts` based on `docs/db schema.md`.
+- [ ] Define enums for status fields (e.g., `ApplicationStatus`) in `types/enums.ts`.
+- [ ] Update `functions/src/index.ts` to export placeholder functions as they are developed.
+
+**Phase 2: Implement Admin Library Approval Workflow**
+- [ ] Implement the `approveLibrary` callable function in `registration/approveLibrary.ts`.
+- [ ] Implement the `rejectLibrary` callable function in `registration/rejectLibrary.ts`.
+- [ ] Implement the `libraryRegistrationRequest` callable function in `registration/libraryRegistrationRequest.ts`.
+
+**Phase 3: Implement User-related Triggers & Functions**
+- [ ] Implement the `onStudentSignup` Auth trigger in `auth/onStudentSignup.ts`.
+- [ ] Implement the `onUserDelete` Auth trigger in `auth/onUserDelete.ts`.
+- [ ] Implement the `manageClaims` callable function for admins.
