@@ -69,23 +69,13 @@ export class RequirementsComponent implements OnInit {
     return this.requirementsForm.get('selectedRequirements') as FormArray;
   }
 
-  // Creates a FormGroup for a new requirement
-  private createRequirementGroup(description = '', isCustom = false): FormGroup {
-    return this.fb.group({
-      description: [description, Validators.required],
-      isCustom: [isCustom],
-      attachSample: [false],
-      sampleFile: [null],
-    });
-  }
-
   addCommonRequirement(requirementText: string): void {
-    const newReqGroup = createRequirementGroup(this.fb, requirementText, false);
+    const newReqGroup = createRequirementGroup(this.fb, { description: requirementText, isCustom: false });
     this.selectedRequirements.push(newReqGroup);
   }
 
   addCustomRequirement(): void {
-    const newReqGroup = createRequirementGroup(this.fb, '', true);
+    const newReqGroup = createRequirementGroup(this.fb, { description: '', isCustom: true });
     this.selectedRequirements.push(newReqGroup);
   }
 

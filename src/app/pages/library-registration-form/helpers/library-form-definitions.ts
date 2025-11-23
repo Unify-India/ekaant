@@ -120,11 +120,11 @@ export function createRequirementsForm(fb: FormBuilder): FormGroup {
 }
 
 // helper to create individual requirement group (if used externally)
-export function createRequirementGroup(fb: FormBuilder, description = '', isCustom = false) {
+export function createRequirementGroup(fb: FormBuilder, req: any = {}) {
   return fb.group({
-    description: [description, Validators.required],
-    isCustom: [isCustom],
-    attachSample: [false],
+    description: [req.description || '', Validators.required],
+    isCustom: [req.isCustom || false],
+    attachSample: [req.attachSample || false],
     sampleFile: [null],
     sampleFileProgress: [0],
   });

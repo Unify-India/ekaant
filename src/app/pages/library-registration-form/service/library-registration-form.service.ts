@@ -114,24 +114,31 @@ export class LibraryRegistrationFormService {
   public loadRegistrationData(data: any): void {
     if (!data) return;
 
-    // Use patchValue for the main form to populate most fields
-    this.mainForm.patchValue(data);
+    // Be explicit: patch each section to avoid issues with `patchValue` on the root form
+    this.mainForm.get('basicInformation')?.patchValue(data.basicInformation || {});
+    this.mainForm.get('hostProfile')?.patchValue(data.hostProfile || {});
+    this.mainForm.get('bookCollection')?.patchValue(data.bookCollection || {});
+    this.mainForm.get('amenities')?.patchValue(data.amenities || {});
+    this.mainForm.get('codeOfConduct')?.patchValue(data.codeOfConduct || {});
 
-    // Manually handle FormArrays
+    // Handle complex groups with primitives and FormArrays separately
+    if (data.seatManagement) {
+      this.mainForm.get('seatManagement.totalSeats')?.patchValue(data.seatManagement.totalSeats);
+      const rangesArray = this.mainForm.get('seatManagement.facilityRanges') as FormArray;
+      rangesArray.clear();
+      if (data.seatManagement.facilityRanges) {
+        data.seatManagement.facilityRanges.forEach((range: any) => {
+          rangesArray.push(createFacilityRangeGroup(this.fb, range.from, range.to, range.facility));
+        });
+      }
+    }
+
+    // Manually handle FormArrays in their respective sections
     if (data.libraryImages && data.libraryImages.libraryPhotos) {
       const photosArray = this.mainForm.get('libraryImages.libraryPhotos') as FormArray;
       photosArray.clear();
       data.libraryImages.libraryPhotos.forEach((photo: any) => {
-        // Note: The 'file' will be null here, but the previewUrl will be a Firebase Storage URL
         photosArray.push(createPhotoGroup(this.fb, photo.previewUrl));
-      });
-    }
-
-    if (data.seatManagement && data.seatManagement.facilityRanges) {
-      const rangesArray = this.mainForm.get('seatManagement.facilityRanges') as FormArray;
-      rangesArray.clear();
-      data.seatManagement.facilityRanges.forEach((range: any) => {
-        rangesArray.push(createFacilityRangeGroup(this.fb, range.from, range.to, range.facility));
       });
     }
 
@@ -147,8 +154,7 @@ export class LibraryRegistrationFormService {
       const requirementsArray = this.mainForm.get('requirements.selectedRequirements') as FormArray;
       requirementsArray.clear();
       data.requirements.selectedRequirements.forEach((req: any) => {
-        // Note: 'sampleFile' will be null, but we might have a URL to the file
-        requirementsArray.push(createRequirementGroup(this.fb, req.description, req.isCustom));
+        requirementsArray.push(createRequirementGroup(this.fb, req));
       });
     }
   }
@@ -170,11 +176,26 @@ export class LibraryRegistrationFormService {
 
   async submitLibrary(): Promise<string> {
     console.log('Submitting library registration form...');
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      throw new Error('User not authenticated. Cannot submit form.');
+    }
+
     // orchestrate modular steps
     const payload = this.mainForm.value;
     const { initialPayload, imagesArray, hostProfileFile, requirementsArray } = this.prepareInitialPayload(payload);
 
+    // Add owner and manager IDs
+    initialPayload.ownerId = currentUser.uid;
+    initialPayload.managerIds = [currentUser.uid];
+
     const libraryId = await this.createLibraryDoc(initialPayload);
+
+    // Update user document with the new library ID
+    const currentManagedIds = currentUser.managedLibraryIds || [];
+    await this.authService.updateUserProfile({
+      managedLibraryIds: [...currentManagedIds, libraryId],
+    });
 
     await this.uploadImages(libraryId, imagesArray);
     await this.uploadHostProfile(libraryId, hostProfileFile);
@@ -202,7 +223,7 @@ export class LibraryRegistrationFormService {
   }
 
   private async createLibraryDoc(initialPayload: any): Promise<string> {
-    return this.firebase.addLibrary(initialPayload);
+    return this.libraryService.addLibrary(initialPayload);
   }
 
   private async uploadImages(libraryId: string, imagesArray: any[]): Promise<void> {
@@ -217,7 +238,7 @@ export class LibraryRegistrationFormService {
         const photosArray = imagesFormGroup?.get('libraryPhotos');
         const photoControl = (photosArray as any)?.at ? (photosArray as any).at(idx) : null;
 
-        await this.firebase.addLibraryImage(libraryId, file, { order: idx }, (percent) => {
+        await this.libraryService.addLibraryImage(libraryId, file, false, { order: idx }, (percent) => {
           try {
             if (photoControl) photoControl.patchValue({ uploadProgress: percent });
           } catch (e) {
@@ -242,8 +263,9 @@ export class LibraryRegistrationFormService {
         }
       };
       const fileName = `host_profile_${Date.now()}_${hostProfileFile.name}`;
-      const url = await this.firebase.uploadFile(libraryId, hostProfileFile, fileName, onProgress);
-      await this.firebase.updateLibraryRegistration(libraryId, { 'hostProfile.photoURL': url });
+      const path = `library-registrations/${libraryId}/${fileName}`;
+      const url = await this.firebase.uploadFile(path, hostProfileFile, onProgress);
+      await this.libraryService.updateLibrary(libraryId, { 'hostProfile.photoURL': url });
       try {
         hostForm?.patchValue({ profilePhotoProgress: 100 });
       } catch (e) {
@@ -265,13 +287,19 @@ export class LibraryRegistrationFormService {
         const selectedArray = reqsForm?.get('selectedRequirements');
         const reqControl = (selectedArray as any)?.at ? (selectedArray as any).at(rIdx) : null;
 
-        await this.firebase.addRequirementDocument(libraryId, file, { description: req.description }, (percent) => {
-          try {
-            if (reqControl) reqControl.patchValue({ sampleFileProgress: percent });
-          } catch (e) {
-            // ignore
-          }
-        });
+        await this.libraryService.addRequirementDocument(
+          libraryId,
+          file,
+          false,
+          { description: req.description },
+          (percent) => {
+            try {
+              if (reqControl) reqControl.patchValue({ sampleFileProgress: percent });
+            } catch (e) {
+              // ignore
+            }
+          },
+        );
       } catch (e) {
         console.warn('Failed to upload requirement file', e);
       }

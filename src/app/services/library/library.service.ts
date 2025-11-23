@@ -12,7 +12,7 @@ import {
   doc,
   setDoc,
 } from '@angular/fire/firestore';
-import { from, map, Observable } from 'rxjs';
+import { from, map, Observable, of, switchMap } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
 
 import { FirebaseService } from '../firebase/firebase-service';
@@ -62,15 +62,31 @@ export class LibraryService {
   }
 
   public getLibraryRegistration(userId: string): Observable<any> {
-    console.log('user id', userId);
+    console.log('Fetching library registration for user:', userId);
     const q = query(collection(this.firestore, 'library-registrations'), where('ownerId', '==', userId), limit(1));
     return from(getDocs(q)).pipe(
-      map((snapshot) => {
+      switchMap((snapshot) => {
         if (snapshot.empty) {
-          return null;
+          return of(null);
         }
-        const doc = snapshot.docs[0];
-        return { id: doc.id, ...doc.data() };
+        const registrationDoc = snapshot.docs[0];
+        const registrationData = { id: registrationDoc.id, ...registrationDoc.data() };
+        const imagesColRef = collection(this.firestore, 'library-registrations', registrationDoc.id, 'libraryImages');
+        return from(getDocs(imagesColRef)).pipe(
+          map((imagesSnapshot) => {
+            const libraryPhotos = imagesSnapshot.docs.map((doc) => {
+              const data = doc.data();
+              return { previewUrl: data['imageURL'] };
+            });
+            const transformedData = {
+              ...registrationData,
+              libraryImages: {
+                libraryPhotos: libraryPhotos,
+              },
+            };
+            return transformedData;
+          }),
+        );
       }),
     );
   }
