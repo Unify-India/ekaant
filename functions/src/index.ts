@@ -1,19 +1,46 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import * as logger from 'firebase-functions/logger';
+import * as functionsV1 from 'firebase-functions/v1'; // For V1 auth triggers
 
-import * as logger from "firebase-functions/logger";
-import {onRequest} from "firebase-functions/v2/https";
+// This file is the main entrypoint for all Firebase Functions.
+// We import functions from their individual files and export them here,
+// grouped by feature, to ensure they are discovered and deployed by Firebase.
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+// Auth Triggers Logic
+import {onStudentSignupLogic} from './auth/onStudentSignup';
+import {onUserDeleteLogic} from './auth/onUserDelete';
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// Registration Callable Functions
+import {approveLibrary} from './registration/approveLibrary';
+import {rejectLibrary} from './registration/rejectLibrary';
+import {libraryRegistrationRequest} from './registration/libraryRegistrationRequest';
+
+// Booking Triggers
+import {transferSeatOnCheckout} from './booking/transferSeatOnCheckout';
+
+// Uploads
+import {getSignedUploadUrl} from './uploads/getSignedUploadUrl';
+
+
+logger.info('Functions cold start');
+
+// Export V1 Auth Triggers (as V2 does not directly support them yet)
+export const authOnStudentSignup = functionsV1.auth.user().onCreate(
+  onStudentSignupLogic,
+);
+export const authOnUserDelete = functionsV1.auth.user().onDelete(
+  onUserDeleteLogic,
+);
+
+// Export V1 Booking Triggers
+export const bookingOnSeatCheckout = transferSeatOnCheckout;
+
+// Export V2 Callable Functions
+export const registration = {
+  approvelibrary: approveLibrary,
+  rejectlibrary: rejectLibrary,
+  libraryregistrationrequest: libraryRegistrationRequest,
+};
+
+export const uploads = {
+  getsigneduploadurl: getSignedUploadUrl,
+};
