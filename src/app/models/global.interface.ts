@@ -9,6 +9,7 @@ export interface IUser {
   createdAt: Date;
   email: string;
   linkedLibraryId?: string;
+  managedLibraryIds?: string[];
   name: string;
   profileCompleted: boolean;
   role: string | 'admin' | 'manager' | 'student';
