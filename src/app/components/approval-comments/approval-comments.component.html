@@ -1,0 +1,30 @@
+<div class="comments-container">
+  <div class="comment-thread" *ngIf="comments$ | async as comments">
+    <div
+      *ngFor="let comment of comments"
+      class="comment-bubble"
+      [ngClass]="{
+        admin: comment.role === 'admin',
+        manager: comment.role === 'manager',
+      }"
+    >
+      <div class="comment-author">{{ comment.role | titlecase }}</div>
+      <div class="comment-text">{{ comment.message }}</div>
+      <div class="comment-timestamp">{{ comment.timestamp?.toDate() | date: 'short' }}</div>
+    </div>
+  </div>
+
+  <div class="comment-input-section" [formGroup]="commentForm">
+    <ion-textarea
+      label="Add a comment"
+      labelPlacement="floating"
+      fill="outline"
+      formControlName="message"
+      [autoGrow]="true"
+    ></ion-textarea>
+    <ion-button slot="end" (click)="addComment()" [disabled]="commentForm.invalid">
+      <ion-icon slot="start" name="send-outline"></ion-icon>
+      Send
+    </ion-button>
+  </div>
+</div>

@@ -12,6 +12,8 @@ import {
   doc,
   setDoc,
   getDoc,
+  collectionData,
+  orderBy,
 } from '@angular/fire/firestore';
 import { from, map, Observable, of, switchMap } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
@@ -197,5 +199,19 @@ export class LibraryService {
       uploadedAt: serverTimestamp(),
     });
     return { id: reqDoc.id, url };
+  }
+
+  public getComments(registrationId: string): Observable<any[]> {
+    const commentsRef = collection(this.firestore, 'library-registrations', registrationId, 'comments');
+    const q = query(commentsRef, orderBy('timestamp', 'asc'));
+    return collectionData(q, { idField: 'id' });
+  }
+
+  public addComment(registrationId: string, comment: any): Promise<any> {
+    const commentsRef = collection(this.firestore, 'library-registrations', registrationId, 'comments');
+    return addDoc(commentsRef, {
+      ...comment,
+      timestamp: serverTimestamp(),
+    });
   }
 }
