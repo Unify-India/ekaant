@@ -26,16 +26,67 @@
 
     <ion-item lines="none">
       <ion-label position="stacked">
-        {{ addressLabel }}
+        {{ addressLine1Label }}
         <span class="required-star">*</span>
       </ion-label>
-      <ion-textarea
-        [placeholder]="addressPlaceholder"
-        formControlName="fullAddress"
-        [autoGrow]="true"
-        [class.ion-invalid]="fullAddress?.invalid && fullAddress?.touched"
+      <ion-input
+        [placeholder]="addressLine1Placeholder"
+        formControlName="addressLine1"
+        [class.ion-invalid]="addressLine1?.invalid && addressLine1?.touched"
         errorText="{{ requiredFieldError }}"
-      ></ion-textarea>
+      ></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="stacked">
+        {{ addressLine2Label }}
+      </ion-label>
+      <ion-input
+        [placeholder]="addressLine2Placeholder"
+        formControlName="addressLine2"
+        [class.ion-invalid]="addressLine2?.invalid && addressLine2?.touched"
+        errorText="{{ requiredFieldError }}"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="stacked">
+        {{ cityLabel }}
+        <span class="required-star">*</span>
+      </ion-label>
+      <ion-input
+        [placeholder]="cityPlaceholder"
+        formControlName="city"
+        [class.ion-invalid]="city?.invalid && city?.touched"
+        errorText="{{ requiredFieldError }}"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="stacked">
+        {{ stateLabel }}
+        <span class="required-star">*</span>
+      </ion-label>
+      <ion-input
+        [placeholder]="statePlaceholder"
+        formControlName="state"
+        [class.ion-invalid]="state?.invalid && state?.touched"
+        errorText="{{ requiredFieldError }}"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="stacked">
+        {{ zipCodeLabel }}
+        <span class="required-star">*</span>
+      </ion-label>
+      <ion-input
+        type="number"
+        [placeholder]="zipCodePlaceholder"
+        formControlName="zipCode"
+        [class.ion-invalid]="zipCode?.invalid && zipCode?.touched"
+        errorText="Please enter a valid 6-digit zip code."
+      ></ion-input>
     </ion-item>
 
     <ion-list>

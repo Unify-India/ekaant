@@ -11,6 +11,7 @@ import {
   updateDoc,
   doc,
   setDoc,
+  getDoc,
 } from '@angular/fire/firestore';
 import { from, map, Observable, of, switchMap } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
@@ -87,6 +88,51 @@ export class LibraryService {
             return transformedData;
           }),
         );
+      }),
+    );
+  }
+
+  public getLibraryRegistrationById(id: string): Observable<any> {
+    const docRef = doc(this.firestore, 'library-registrations', id);
+    return from(getDoc(docRef)).pipe(
+      map((snapshot) => {
+        if (snapshot.exists()) {
+          return { id: snapshot.id, ...snapshot.data() };
+        } else {
+          return null;
+        }
+      }),
+    );
+  }
+
+  public getPendingLibraries(): Observable<any[]> {
+    const q = query(collection(this.firestore, 'library-registrations'), where('applicationStatus', '==', 'pending'));
+    return from(getDocs(q)).pipe(
+      map((snapshot) => {
+        if (snapshot.empty) {
+          return [];
+        }
+        return snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const addressParts = [
+            data.basicInformation?.addressLine1,
+            data.basicInformation?.addressLine2,
+            data.basicInformation?.city,
+            data.basicInformation?.state,
+            data.basicInformation?.zipCode,
+          ].filter(Boolean); // Filter out any undefined/null parts
+
+          return {
+            id: doc.id,
+            libraryName: data.basicInformation?.libraryName,
+            libraryManager: data.hostProfile?.fullName,
+            address: addressParts.join(', '),
+            totalSeats: data.seatManagement?.totalSeats,
+            applicationStatus: data.applicationStatus,
+            // Include other top-level fields if necessary for display
+            // ...data,
+          };
+        });
       }),
     );
   }

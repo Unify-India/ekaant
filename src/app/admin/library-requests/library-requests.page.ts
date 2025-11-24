@@ -1,6 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonChip } from '@ionic/angular/standalone';
+import { IonChip, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -11,6 +12,8 @@ import {
   cloudDownloadOutline,
   eyeOutline,
 } from 'ionicons/icons';
+import { Observable } from 'rxjs';
+import { LibraryService } from 'src/app/services/library/library.service';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
 
@@ -19,42 +22,22 @@ import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials
   templateUrl: './library-requests.page.html',
   styleUrls: ['./library-requests.page.scss'],
   standalone: true,
-  imports: [IonChip, BaseUiComponents, UiEssentials],
+  imports: [IonSpinner, IonChip, BaseUiComponents, UiEssentials, CommonModule],
 })
 export class LibraryRequestsPage implements OnInit {
-  // Mock data for the table
-  requests = [
-    {
-      libraryManager: 'Rohan Mehta',
-      libraryName: "The Scholar's Nook",
-      address: '123 University Ave, Pune, Maharashtra',
-      totalSeats: 100,
-      applicationStatus: 'pending',
-      id: 'req-001',
-    },
-    {
-      libraryManager: 'Anjali Sharma',
-      libraryName: 'Readers Paradise',
-      address: '456 Library Rd, Mumbai, Maharashtra',
-      totalSeats: 75,
-      applicationStatus: 'approved',
-      id: 'req-002',
-    },
-    {
-      libraryManager: 'Vikram Singh',
-      libraryName: 'Knowledge Hub',
-      address: '789 Bookworm Ln, Delhi',
-      totalSeats: 120,
-      applicationStatus: 'revision_requested',
-      id: 'req-003',
-    },
-  ];
+  requests$!: Observable<any[]>;
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private libraryService: LibraryService,
+  ) {
     addIcons({ cloudDownloadOutline, addOutline, eyeOutline, createOutline, trashOutline, saveOutline, closeOutline });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.requests$ = this.libraryService.getPendingLibraries();
+    console.info('requests', this.requests$);
+  }
 
   // Navigates to the detail page in edit mode
   editRequest(requestId: string) {

@@ -124,14 +124,19 @@
       </ion-button>
     </div>
     <div class="section-content">
-      <h4>{{ section.value.totalSeats }} Total Seats</h4>
+      <h4>
+        <ion-icon name="people-outline"></ion-icon>
+        {{ section.value.totalSeats }} Total Seats
+      </h4>
       <!-- fixme: if no facility range hide h5 also -->
-      <h5>Facility Ranges:</h5>
-      <ul>
-        @for (range of section.value.facilityRanges; track $index) {
-          <li>Seats {{ range.from }}-{{ range.to }}: {{ range.facility }}</li>
-        }
-      </ul>
+      @if (section.value.facilityRanges.length > 0) {
+        <p>Facility Ranges:</p>
+        <ul class="facility-range-list">
+          @for (range of section.value.facilityRanges; track $index) {
+            <li>Seats {{ range.from }}-{{ range.to }}: {{ range.facility }}</li>
+          }
+        </ul>
+      }
     </div>
   </div>
 }
@@ -203,7 +208,7 @@
         Edit
       </ion-button>
     </div>
-    <div class="section-content">
+    <div class="pricing-plans">
       <ion-grid>
         <ion-row>
           @for (plan of section.value.pricingPlans; track $index) {

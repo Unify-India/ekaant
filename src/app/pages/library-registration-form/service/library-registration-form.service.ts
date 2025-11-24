@@ -115,7 +115,30 @@ export class LibraryRegistrationFormService {
     if (!data) return;
 
     // Be explicit: patch each section to avoid issues with `patchValue` on the root form
-    this.mainForm.get('basicInformation')?.patchValue(data.basicInformation || {});
+    // Handle basicInformation separately to parse fullAddress if necessary
+    if (data.basicInformation) {
+      const basicInfoData = { ...data.basicInformation };
+      // If an old 'fullAddress' exists, try to parse it into new fields
+      if (basicInfoData.fullAddress && !basicInfoData.addressLine1) {
+        // This is a simplistic parsing. A more robust solution might use a third-party library
+        // or a more sophisticated regex if the fullAddress format varies.
+        // For now, we'll just try to split by commas and assign,
+        // which might not be perfect but provides a starting point.
+        const addressParts = basicInfoData.fullAddress.split(',').map((part: string) => part.trim());
+        if (addressParts.length >= 3) {
+          basicInfoData.addressLine1 = addressParts[0];
+          basicInfoData.city = addressParts[addressParts.length - 3];
+          basicInfoData.state = addressParts[addressParts.length - 2];
+          basicInfoData.zipCode = addressParts[addressParts.length - 1];
+          basicInfoData.addressLine2 = addressParts.slice(1, addressParts.length - 3).join(', ');
+        } else {
+          basicInfoData.addressLine1 = basicInfoData.fullAddress;
+        }
+        delete basicInfoData.fullAddress;
+      }
+      this.mainForm.get('basicInformation')?.patchValue(basicInfoData);
+    }
+
     this.mainForm.get('hostProfile')?.patchValue(data.hostProfile || {});
     this.mainForm.get('bookCollection')?.patchValue(data.bookCollection || {});
     this.mainForm.get('amenities')?.patchValue(data.amenities || {});
@@ -211,6 +234,13 @@ export class LibraryRegistrationFormService {
     const requirementsArray = payload.requirements?.selectedRequirements ?? [];
 
     const initialPayload = { ...payload };
+
+    // Clean basicInformation to ensure only new address fields are present
+    if (initialPayload.basicInformation) {
+      const basicInfo = { ...initialPayload.basicInformation };
+      delete (basicInfo as any).fullAddress; // Remove old fullAddress if it somehow persists
+      initialPayload.basicInformation = basicInfo;
+    }
 
     // Clean libraryImages to not store File objects
     if (initialPayload.libraryImages) {

@@ -26,8 +26,16 @@ export class BasicInformationComponent implements OnInit {
   public readonly completionWarning = 'This section needs to be completed';
   public readonly libraryNameLabel = 'Library Name';
   public readonly libraryNamePlaceholder = 'Enter your library name';
-  public readonly addressLabel = 'Full Address';
-  public readonly addressPlaceholder = 'Enter complete address with landmarks';
+  public readonly addressLine1Label = 'Address Line 1';
+  public readonly addressLine1Placeholder = 'House No., Building, Street, Area';
+  public readonly addressLine2Label = 'Address Line 2 (Optional)';
+  public readonly addressLine2Placeholder = 'Landmark, Colony, Locality';
+  public readonly cityLabel = 'City';
+  public readonly cityPlaceholder = 'Enter city';
+  public readonly stateLabel = 'State';
+  public readonly statePlaceholder = 'Enter state';
+  public readonly zipCodeLabel = 'Zip Code';
+  public readonly zipCodePlaceholder = 'Enter 6-digit zip code';
   public readonly genderCategoryLabel = 'Gender Category';
   public readonly genderCategoryOptions = [
     {
@@ -56,8 +64,20 @@ export class BasicInformationComponent implements OnInit {
   get libraryName() {
     return this.basicInfoForm.get('libraryName');
   }
-  get fullAddress() {
-    return this.basicInfoForm.get('fullAddress');
+  get addressLine1() {
+    return this.basicInfoForm.get('addressLine1');
+  }
+  get addressLine2() {
+    return this.basicInfoForm.get('addressLine2');
+  }
+  get city() {
+    return this.basicInfoForm.get('city');
+  }
+  get state() {
+    return this.basicInfoForm.get('state');
+  }
+  get zipCode() {
+    return this.basicInfoForm.get('zipCode');
   }
   get genderCategory() {
     return this.basicInfoForm.get('genderCategory');

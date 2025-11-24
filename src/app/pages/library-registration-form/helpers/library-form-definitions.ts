@@ -4,7 +4,11 @@ export function createBasicInformationForm(fb: FormBuilder): FormGroup {
   // todo: add pattern validation for operation hours like 6AM - 10PM
   return fb.group({
     libraryName: ['', [Validators.required, Validators.minLength(3)]],
-    fullAddress: ['', [Validators.required, Validators.minLength(10)]],
+    addressLine1: ['', [Validators.required, Validators.minLength(3)]],
+    addressLine2: ['', []],
+    city: ['', [Validators.required, Validators.minLength(3)]],
+    state: ['', [Validators.required, Validators.minLength(2)]],
+    zipCode: ['', [Validators.required, Validators.pattern('^[1-9]{1}[0-9]{5}$')]], // Indian pincode pattern
     genderCategory: ['Co-ed (Mixed)', Validators.required],
     operatingHours: ['', Validators.required],
   });

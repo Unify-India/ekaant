@@ -26,7 +26,7 @@
 
   <ion-card class="table-card">
     <div class="table-container">
-      <ion-grid class="data-grid">
+      <ion-grid class="data-grid" *ngIf="requests$ | async as requests; else loading">
         <!-- Header Row -->
         <ion-row class="grid-header">
           <ion-col size="1.5" class="ion-text-center">Actions</ion-col>
@@ -38,8 +38,8 @@
         </ion-row>
 
         <!-- Data Rows -->
-        @for (req of requests; track req.id) {
-          <ion-row class="grid-row">
+        <ng-container *ngIf="requests.length > 0; else noRequests">
+          <ion-row class="grid-row" *ngFor="let req of requests">
             <ion-col size="1.5" class="action-buttons ion-text-center">
               <ion-button fill="clear" size="small" (click)="viewRequest(req.id)">
                 <ion-icon slot="icon-only" name="eye-outline" color="success"></ion-icon>
@@ -69,8 +69,21 @@
               </ion-chip>
             </ion-col>
           </ion-row>
-        }
+        </ng-container>
       </ion-grid>
     </div>
   </ion-card>
+
+  <ng-template #loading>
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+      <p>Loading pending requests...</p>
+    </div>
+  </ng-template>
+
+  <ng-template #noRequests>
+    <div class="ion-text-center ion-padding">
+      <p>No pending library registration requests found.</p>
+    </div>
+  </ng-template>
 </ion-content>
