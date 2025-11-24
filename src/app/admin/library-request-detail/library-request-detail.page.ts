@@ -51,6 +51,14 @@ export class LibraryRequestDetailPage implements OnInit {
     if (this.requestId) {
       this.libraryService.getLibraryRegistrationById(this.requestId).subscribe((data) => {
         if (data) {
+          console.info('data', data);
+          // Convert Firestore Timestamps to readable dates
+          if (data.createdAt && data.createdAt.toDate) {
+            data.createdAt = data.createdAt.toDate().toLocaleString();
+          }
+          if (data.updatedAt && data.updatedAt.toDate) {
+            data.updatedAt = data.updatedAt.toDate().toLocaleString();
+          }
           this.requestForm.patchValue(data);
         }
       });
