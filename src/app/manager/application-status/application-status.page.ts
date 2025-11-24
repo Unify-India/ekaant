@@ -3,6 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { AuthService } from 'src/app/auth/service/auth.service';
+import { ApprovalCommentsComponent } from 'src/app/components/approval-comments/approval-comments.component';
 import { PreviewComponent } from 'src/app/pages/library-registration-form/components/preview/preview.component';
 import { LibraryRegistrationFormService } from 'src/app/pages/library-registration-form/service/library-registration-form.service';
 import { LibraryService } from 'src/app/services/library/library.service';
@@ -12,7 +13,7 @@ import { LibraryService } from 'src/app/services/library/library.service';
   templateUrl: './application-status.page.html',
   styleUrls: ['./application-status.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, PreviewComponent, RouterModule],
+  imports: [IonicModule, CommonModule, PreviewComponent, RouterModule, ApprovalCommentsComponent],
 })
 export class ApplicationStatusPage implements OnInit {
   private authService = inject(AuthService);
@@ -21,9 +22,16 @@ export class ApplicationStatusPage implements OnInit {
 
   isLoading = true;
   application: any;
+  currentUserRole: 'admin' | 'manager' = 'manager';
+  currentUserId!: string;
 
   ngOnInit() {
     this.loadApplicationStatus();
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.currentUserId = user.uid;
+      this.currentUserRole = this.authService.getCurrentUser()?.role as 'admin' | 'manager';
+    }
   }
 
   loadApplicationStatus() {
