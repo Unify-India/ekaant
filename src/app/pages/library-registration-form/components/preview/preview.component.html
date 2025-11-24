@@ -21,7 +21,13 @@
     </div>
     <div class="section-content">
       <h3>{{ section.value.libraryName }}</h3>
-      <p>{{ section.value.fullAddress }}</p>
+      <p>
+        {{ section.value.addressLine1 }}<br />
+        @if (section.value.addressLine2) {
+          {{ section.value.addressLine2 }}<br />
+        }
+        {{ section.value.city }}, {{ section.value.state }} - {{ section.value.zipCode }}
+      </p>
       <ion-chip>{{ section.value.genderCategory }}</ion-chip>
       <ion-chip>{{ section.value.operatingHours }}</ion-chip>
     </div>
