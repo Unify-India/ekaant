@@ -115,20 +115,20 @@ export class LibraryService {
         return snapshot.docs.map((doc) => {
           const data = doc.data();
           const addressParts = [
-            data.basicInformation?.addressLine1,
-            data.basicInformation?.addressLine2,
-            data.basicInformation?.city,
-            data.basicInformation?.state,
-            data.basicInformation?.zipCode,
+            data['basicInformation']?.addressLine1,
+            data['basicInformation']?.addressLine2,
+            data['basicInformation']?.city,
+            data['basicInformation']?.state,
+            data['basicInformation']?.zipCode,
           ].filter(Boolean); // Filter out any undefined/null parts
 
           return {
             id: doc.id,
-            libraryName: data.basicInformation?.libraryName,
-            libraryManager: data.hostProfile?.fullName,
+            libraryName: data['basicInformation']?.libraryName,
+            libraryManager: data['hostProfile']?.fullName,
             address: addressParts.join(', '),
-            totalSeats: data.seatManagement?.totalSeats,
-            applicationStatus: data.applicationStatus,
+            totalSeats: data['seatManagement']?.totalSeats,
+            applicationStatus: data['applicationStatus'],
             // Include other top-level fields if necessary for display
             // ...data,
           };
