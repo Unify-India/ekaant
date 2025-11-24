@@ -2,6 +2,7 @@
 - Do not assume changes, always ask user with change proposal.
 - Do not test shell commands automatically, give proposal to user for confirmation then start planning.
 - Ask doubts in case the instructions are not clear
+- Never edit the environment files 
   
 
 # Project Context Saved (November 5, 2025)
@@ -51,7 +52,7 @@ The frontend UI for the Admin's library approval workflow is complete and styled
 1.  **Connect Library Requests List to Firestore:**
     *   Modify `src/app/admin/library-requests/library-requests.page.ts` to fetch actual `libraryRegistrationRequests` from the Firestore collection.
 2.  **Connect Library Request Detail Page to Firestore:**
-    *   Modify `src/app/admin/library-request-detail/library-request-detail.page.ts` to fetch specific request data by ID from Firestore.
+    *   **STATUS: COMPLETED.** Modified `src/app/admin/library-request-detail/library-request-detail.page.ts` to fetch specific request data by ID from Firestore and properly map Firestore `Timestamp` objects to readable dates.
     *   Implement the `update()` method to save changes (including `applicationStatus` and `adminComments`) back to the Firestore document.
 3.  **Develop "Approve Library" Backend Logic (Cloud Function):**
     *   Create a Firebase Cloud Function (e.g., `onLibraryRequestApprove`) that triggers when a `libraryRegistrationRequests` document's `applicationStatus` is set to "approved".
