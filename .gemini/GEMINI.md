@@ -63,4 +63,13 @@ The frontend UI for the Admin's library approval workflow is complete and styled
         *   Set a custom claim (`role: 'manager'`) for the new user.
         *   (Optional) Send an email to the manager with login credentials.
 
-This plan will fully implement the "Approve Library" feature, from frontend UI to backend data and user management.
+### c. Reusable Comments Component
+*   **New Component (`/src/app/components/approval-comments`):**
+    *   Created a standalone, reusable component for displaying and adding comments to a library registration.
+    *   The component fetches and displays a real-time feed of comments from the `library-registrations/{id}/comments` sub-collection.
+    *   It allows users (both admins and managers) to add new comments.
+*   **Integration:**
+    *   **Admin:** Replaced the old comments section in the `library-request-detail` page with the new `approval-comments` component.
+    *   **Manager:** Replaced the old comments section in the `application-status` page with the new `approval-comments` component.
+*   **Database:**
+    *   The `library-registrations` collection now includes a `comments` sub-collection to store the comment history for each application.
