@@ -17,6 +17,7 @@ import {
 } from '@angular/fire/firestore';
 import { from, map, Observable, of, switchMap } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
+import { ILibraryState } from 'src/app/models/library.interface';
 
 import { FirebaseService } from '../firebase/firebase-service';
 
@@ -29,16 +30,15 @@ export class LibraryService {
 
   constructor() {}
 
-  async hasLibrary(user: IUser): Promise<boolean> {
+  async getManagerLibraryState(user: IUser): Promise<ILibraryState | null> {
     // 1. Check for an approved library first
     const approvedQuery = query(collection(this.firestore, 'libraries'), where('managerId', '==', user.uid), limit(1));
     const approvedSnapshot = await getDocs(approvedQuery);
 
     if (!approvedSnapshot.empty) {
       const libraryData = approvedSnapshot.docs[0].data();
-      // Ensure we add a status for the UI logic to work consistently
-      localStorage.setItem('library', JSON.stringify({ ...libraryData, registration: 'registered' }));
-      return true;
+      // Synthesize applicationStatus for consistency, as 'libraries' collection has 'status'
+      return { ...libraryData, applicationStatus: 'approved' } as ILibraryState;
     }
 
     // 2. If no approved library, check for a registration request
@@ -51,17 +51,12 @@ export class LibraryService {
 
     if (!pendingSnapshot.empty) {
       const requestData = pendingSnapshot.docs[0].data();
-      // The 'applicationStatus' from the request becomes the 'registration' status
-      localStorage.setItem(
-        'library',
-        JSON.stringify({ ...requestData, registration: requestData['applicationStatus'] }),
-      );
-      return true;
+      // This document already has the 'applicationStatus' field
+      return requestData as ILibraryState;
     }
 
-    // 3. If nothing is found, clear any stale data and return false
-    localStorage.removeItem('library');
-    return false;
+    // 3. If nothing is found, return null;
+    return null;
   }
 
   public getLibraryRegistration(userId: string): Observable<any> {
