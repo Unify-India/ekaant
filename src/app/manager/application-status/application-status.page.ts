@@ -8,6 +8,8 @@ import { PreviewComponent } from 'src/app/pages/library-registration-form/compon
 import { LibraryRegistrationFormService } from 'src/app/pages/library-registration-form/service/library-registration-form.service';
 import { LibraryService } from 'src/app/services/library/library.service';
 
+import { IUser } from 'src/app/models/global.interface';
+
 @Component({
   selector: 'app-application-status',
   templateUrl: './application-status.page.html',
@@ -26,35 +28,32 @@ export class ApplicationStatusPage implements OnInit {
   currentUserId!: string;
 
   ngOnInit() {
-    this.loadApplicationStatus();
     const user = this.authService.getCurrentUser();
     if (user) {
       this.currentUserId = user.uid;
-      this.currentUserRole = this.authService.getCurrentUser()?.role as 'admin' | 'manager';
+      this.loadApplicationStatus(user.uid);
+    } else {
+      this.isLoading = false;
+      console.log('No user found, cannot load application status.');
     }
   }
 
-  loadApplicationStatus() {
+  loadApplicationStatus(userId: string) {
     this.isLoading = true;
-    const user = this.authService.getCurrentUser();
-    if (user) {
-      this.libraryService.getLibraryRegistration(user.uid).subscribe({
-        next: (data) => {
-          this.application = data;
-          if (data) {
-            this.lrfService.loadRegistrationData(data);
-            this.lrfService.setEditMode(true, data.id);
-          }
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error fetching application status:', err);
-          this.isLoading = false;
-        },
-      });
-    } else {
-      this.isLoading = false;
-    }
+    this.libraryService.getLibraryRegistration(userId).subscribe({
+      next: (data) => {
+        this.application = data;
+        if (data) {
+          this.lrfService.loadRegistrationData(data);
+          this.lrfService.setEditMode(true, data.id);
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error fetching application status:', err);
+        this.isLoading = false;
+      },
+    });
   }
 
   getStatusClass(status: string): string {

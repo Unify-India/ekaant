@@ -30,12 +30,14 @@
       </ion-card-content>
     </ion-card>
 
-    <app-approval-comments
-      *ngIf="application.id"
-      [registrationId]="application.id"
-      [currentUserRole]="currentUserRole"
-      [currentUserId]="currentUserId"
-    ></app-approval-comments>
+    <div class="approval-comments">
+      <app-approval-comments
+        *ngIf="application.id"
+        [registrationId]="application.id"
+        [currentUserRole]="currentUserRole"
+        [currentUserId]="currentUserId"
+      ></app-approval-comments>
+    </div>
 
     <!-- Application Preview -->
     <app-preview></app-preview>
