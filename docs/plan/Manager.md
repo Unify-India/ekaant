@@ -13,6 +13,25 @@ The Library Manager is the owner or operator of a library registered on the Ekaa
 3.  **Payment Verification:** Confirming and recording payments made by students (initially cash-based).
 4.  **SaaS Subscription:** Managing the library's subscription to the Ekaant platform itself.
 
+### 1.a. Manager Profile Data Model
+
+While the `LIBRARIES` collection holds data about the physical library, the `USERS` document for a manager should store their personal information. This ensures a manager's personal data is separate from the library's operational data, which is crucial as they could potentially manage multiple libraries.
+
+A `user` document with the `role: 'manager'` should contain:
+
+*   **`uid`**: The user's unique Firebase Authentication ID.
+*   **`email`**: The manager's login email.
+*   **`displayName`**: The manager's full name.
+*   **`phoneNumber`**: The manager's personal contact number.
+*   **`photoURL`**: A URL to their profile picture.
+*   **`roleInLibrary`**: A string describing their position (e.g., "Owner", "Head Manager", "Staff").
+*   **`verification`**: An object containing identity verification details.
+    *   **`idType`**: e.g., "Aadhaar", "PAN Card".
+    *   **`idNumber`**: The number of the provided ID.
+    *   **`idDocumentUrl`**: A Firebase Storage URL to the scanned document.
+    *   **`status`**: 'verified', 'pending', 'rejected'.
+
+
 ---
 
 ## 2. Manager-Specific Cloud Functions
