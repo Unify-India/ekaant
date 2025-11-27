@@ -14,6 +14,8 @@ import {
   getDoc,
   collectionData,
   orderBy,
+  deleteDoc,
+  writeBatch,
 } from '@angular/fire/firestore';
 import { from, map, Observable, of, switchMap } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
@@ -148,9 +150,71 @@ export class LibraryService {
   }
 
   public async updateLibrary(docId: string, data: any, isApproved = false): Promise<void> {
-    const collectionName = isApproved ? 'libraries' : 'library-registrations';
-    const ref = doc(this.firestore, collectionName, docId);
-    return await updateDoc(ref, data);
+    if (isApproved) {
+      // This is the approval "move" logic
+      const regRef = doc(this.firestore, 'library-registrations', docId);
+      const regSnap = await getDoc(regRef);
+
+      if (!regSnap.exists()) {
+        console.error('Library registration document not found for approval:', docId);
+        throw new Error('Registration not found');
+      }
+
+      const registrationData = regSnap.data();
+      // Combine old data, with new data from the approval form
+      const finalLibraryData = { ...registrationData, ...data, status: 'approved' };
+
+      // The 'libraries' collection has a 'status' field, while 'library-registrations' has 'applicationStatus'.
+      // We remove the old one to keep the schema clean for the new collection.
+      if ('applicationStatus' in finalLibraryData) {
+        delete finalLibraryData.applicationStatus;
+      }
+
+      // 1. Create the new document in 'libraries' collection with the same ID
+      const libRef = doc(this.firestore, 'libraries', docId);
+      await setDoc(libRef, finalLibraryData);
+
+      // 2. Move all documents from subcollections ('comments', 'libraryImages', 'requirements')
+      await this.moveSubcollections(docId);
+
+      // 3. Finally, delete the original registration document
+      await deleteDoc(regRef);
+    } else {
+      // This is a simple update on the registration document (e.g., cancellation, or manager updating info)
+      const ref = doc(this.firestore, 'library-registrations', docId);
+      return await updateDoc(ref, data);
+    }
+  }
+
+  private async moveSubcollections(libraryId: string) {
+    const subcollections = ['comments', 'libraryImages', 'requirements'];
+    for (const sub of subcollections) {
+      const sourcePath = `library-registrations/${libraryId}/${sub}`;
+      const destPath = `libraries/${libraryId}/${sub}`;
+      await this.moveSubcollection(sourcePath, destPath);
+    }
+  }
+
+  private async moveSubcollection(sourcePath: string, destPath: string) {
+    const sourceColRef = collection(this.firestore, sourcePath);
+    const snapshot = await getDocs(sourceColRef);
+
+    if (snapshot.empty) {
+      return; // Nothing to move
+    }
+
+    const batch = writeBatch(this.firestore);
+    const destColRef = collection(this.firestore, destPath);
+
+    // Copy docs to new location and schedule them for deletion
+    snapshot.docs.forEach((docSnap) => {
+      const destDocRef = doc(destColRef, docSnap.id);
+      batch.set(destDocRef, docSnap.data());
+      batch.delete(docSnap.ref);
+    });
+
+    // Commit all batched writes and deletes
+    await batch.commit();
   }
 
   async addLibraryImage(

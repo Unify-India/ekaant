@@ -118,7 +118,10 @@ export class LibraryRequestDetailPage implements OnInit {
 
   update() {
     if (this.requestForm.valid && this.requestId) {
-      this.libraryService.updateLibrary(this.requestId, this.requestForm.value).then(() => {
+      const formValue = this.requestForm.value;
+      const isApproved = formValue.applicationStatus === 'approved';
+
+      this.libraryService.updateLibrary(this.requestId, formValue, isApproved).then(() => {
         this.router.navigate(['/admin/pending-requests']);
       });
     } else {
