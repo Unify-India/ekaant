@@ -1,13 +1,78 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>library-management</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Library Management</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">library-management</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <div class="page-header">
+    <div class="header-actions">
+      <ion-button color="success" (click)="exportCsv()">
+        <ion-icon slot="start" name="cloud-download-outline"></ion-icon>
+        Export CSV
+      </ion-button>
+      <ion-button color="primary" (click)="addNewRequest()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Add New
+      </ion-button>
+    </div>
+  </div>
+
+  <ion-card class="table-card">
+    <div class="table-container">
+      @if (libraries$ | async; as libraries) {
+        <ion-grid class="data-grid">
+          <!-- Header Row -->
+          <ion-row class="grid-header">
+            <ion-col size="1.5" class="ion-text-center">Actions</ion-col>
+            <ion-col size="2">Library Name</ion-col>
+            <ion-col size="2">Library Manager</ion-col>
+            <ion-col size="3">Address</ion-col>
+            <ion-col size="1.5" class="ion-text-center">Total Seats</ion-col>
+            <ion-col size="2">Status</ion-col>
+          </ion-row>
+
+          <!-- Data Rows -->
+          @if (libraries.length > 0) {
+            @for (lib of libraries; track lib.id) {
+              <ion-row class="grid-row">
+                <ion-col size="1.5" class="action-buttons ion-text-center">
+                  <ion-button fill="clear" size="small" (click)="viewRequest(lib.id)">
+                    <ion-icon slot="icon-only" name="eye-outline" color="success"></ion-icon>
+                  </ion-button>
+                  <ion-button fill="clear" size="small" (click)="editRequest(lib.id)">
+                    <ion-icon slot="icon-only" name="create-outline" color="primary"></ion-icon>
+                  </ion-button>
+                  <ion-button fill="clear" size="small" (click)="deleteRequest(lib.id)">
+                    <ion-icon slot="icon-only" name="trash-outline" color="danger"></ion-icon>
+                  </ion-button>
+                </ion-col>
+                <ion-col size="2">{{ lib.libraryName }}</ion-col>
+                <ion-col size="2">{{ lib.libraryManager }}</ion-col>
+                <ion-col size="3" class="address-col">{{ lib.address }}</ion-col>
+                <ion-col size="1.5" class="ion-text-center">{{ lib.totalSeats }}</ion-col>
+                <ion-col size="2">
+                  <ion-chip color="success">
+                    {{ lib.applicationStatus | titlecase }}
+                  </ion-chip>
+                </ion-col>
+              </ion-row>
+            }
+          } @else {
+            <div class="ion-text-center ion-padding">
+              <p>No approved libraries found.</p>
+            </div>
+          }
+        </ion-grid>
+      } @else {
+        <div class="ion-text-center ion-padding">
+          <ion-spinner></ion-spinner>
+          <p>Loading approved libraries...</p>
+        </div>
+      }
+    </div>
+  </ion-card>
 </ion-content>

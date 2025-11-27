@@ -136,6 +136,36 @@ export class LibraryService {
     );
   }
 
+  public getApprovedLibraries(): Observable<any[]> {
+    const q = query(collection(this.firestore, 'libraries'), where('status', '==', 'approved'));
+    return from(getDocs(q)).pipe(
+      map((snapshot) => {
+        if (snapshot.empty) {
+          return [];
+        }
+        return snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const addressParts = [
+            data['basicInformation']?.addressLine1,
+            data['basicInformation']?.addressLine2,
+            data['basicInformation']?.city,
+            data['basicInformation']?.state,
+            data['basicInformation']?.zipCode,
+          ].filter(Boolean); // Filter out any undefined/null parts
+
+          return {
+            id: doc.id,
+            libraryName: data['basicInformation']?.libraryName,
+            libraryManager: data['hostProfile']?.fullName,
+            address: addressParts.join(', '),
+            totalSeats: data['seatManagement']?.totalSeats,
+            applicationStatus: data['status'], // Map 'status' to 'applicationStatus' for UI consistency
+          };
+        });
+      }),
+    );
+  }
+
   async addLibrary(libraryData: any): Promise<string> {
     try {
       const docRef = await addDoc(collection(this.firestore, 'library-registrations'), {
