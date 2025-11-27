@@ -91,6 +91,36 @@ export class LibraryService {
     );
   }
 
+  public getApprovedLibrary(userId: string): Observable<any> {
+    console.log('Fetching approved library for user:', userId);
+    const q = query(collection(this.firestore, 'libraries'), where('managerIds', 'array-contains', userId), limit(1));
+    return from(getDocs(q)).pipe(
+      switchMap((snapshot) => {
+        if (snapshot.empty) {
+          return of(null);
+        }
+        const libraryDoc = snapshot.docs[0];
+        const libraryData = { id: libraryDoc.id, ...libraryDoc.data() };
+        const imagesColRef = collection(this.firestore, 'libraries', libraryDoc.id, 'libraryImages');
+        return from(getDocs(imagesColRef)).pipe(
+          map((imagesSnapshot) => {
+            const libraryPhotos = imagesSnapshot.docs.map((doc) => {
+              const data = doc.data();
+              return { previewUrl: data['imageURL'] };
+            });
+            const transformedData = {
+              ...libraryData,
+              libraryImages: {
+                libraryPhotos: libraryPhotos,
+              },
+            };
+            return transformedData;
+          }),
+        );
+      }),
+    );
+  }
+
   public getLibraryRegistrationById(id: string): Observable<any> {
     const docRef = doc(this.firestore, 'library-registrations', id);
     return from(getDoc(docRef)).pipe(

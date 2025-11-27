@@ -52,10 +52,14 @@ import {
   arrowBack,
   documentTextSharp,
   documentTextOutline,
+  businessOutline,
+  businessSharp,
 } from 'ionicons/icons';
 
 export class UsedIcons {
   static icons = {
+    businessOutline,
+    businessSharp,
     gridOutline,
     gridSharp,
     listOutline,
