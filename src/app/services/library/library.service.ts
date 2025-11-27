@@ -34,7 +34,7 @@ export class LibraryService {
 
   async getManagerLibraryState(user: IUser): Promise<ILibraryState | null> {
     // 1. Check for an approved library first
-    const approvedQuery = query(collection(this.firestore, 'libraries'), where('managerId', '==', user.uid), limit(1));
+    const approvedQuery = query(collection(this.firestore, 'libraries'), where('managerIds', 'array-contains', user.uid), limit(1));
     const approvedSnapshot = await getDocs(approvedQuery);
 
     if (!approvedSnapshot.empty) {
@@ -46,7 +46,7 @@ export class LibraryService {
     // 2. If no approved library, check for a registration request
     const pendingQuery = query(
       collection(this.firestore, 'library-registrations'),
-      where('managerId', '==', user.uid),
+      where('managerIds', 'array-contains', user.uid),
       limit(1),
     );
     const pendingSnapshot = await getDocs(pendingQuery);
