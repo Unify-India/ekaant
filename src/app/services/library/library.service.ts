@@ -19,7 +19,7 @@ import {
 } from '@angular/fire/firestore';
 import { from, map, Observable, of, switchMap } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
-import { ILibraryState } from 'src/app/models/library.interface';
+import { IFirestoreLibrary, ILibraryState } from 'src/app/models/library.interface';
 
 import { FirebaseService } from '../firebase/firebase-service';
 
@@ -146,22 +146,22 @@ export class LibraryService {
           return [];
         }
         return snapshot.docs.map((doc) => {
-          const data = doc.data();
+          const data = doc.data() as IFirestoreLibrary;
           const addressParts = [
-            data['basicInformation']?.addressLine1,
-            data['basicInformation']?.addressLine2,
-            data['basicInformation']?.city,
-            data['basicInformation']?.state,
-            data['basicInformation']?.zipCode,
+            data.basicInformation?.addressLine1,
+            data.basicInformation?.addressLine2,
+            data.basicInformation?.city,
+            data.basicInformation?.state,
+            data.basicInformation?.zipCode,
           ].filter(Boolean); // Filter out any undefined/null parts
 
           return {
             id: doc.id,
-            libraryName: data['basicInformation']?.libraryName,
-            libraryManager: data['hostProfile']?.fullName,
+            libraryName: data.basicInformation?.libraryName,
+            libraryManager: data.hostProfile?.fullName,
             address: addressParts.join(', '),
-            totalSeats: data['seatManagement']?.totalSeats,
-            applicationStatus: data['applicationStatus'],
+            totalSeats: data.seatManagement?.totalSeats,
+            applicationStatus: data.applicationStatus,
             // Include other top-level fields if necessary for display
             // ...data,
           };
@@ -178,22 +178,22 @@ export class LibraryService {
           return [];
         }
         return snapshot.docs.map((doc) => {
-          const data = doc.data();
+          const data = doc.data() as IFirestoreLibrary;
           const addressParts = [
-            data['basicInformation']?.addressLine1,
-            data['basicInformation']?.addressLine2,
-            data['basicInformation']?.city,
-            data['basicInformation']?.state,
-            data['basicInformation']?.zipCode,
+            data.basicInformation?.addressLine1,
+            data.basicInformation?.addressLine2,
+            data.basicInformation?.city,
+            data.basicInformation?.state,
+            data.basicInformation?.zipCode,
           ].filter(Boolean); // Filter out any undefined/null parts
 
           return {
             id: doc.id,
-            libraryName: data['basicInformation']?.libraryName,
-            libraryManager: data['hostProfile']?.fullName,
+            libraryName: data.basicInformation?.libraryName,
+            libraryManager: data.hostProfile?.fullName,
             address: addressParts.join(', '),
-            totalSeats: data['seatManagement']?.totalSeats,
-            applicationStatus: data['status'], // Map 'status' to 'applicationStatus' for UI consistency
+            totalSeats: data.seatManagement?.totalSeats,
+            applicationStatus: data.status, // Map 'status' to 'applicationStatus' for UI consistency
           };
         });
       }),
@@ -208,8 +208,12 @@ export class LibraryService {
           return [];
         }
         return snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const address = [data.basicInformation?.addressLine1, data.basicInformation?.city, data.basicInformation?.state]
+          const data = doc.data() as IFirestoreLibrary;
+          const address = [
+            data.basicInformation?.addressLine1,
+            data.basicInformation?.city,
+            data.basicInformation?.state,
+          ]
             .filter(Boolean)
             .join(', ');
 
