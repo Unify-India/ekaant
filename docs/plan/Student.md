@@ -23,11 +23,11 @@ The following Firebase Functions are either triggered by student actions or run 
 | Function Module | Function Name | Trigger Type | Description |
 | :--- | :--- | :--- | :--- |
 | **Auth** | `onStudentSignup` | `Auth Trigger` | When a new user signs up, this function automatically creates a corresponding user document in the `USERS` collection with the role `student`. |
-| **Booking** | `applyForLibrarySeat` | `onCall` | Called by the student's client when they apply to a library. It creates a document in the `STUDENT_REQUESTS` collection with a 'pending' status. |
+| **Booking** | `applyForLibrarySeat` | `onCall` | Called by the student's client when they apply to a library. Creates a `STUDENT_REQUESTS` document with `status: 'pending'` and denormalizes `studentName` for the manager's UI. |
 | **Waiting** | `confirmWaitingAssignment`| `onCall` | If a student is offered a seat from the waiting list, they call this function to accept it within a specific time frame. |
-| **Attendance**| `checkInStudent` | `onCall` | Creates an `ATTENDANCE_LOGS` entry with a `checkIn` timestamp when the student arrives at the library. |
-| **Attendance**| `checkOutStudent` | `onCall` | Closes out an attendance log by adding a `checkOut` timestamp and calculating the duration of the session. |
-| **Payments** | `recordPayment` | `onCall` | Allows a student to submit their payment details (e.g., transaction ID if paid online) to the library manager for confirmation. |
+| **Attendance**| `checkInStudent` | `onCall` | Creates an `ATTENDANCE_LOGS` entry. This is a primary trigger for the `updateOccupancyStats` function, which updates the manager's real-time dashboard. |
+| **Attendance**| `checkOutStudent` | `onCall` | Closes an attendance log. This is a primary trigger for the `updateOccupancyStats` function, which updates the manager's real-time dashboard. |
+| **Payments** | `recordPayment` | `onCall` | Submits payment details for manager confirmation. Creates a `PAYMENTS` document with a `bookingCode` and denormalized `studentName`. |
 
 ---
 
@@ -42,7 +42,7 @@ The following Firebase Functions are either triggered by student actions or run 
     3.  **Profile Completion:** Student uploads an ID proof. The client uploads the file to a specific path in Firebase Storage, protected by security rules ensuring only the authenticated user can write to their own folder (`/users/{uid}/proof.jpg`).
     4.  **Apply:** Student clicks "Apply" for a library.
     5.  **Callable Function:** The client calls the `applyForLibrarySeat` function, passing the `libraryId`.
-    6.  **Action:** The function creates a new document in the `STUDENT_REQUESTS` collection, linking the `studentId` and `libraryId` with `status: 'pending'`. A notification may be triggered to the Library Manager.
+    6.  **Action:** The function creates a new document in the `STUDENT_REQUESTS` collection, linking the `studentId`, `libraryId`, `studentName`, and setting `status: 'pending'`. A notification may be triggered to the Library Manager.
 
 ### b. Checking Application Status
 

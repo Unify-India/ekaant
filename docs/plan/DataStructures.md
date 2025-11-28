@@ -34,6 +34,7 @@ erDiagram
       string managerIds "Array of userIds"
       map location
       map seatConfig
+      map realtimeStats "Updated by Cloud Function"
       string status
       timestamp createdAt
     }
@@ -41,6 +42,7 @@ erDiagram
     STUDENT_REQUESTS {
       string requestId PK
       string studentId FK
+      string studentName "Denormalized"
       string libraryId FK
       string status
       timestamp appliedAt
@@ -50,7 +52,9 @@ erDiagram
     PAYMENTS {
       string paymentId PK
       string studentId FK
+      string studentName "Denormalized"
       string libraryId FK
+      string bookingCode
       number amount
       string mode
       string status
@@ -93,8 +97,8 @@ erDiagram
       string reportId PK
       string libraryId FK
       date date
-      map utilization
-      map paymentsSummary
+      map utilization "Contains main value and trend data"
+      map paymentsSummary "Contains main value and trend data"
       number waitingListCount
     }
 ```
@@ -102,6 +106,17 @@ erDiagram
 ---
 
 ## Notes & Index Recommendations
+
+*   **Real-time Dashboard Data:**
+    *   The `LIBRARIES.realtimeStats` map (containing `occupiedSeats` and `availableSeats`) is updated by a Cloud Function that triggers on changes to the `ATTENDANCE_LOGS` collection. This provides an efficient, real-time view of library occupancy for the manager's dashboard.
+
+*   **Denormalization for UI Performance:**
+    *   To render manager dashboards and lists efficiently, the following fields **must** be denormalized:
+        *   Store `studentName` inside `STUDENT_REQUESTS`, `PAYMENTS`, and `WAITING_LIST` to avoid extra document reads.
+        *   Store `libraryName` and `libraryLogoUrl` inside `PAYMENTS` and `ATTENDANCE_LOGS` for quicker reporting and history views.
+
+*   **Aggregate Data Reporting:**
+    *   The `REPORTS` collection is populated by a periodic, scheduled Cloud Function. It pre-calculates daily aggregate data like total revenue, new students, and their trends (e.g., vs. last month). Dashboards read from this collection to ensure fast load times.
 
 *   **Composite Indexes**:
     *   `libraries` by `location.pincode` and `status`.
@@ -113,13 +128,11 @@ erDiagram
 
 *   **TTL / Cleanup:** Use `expiresAt` on `waiting_list` and a scheduled Cloud Function to remove expired entries.
 
-*   **Denormalization Tips:**
-    *   Store `studentName`, `studentPhone` inside `student_requests` & `waiting_list` to avoid extra reads when rendering manager dashboards.
-    *   Store `libraryName` and `libraryLogoUrl` inside `payments` and `attendance_logs` for quicker reporting.
-
 ---
 
-## Sample Document (student user)
+## Sample Documents
+
+**Sample Document (student user)**
 
 ```json
 {
@@ -135,7 +148,7 @@ erDiagram
 }
 ```
 
-## Sample Document (manager user)
+**Sample Document (manager user)**
 
 ```json
 {
@@ -151,7 +164,7 @@ erDiagram
 }
 ```
 
-## Sample Document (library)
+**Sample Document (library)**
 
 ```json
 {
@@ -161,8 +174,25 @@ erDiagram
   "managerIds": ["UID999", "UID998"],
   "location": {"city":"Ranchi","pincode":"834001","mapUrl":"..."},
   "seatConfig": {"totalSeats":50,"slots":[{"slotType":"4hr","price":40}]},
+  "realtimeStats": {"occupiedSeats": 12, "availableSeats": 38},
   "status":"approved",
   "createdAt":"2025-11-01T00:00:00Z"
+}
+```
+
+**Sample Document (payment)**
+
+```json
+{
+  "paymentId": "PAY789",
+  "studentId": "UID123",
+  "studentName": "Sandeep Kumar",
+  "libraryId": "LIB001",
+  "bookingCode": "EKA-RSH-00124",
+  "amount": 1200,
+  "mode": "Cash",
+  "status": "paid",
+  "createdAt": "2025-11-28T10:00:00Z"
 }
 ```
 --- 

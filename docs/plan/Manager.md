@@ -77,3 +77,46 @@ The following Firebase Functions are designed to be called by authenticated Libr
     4.  The function communicates with the payment provider (e.g., Stripe) to create a subscription object.
     5.  It receives a `paymentProviderSubscriptionId` in return.
     6.  The function then creates a new document in the `librarySubscriptions` collection in Firestore, storing the plan details and provider ID. The initial status is set to `trialing` or `active` depending on the plan.
+
+### d. Viewing the Dashboard
+
+*   **User Story:** "As a library manager, I want to see a real-time dashboard with an at-a-glance view of my library's current seat availability, recent bookings, and pending student applications so I can make quick operational decisions."
+
+---
+
+## 4. Dashboard Data & Aggregation
+
+The manager dashboard is a data-rich view that requires an efficient backend strategy to remain fast and responsive. The data is sourced using three primary methods:
+
+### a. Real-time Seat Availability (Firestore Triggers)
+
+*   **Goal:** Provide an instantaneous count of occupied and available seats.
+*   **Strategy:** This is achieved using a Firestore Cloud Function that responds to real-time events.
+    *   **Function:** `updateOccupancyStats`
+    *   **Trigger:** `onWrite` to the `ATTENDANCE_LOGS` collection.
+    *   **Flow:**
+        1.  A student checks in or out, creating or updating a document in `ATTENDANCE_LOGS`.
+        2.  The `updateOccupancyStats` function triggers.
+        3.  It performs a quick aggregation on `ATTENDANCE_LOGS` to count the number of currently checked-in students for the specific library.
+        4.  It then updates the `realtimeStats` map (`occupiedSeats`, `availableSeats`) on the corresponding `LIBRARIES/{libraryId}` document.
+    *   **Result:** The frontend only needs to listen to a single document (`LIBRARIES/{libraryId}`) to get live occupancy data, which is highly efficient.
+
+### b. Periodic Reporting for Stat Cards (Scheduled Functions)
+
+*   **Goal:** Display key performance indicators (KPIs) like "Total Revenue" and "New Students" with trends, without slowing down the app with complex queries.
+*   **Strategy:** A scheduled function runs periodically to pre-calculate and store these metrics.
+    *   **Function:** `generateDailyReport`
+    *   **Trigger:** `onSchedule` (e.g., runs every night at 1 AM).
+    *   **Flow:**
+        1.  The function runs for each library.
+        2.  It queries the `PAYMENTS` and `STUDENT_REQUESTS` collections for the past day/month to calculate total revenue, new student count, etc.
+        3.  It compares these numbers with the previous day's report to calculate a trend (e.g., +5% vs. yesterday).
+        4.  The aggregated data is saved to a new document in the `REPORTS` collection for that day.
+    *   **Result:** The dashboard stat cards load instantly by reading from the latest document in the `REPORTS` collection, avoiding expensive, real-time aggregation queries.
+
+### c. Direct Queries & Denormalization (Client-Side)
+
+*   **Goal:** Display lists of recent activities like "Recent Bookings" and "Pending Applications".
+*   **Strategy:** These are fetched using direct, optimized Firestore queries from the client, relying on denormalized data for speed.
+    *   **Recent Bookings:** The client performs a query on the `PAYMENTS` collection, ordered by `createdAt` and limited to the last 5-10 entries. It can display the `studentName` instantly because it was denormalized into the payment document.
+    *   **Quick Action Badges:** To show a count of pending applications, the client uses a `count()` query on the `STUDENT_REQUESTS` collection (`where('status', '==', 'pending')`). This is highly efficient as it only retrieves the count, not the full documents.
