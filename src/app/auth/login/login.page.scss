@@ -54,6 +54,7 @@
 .role-cards {
   display: grid;
   gap: var(--ion-margin, 16px);
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 }
 
 .role-card {
