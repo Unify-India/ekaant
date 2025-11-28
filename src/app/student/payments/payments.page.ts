@@ -10,6 +10,7 @@ import {
   downloadOutline,
 } from 'ionicons/icons';
 import { constants } from 'src/app/constants/constants';
+import { FooterPage } from 'src/app/pages/footer/footer.page';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { FormEssentials } from 'src/app/shared/core/micro-components/form-essentials.module';
 import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
@@ -35,7 +36,7 @@ interface Payment {
   templateUrl: './payments.page.html',
   styleUrls: ['./payments.page.scss'],
   standalone: true,
-  imports: [IonChip, BaseUiComponents, UiEssentials, FormEssentials],
+  imports: [IonChip, BaseUiComponents, UiEssentials, FormEssentials, FooterPage],
 })
 export class PaymentsPage implements OnInit {
   pageTitle = 'Payments';
