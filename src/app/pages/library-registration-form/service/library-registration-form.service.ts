@@ -212,6 +212,7 @@ export class LibraryRegistrationFormService {
     // Add owner and manager IDs
     initialPayload.ownerId = currentUser.uid;
     initialPayload.managerIds = [currentUser.uid];
+    initialPayload.applicationStatus = 'pending';
 
     const libraryId = await this.createLibraryDoc(initialPayload);
 

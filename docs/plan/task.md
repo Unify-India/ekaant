@@ -115,3 +115,9 @@ for **both** screens.
 - [ ] Implement the `onStudentSignup` Auth trigger in `auth/onStudentSignup.ts`.
 - [ ] Implement the `onUserDelete` Auth trigger in `auth/onUserDelete.ts`.
 - [ ] Implement the `manageClaims` callable function for admins.
+
+
+## 28 Nov 2025
+1. Library registration by manager payload misses the status parameter, resulting in missing status while rendering in Application status page.
+2. We need to add the  showRegistrationHeader flag in application status page for app-preview
+3. In the registration flow, in the last stage preview screen, the host image got some issue as the preview is not working as expected. 

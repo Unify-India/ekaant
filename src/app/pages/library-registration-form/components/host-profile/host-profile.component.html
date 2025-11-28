@@ -13,8 +13,10 @@
     <h3 class="ion-margin-top">Profile Photo</h3>
     <input type="file" hidden #fileInput (change)="onFileSelected($event)" accept="image/*" />
     <div class="upload-area" (click)="triggerFileInput(fileInput)">
-      @if (hostProfileForm.get('profilePhoto')?.value; as file) {
-        <p>✅ {{ file.name }} selected</p>
+      @if (hostProfileForm.get('photoURL')?.value; as photoUrl) {
+        <ion-avatar class="host-photo-preview">
+          <img [src]="photoUrl" alt="Host profile photo preview" />
+        </ion-avatar>
         <div
           *ngIf="
             hostProfileForm.get('profilePhotoProgress')?.value > 0 &&

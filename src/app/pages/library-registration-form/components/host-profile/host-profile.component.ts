@@ -83,7 +83,13 @@ export class HostProfileComponent implements OnInit {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      this.hostProfileForm.patchValue({ profilePhoto: input.files[0], profilePhotoProgress: 0 });
+      const file = input.files[0];
+      const previewUrl = URL.createObjectURL(file);
+      this.hostProfileForm.patchValue({
+        profilePhoto: file,
+        photoURL: previewUrl,
+        profilePhotoProgress: 0,
+      });
     }
   }
 }
