@@ -161,7 +161,7 @@ export class LibraryService {
             libraryManager: data.hostProfile?.fullName,
             address: addressParts.join(', '),
             totalSeats: data.seatManagement?.totalSeats,
-            applicationStatus: data.applicationStatus,
+            applicationStatus: data.status,
             // Include other top-level fields if necessary for display
             // ...data,
           };

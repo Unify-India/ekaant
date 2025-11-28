@@ -1,9 +1,9 @@
 .info-card {
   border-radius: 0.5rem;
-  box-shadow: 0 0 0.4rem color-mix(in srgb, var(--ion-color-dark-shade) 30%, transparent);
+  box-shadow: 0 0 0.25rem color-mix(in srgb, var(--ion-color-dark-shade) 30%, transparent);
 }
 .info-card:hover {
-  box-shadow: 0 0 0.75rem color-mix(in srgb, var(--ion-color-dark-shade) 40%, transparent);
+  box-shadow: 0 0 0.4rem color-mix(in srgb, var(--ion-color-dark-shade) 40%, transparent);
   transition: box-shadow 0.3s ease;
 }
 .section-heading {
@@ -31,7 +31,7 @@
 .section-subtitle {
   font-size: 1rem;
   color: var(--ion-text-color-step-600);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .no-margin {
