@@ -1,6 +1,6 @@
-# Ekaant — ER Diagram & Schema Visualization (v2)
+# Ekaant — ER Diagram & Schema Visualization (v2.1 - With Reviews)
 
-Below is the updated ER-style diagram (Mermaid) of the Firestore schema. This version incorporates feedback to support multiple managers per library and to prepare for managers overseeing multiple libraries in the future.
+Below is the updated ER-style diagram (Mermaid) of the Firestore schema. This version incorporates a new `REVIEWS` collection and denormalized aggregate data into the `LIBRARIES` collection to efficiently handle user ratings and reviews.
 
 ```mermaid
 erDiagram
@@ -8,11 +8,13 @@ erDiagram
     USERS ||--o{ PAYMENTS : "makes (if student)"
     USERS ||--o{ ATTENDANCE_LOGS : "attends (if student)"
     USERS ||--o{ WAITING_LIST : "queues (if student)"
+    USERS ||--o{ REVIEWS : "writes"
     LIBRARIES ||--o{ STUDENT_REQUESTS : receives
     LIBRARIES ||--o{ PAYMENTS : receives
     LIBRARIES ||--o{ ATTENDANCE_LOGS : hosts
     LIBRARIES ||--o{ WAITING_LIST : holds
     LIBRARIES ||--o{ REPORTS : has
+    LIBRARIES ||--o{ REVIEWS : "is reviewed in"
     FEEDBACK_SUPPORT }o--|| USERS : authored_by
 
     USERS {
@@ -36,6 +38,23 @@ erDiagram
       map seatConfig
       map realtimeStats "Updated by Cloud Function"
       string status
+      number averageRating "Calculated by Cloud Function"
+      number totalReviews "Calculated by Cloud Function"
+      map ratingsBreakdown "Calculated by Cloud Function"
+      string[] positiveAspects "Aggregated from reviews"
+      string[] areasForImprovement "Aggregated from reviews"
+      timestamp createdAt
+    }
+
+    REVIEWS {
+      string reviewId PK "Composite: {libraryId}_{studentId}"
+      string libraryId FK
+      string studentId FK
+      string studentName "Denormalized"
+      number rating "1-5"
+      string comment
+      array tags
+      bool isVerified "Set by Cloud Function"
       timestamp createdAt
     }
 
@@ -108,15 +127,20 @@ erDiagram
 ## Notes & Index Recommendations
 
 *   **Real-time Dashboard Data:**
-    *   The `LIBRARIES.realtimeStats` map (containing `occupiedSeats` and `availableSeats`) is updated by a Cloud Function that triggers on changes to the `ATTENDANCE_LOGS` collection. This provides an efficient, real-time view of library occupancy for the manager's dashboard.
+    *   The `LIBRARIES.realtimeStats` map is updated by a Cloud Function that triggers on changes to `ATTENDANCE_LOGS`.
+
+*   **Rating Aggregation (Cloud Function):**
+    *   A Cloud Function (`onReviewChange`) triggers whenever a document in the `REVIEWS` collection is created, updated, or deleted.
+    *   This function performs an aggregation query on the `REVIEWS` collection for the specific `libraryId`.
+    *   It calculates the new `averageRating`, `totalReviews`, `ratingsBreakdown` map, and aggregates the top positive/negative tags.
+    *   It then updates these fields in the corresponding `LIBRARIES` document. This ensures that the library details page can load all rating information with a single document read, making it highly performant.
 
 *   **Denormalization for UI Performance:**
-    *   To render manager dashboards and lists efficiently, the following fields **must** be denormalized:
-        *   Store `studentName` inside `STUDENT_REQUESTS`, `PAYMENTS`, and `WAITING_LIST` to avoid extra document reads.
-        *   Store `libraryName` and `libraryLogoUrl` inside `PAYMENTS` and `ATTENDANCE_LOGS` for quicker reporting and history views.
+    *   `studentName` is denormalized into `STUDENT_REQUESTS`, `PAYMENTS`, `WAITING_LIST`, and `REVIEWS`.
+    *   `libraryName` and `libraryLogoUrl` are denormalized into `PAYMENTS` and `ATTENDANCE_LOGS`.
 
 *   **Aggregate Data Reporting:**
-    *   The `REPORTS` collection is populated by a periodic, scheduled Cloud Function. It pre-calculates daily aggregate data like total revenue, new students, and their trends (e.g., vs. last month). Dashboards read from this collection to ensure fast load times.
+    *   The `REPORTS` collection is populated by a scheduled Cloud Function for fast dashboard loading.
 
 *   **Composite Indexes**:
     *   `libraries` by `location.pincode` and `status`.
@@ -125,12 +149,52 @@ erDiagram
     *   `waiting_list` composite index: `libraryId, status, createdAt`.
     *   `attendance_logs` composite: `libraryId, checkIn (desc)`.
     *   `payments` composite: `libraryId, status, createdAt`.
+    *   **`reviews` composite: `libraryId, createdAt (desc)`.**
 
-*   **TTL / Cleanup:** Use `expiresAt` on `waiting_list` and a scheduled Cloud Function to remove expired entries.
+*   **TTL / Cleanup:** Use `expiresAt` on `waiting_list` for cleanup.
 
 ---
 
 ## Sample Documents
+
+**Sample Document (library)**
+```json
+{
+  "libraryId": "LIB001",
+  "name": "Ranchi Study Hub",
+  "ownerId": "UID999",
+  "managerIds": ["UID999", "UID998"],
+  "location": {"city":"Ranchi","pincode":"834001","mapUrl":"..."},
+  "seatConfig": {"totalSeats":50,"slots":[{"slotType":"4hr","price":40}]},
+  "realtimeStats": {"occupiedSeats": 12, "availableSeats": 38},
+  "status":"approved",
+  "averageRating": 4.5,
+  "totalReviews": 128,
+  "ratingsBreakdown": { "5": 78, "4": 32, "3": 12, "2": 4, "1": 2 },
+  "positiveAspects": ["Fast Wi-Fi", "Cleanliness", "Quiet Atmosphere"],
+  "areasForImprovement": ["Crowded", "AC Issues"],
+  "createdAt":"2025-11-01T00:00:00Z"
+}
+```
+
+**Sample Document (review)**
+```json
+// Document ID: LIB001_UID123
+{
+  "reviewId": "LIB001_UID123",
+  "libraryId": "LIB001",
+  "studentId": "UID123",
+  "studentName": "Priya Sharma",
+  "rating": 5,
+  "comment": "Excellent facilities and very clean environment. The Wi-Fi is super fast!",
+  "tags": [
+    { "text": "Cleanliness", "type": "positive" },
+    { "text": "Fast Wi-Fi", "type": "positive" }
+  ],
+  "isVerified": true,
+  "createdAt": "2025-11-26T14:30:00Z"
+}
+```
 
 **Sample Document (student user)**
 
@@ -164,22 +228,6 @@ erDiagram
 }
 ```
 
-**Sample Document (library)**
-
-```json
-{
-  "libraryId": "LIB001",
-  "name": "Ranchi Study Hub",
-  "ownerId": "UID999",
-  "managerIds": ["UID999", "UID998"],
-  "location": {"city":"Ranchi","pincode":"834001","mapUrl":"..."},
-  "seatConfig": {"totalSeats":50,"slots":[{"slotType":"4hr","price":40}]},
-  "realtimeStats": {"occupiedSeats": 12, "availableSeats": 38},
-  "status":"approved",
-  "createdAt":"2025-11-01T00:00:00Z"
-}
-```
-
 **Sample Document (payment)**
 
 ```json
@@ -196,6 +244,73 @@ erDiagram
 }
 ```
 --- 
+
+### Feature Spotlight: Ratings & Reviews
+
+This section provides a deep-dive into the review system's architecture, logic, and security.
+
+#### 1. Core Logic & User Flow
+
+1.  **One Review Per Student, Per Library**: To maintain authenticity, a student can only submit one review for any given library.
+    *   **Implementation**: We enforce this by creating a composite **Document ID** for each review using the format `{libraryId}_{studentId}`.
+    *   **User Experience**: When a student who has already left a review attempts to write another, the UI will present them with their existing review in an "edit" mode instead of a "create" mode.
+
+2.  **Verified Reviews**: To combat fake or paid reviews, we mark reviews as "verified" only if the student is a legitimate member of the library.
+    *   **Implementation**: The `isVerified` flag on a `REVIEWS` document is set by a Cloud Function. When a review is written, the function checks if the `studentId` has an `approved` application in `STUDENT_REQUESTS` or a recent `PAYMENTS` record for that `libraryId`.
+    *   **User Experience**: Verified reviews are given more prominence in the UI, potentially with a distinct badge.
+
+3.  **Review Tags**: Users can add descriptive tags (e.g., "Cleanliness", "Crowded") to their reviews, similar to the Google Play Store.
+    *   **Implementation**: The `REVIEWS` document contains a `tags` array. Each tag is an object with `text` and `type` ('positive' or 'negative').
+    *   **Aggregation**: The `onReviewChange` Cloud Function will also aggregate the most frequently mentioned tags and update the `positiveAspects` and `areasForImprovement` arrays in the main `LIBRARIES` document.
+
+#### 2. Backend Implementation (`onReviewChange` Cloud Function)
+
+A single Cloud Function, `onReviewChange`, handles all rating and review aggregation. It is triggered by `onCreate`, `onUpdate`, and `onDelete` events in the `REVIEWS` collection.
+
+*   **Trigger**: `functions.firestore.document('reviews/{reviewId}')`
+*   **Process**:
+    1.  Get the `libraryId` from the changed document.
+    2.  Query all documents in the `REVIEWS` collection where `libraryId` matches.
+    3.  **Recalculate**:
+        *   `totalReviews`: The count of all documents.
+        *   `averageRating`: The average of the `rating` field across all documents.
+        *   `ratingsBreakdown`: A map counting the occurrences of each star rating (1 through 5).
+        *   `positiveAspects` / `areasForImprovement`: Count occurrences of each tag and take the top 3-5 for each category.
+    4.  **Update**: Write the aggregated data back to the corresponding document in the `LIBRARIES` collection.
+
+#### 3. Security Rules (`firestore.rules`)
+
+Security rules are critical to ensure data integrity and prevent abuse.
+
+```
+match /reviews/{reviewId} {
+    //
+    // RULE: A user can only review a library once.
+    // The documentId must be a composite of libraryId and the user's own ID.
+    // On create, this prevents a user from creating a second review for the same library.
+    //
+    allow create: if request.auth.uid == request.resource.data.studentId
+                  && reviewId == request.resource.data.libraryId + '_' + request.auth.uid
+                  && isVerifiedMember(request.resource.data.libraryId, request.auth.uid);
+
+    //
+    // RULE: A user can only update their own review.
+    //
+    allow update: if request.auth.uid == resource.data.studentId;
+
+    //
+    // RULE: Anyone can read reviews.
+    //
+    allow get, list: if true;
+
+    // Helper function to check for library membership.
+    // (This is a simplified example; actual implementation might be more complex)
+    function isVerifiedMember(libraryId, userId) {
+      return exists(/databases/$(database)/documents/student_requests/$(libraryId + '_' + userId))
+             && get(/databases/$(database)/documents/student_requests/$(libraryId + '_' + userId)).data.status == 'approved';
+    }
+}
+```
 
 ### Feature Spotlight: Registration Comments
 
