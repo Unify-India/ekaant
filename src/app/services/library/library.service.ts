@@ -34,7 +34,11 @@ export class LibraryService {
 
   async getManagerLibraryState(user: IUser): Promise<ILibraryState | null> {
     // 1. Check for an approved library first
-    const approvedQuery = query(collection(this.firestore, 'libraries'), where('managerIds', 'array-contains', user.uid), limit(1));
+    const approvedQuery = query(
+      collection(this.firestore, 'libraries'),
+      where('managerIds', 'array-contains', user.uid),
+      limit(1),
+    );
     const approvedSnapshot = await getDocs(approvedQuery);
 
     if (!approvedSnapshot.empty) {
@@ -190,6 +194,38 @@ export class LibraryService {
             address: addressParts.join(', '),
             totalSeats: data['seatManagement']?.totalSeats,
             applicationStatus: data['status'], // Map 'status' to 'applicationStatus' for UI consistency
+          };
+        });
+      }),
+    );
+  }
+
+  public getLibrariesForCardView(): Observable<any[]> {
+    const q = query(collection(this.firestore, 'libraries'), where('status', '==', 'approved'));
+    return from(getDocs(q)).pipe(
+      map((snapshot) => {
+        if (snapshot.empty) {
+          return [];
+        }
+        return snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const address = [data.basicInformation?.addressLine1, data.basicInformation?.city, data.basicInformation?.state]
+            .filter(Boolean)
+            .join(', ');
+
+          const totalSeats = data.seatManagement?.totalSeats ?? 0;
+          const availableSeats = data.realtimeStats?.availableSeats ?? 0;
+
+          return {
+            id: doc.id,
+            name: data.basicInformation?.libraryName,
+            address: address,
+            availableSeats: availableSeats,
+            totalSeats: totalSeats,
+            isFull: availableSeats === 0,
+            type: data.basicInformation?.genderCategory,
+            // TODO: Add a proper placeholder image
+            photoURL: data.libraryImages?.libraryPhotos?.[0]?.previewUrl || null,
           };
         });
       }),
