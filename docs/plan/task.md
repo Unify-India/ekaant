@@ -120,4 +120,60 @@ for **both** screens.
 ## 28 Nov 2025
 1. Library registration by manager payload misses the status parameter, resulting in missing status while rendering in Application status page.
 2. We need to add the  showRegistrationHeader flag in application status page for app-preview
-3. In the registration flow, in the last stage preview screen, the host image got some issue as the preview is not working as expected. 
+3. In the registration flow, in the last stage preview screen, the host image got some issue as the preview is not working as expected.
+
+## New Feature: Student Enrollment & Seat Allocation
+
+### Phase 1: Student Application (Frontend & Backend)
+
+*   [ ] **Student UI: Library Discovery & Application**
+    *   [ ] Implement `Browse Libraries` page UI to display library basic info and availability (using `LIBRARIES.realtimeStats`).
+    *   [ ] Implement `Library Details` page UI, showing full library details, available slots/pricing, and an "Apply" button.
+    *   [ ] Connect "Apply" button to `applyForLibrarySeat` callable function.
+*   [ ] **Student Backend: `applyForLibrarySeat` function**
+    *   [ ] Implement `applyForLibrarySeat` Cloud Function.
+    *   [ ] Ensure it creates a `STUDENT_REQUESTS` document with `status: 'pending'`, `studentId`, `libraryId`, `appliedAt`, and denormalized `studentName`.
+    *   [ ] (Optional but recommended for MVP) Implement a notification to the manager for new applications.
+*   [ ] **Student UI: Application Status Display**
+    *   [ ] Connect student dashboard to `STUDENT_REQUESTS` collection to display application status (`pending`, `approved`, `waiting_list`) in real-time.
+
+### Phase 2: Manager Review & Payment (Frontend & Backend)
+
+*   [ ] **Manager UI: Student Applications List**
+    *   [ ] Implement `Student Applications` page UI (`manager/student-applications`).
+    *   [ ] Display list of `STUDENT_REQUESTS` for the manager's library (`status: 'pending'` or `status: 'waiting_list'`). Show student name, applied date, etc.
+    *   [ ] Add "View Details", "Approve", "Reject", "Add to Waitlist" actions/buttons for each application.
+*   [ ] **Manager UI: Student Application Detail**
+    *   [ ] Implement `Student Application Detail` page UI (`manager/student-application-detail`).
+    *   [ ] Display full student profile (from `USERS`) and application details (from `STUDENT_REQUESTS`).
+    *   [ ] Add UI for Manager to set `STUDENT_REQUESTS.status` to `approved`, `rejected`, or `waiting_list`.
+    *   [ ] Integrate "Record Cash Payment" UI.
+*   [ ] **Manager Backend: `managerApproveSeat` function**
+    *   [ ] Implement `managerApproveSeat` callable function.
+    *   [ ] Update `STUDENT_REQUESTS.status` to `approved`.
+    *   [ ] Assign `linkedLibraryId` to student's `USERS` document.
+    *   [ ] Send notification to student about approval.
+*   [ ] **Manager Backend: `recordCashPayment` function**
+    *   [ ] Implement `recordCashPayment` callable function (or `confirmPayment` as per `Manager.md`).
+    *   [ ] Create a `PAYMENTS` document with `studentId`, `libraryId`, `amount`, `status: 'paid'`, `bookingCode`, and denormalized `studentName`.
+*   [ ] **Manager Backend: Waitlist Management**
+    *   [ ] Implement logic within `managerApproveSeat` or a separate function to change `STUDENT_REQUESTS.status` to `waiting_list`.
+    *   [ ] If a separate `WAITING_LIST` collection is used, add/update document there.
+
+### Phase 3: Seat Allocation & Attendance (Frontend & Backend)
+
+*   [ ] **Student UI: Seat Check-in/Check-out**
+    *   [ ] Implement UI for students to `checkInStudent` and `checkOutStudent` from a designated seat. (e.g., QR code scan, manual selection).
+    *   [ ] Display current seat assignment (if any).
+*   [ ] **Student Backend: `checkInStudent` function**
+    *   [ ] Implement `checkInStudent` callable function.
+    *   [ ] Create `ATTENDANCE_LOGS` entry with `checkIn` timestamp and assigned `seatNo`.
+    *   [ ] Trigger `updateOccupancyStats` Cloud Function (or ensure it listens to `ATTENDANCE_LOGS`).
+*   [ ] **Student Backend: `checkOutStudent` function**
+    *   [ ] Implement `checkOutStudent` callable function.
+    *   [ ] Update `ATTENDANCE_LOGS` entry with `checkOut` timestamp and calculate `duration`.
+    *   [ ] Trigger `updateOccupancyStats` Cloud Function.
+*   [ ] **Manager Backend: Occupancy Stats Function**
+    *   [ ] Implement `updateOccupancyStats` Cloud Function (triggered by `ATTENDANCE_LOGS` changes).
+    *   [ ] Calculate current `occupiedSeats` and `availableSeats` for the library.
+    *   [ ] Update `LIBRARIES.realtimeStats` map.
