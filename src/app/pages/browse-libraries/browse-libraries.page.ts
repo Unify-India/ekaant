@@ -58,7 +58,7 @@ export class BrowseLibrariesPage implements OnInit {
       console.warn('No library data in action event');
       return;
     }
-    this.router.navigate(['/apply-library', library.id]);
+    this.router.navigate(['student/application-form', library.id]);
   }
 
   onSearch() {
