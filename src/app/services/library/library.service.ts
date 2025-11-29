@@ -200,6 +200,28 @@ export class LibraryService {
     );
   }
 
+  public getLibraryById(libraryId: string): Observable<any> {
+    const libraryDocRef = doc(this.firestore, `libraries/${libraryId}`);
+    return from(getDoc(libraryDocRef)).pipe(
+      switchMap((librarySnapshot) => {
+        if (!librarySnapshot.exists()) {
+          return of(null);
+        }
+        const libraryData = { id: librarySnapshot.id, ...librarySnapshot.data() };
+        const pricingPlansColRef = collection(this.firestore, `libraries/${libraryId}/pricingPlans`);
+        return from(getDocs(pricingPlansColRef)).pipe(
+          map((pricingPlansSnapshot) => {
+            const pricingPlans = pricingPlansSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            return {
+              ...libraryData,
+              pricingPlans: pricingPlans,
+            };
+          }),
+        );
+      }),
+    );
+  }
+
   public getLibrariesForCardView(): Observable<any[]> {
     const q = query(collection(this.firestore, 'libraries'), where('status', '==', 'approved'));
     return from(getDocs(q)).pipe(
@@ -244,6 +266,19 @@ export class LibraryService {
       return docRef.id;
     } catch (error) {
       console.error('Error adding library:', error);
+      throw error;
+    }
+  }
+
+  async submitLibraryApplication(applicationData: any): Promise<string> {
+    try {
+      const docRef = await addDoc(collection(this.firestore, 'studentLibraryApplications'), {
+        ...applicationData,
+        createdAt: serverTimestamp(),
+      });
+      return docRef.id;
+    } catch (error) {
+      console.error('Error submitting library application:', error);
       throw error;
     }
   }
