@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 
 @Component({
@@ -6,9 +7,10 @@ import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.m
   templateUrl: './tickets.page.html',
   styleUrls: ['./tickets.page.scss'],
   standalone: true,
-  imports: [BaseUiComponents],
+  imports: [FormsModule, BaseUiComponents],
 })
 export class TicketsPage implements OnInit {
+  pageTitle = 'My Tickets';
   constructor() {}
 
   ngOnInit() {}
