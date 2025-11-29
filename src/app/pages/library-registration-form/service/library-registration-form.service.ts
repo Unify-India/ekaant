@@ -195,7 +195,7 @@ export class LibraryRegistrationFormService {
     // TODO: Handle uploads for images and host profile picture on update
 
     // Update the main document with cleaned data
-    await this.libraryService.updateLibrary(this.registrationDocId, initialPayload);
+    await this.libraryService.updateLibraryRegistration(this.registrationDocId, initialPayload);
   }
 
   async submitLibrary(): Promise<string> {
@@ -314,7 +314,7 @@ export class LibraryRegistrationFormService {
       const fileName = `host_profile_${Date.now()}_${hostProfileFile.name}`;
       const path = `library-registrations/${libraryId}/${fileName}`;
       const url = await this.firebase.uploadFile(path, hostProfileFile, onProgress);
-      await this.libraryService.updateLibrary(libraryId, { 'hostProfile.photoURL': url });
+      await this.libraryService.updateLibraryRegistration(libraryId, { 'hostProfile.photoURL': url });
       try {
         hostForm?.patchValue({ profilePhotoProgress: 100 });
       } catch (e) {

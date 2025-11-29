@@ -95,7 +95,7 @@ bootstrapApplication(AppComponent, {
       const storage = getStorage();
       if (environment.useEmulators) {
         try {
-          const host = environment.emulatorUrls?.storage || 'http://127.0.0.1:9199';
+          const host = (environment.emulatorUrls && (environment.emulatorUrls as any).storage) ? (environment.emulatorUrls as any).storage : 'http://127.0.0.1:9199';
           const url = new URL(host);
           const hostname = url.hostname;
           const port = Number(url.port) || environment.ports?.storage || 9199;
