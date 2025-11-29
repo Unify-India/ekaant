@@ -80,11 +80,24 @@
               <ion-icon slot="start" name="close-outline"></ion-icon>
               Cancel
             </ion-button>
-            <ion-button color="primary" (click)="update()">
+            <ion-button color="primary" (click)="saveChanges()">
               <ion-icon slot="start" name="save-outline"></ion-icon>
-              Update
+              Save Changes
             </ion-button>
           </div>
+          @if (currentUserRole === 'admin') {
+            <div class="admin-actions">
+              <ion-button color="danger" (click)="reject()">
+                <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+                Reject
+              </ion-button>
+              <ion-button color="success" (click)="approve()" [disabled]="isApproving">
+                <ion-spinner *ngIf="isApproving" name="crescent"></ion-spinner>
+                <ion-icon *ngIf="!isApproving" slot="start" name="checkmark-circle-outline"></ion-icon>
+                {{ isApproving ? 'Approving...' : 'Approve & Create Library' }}
+              </ion-button>
+            </div>
+          }
         }
       </ion-card-content>
     </ion-card>

@@ -36,7 +36,7 @@ export const bookingOnSeatCheckout = transferSeatOnCheckout;
 
 // Export V2 Callable Functions
 export const registration = {
-  approvelibrary: approveLibrary,
+  approveLibrary: approveLibrary,
   rejectlibrary: rejectLibrary,
   libraryregistrationrequest: libraryRegistrationRequest,
 };

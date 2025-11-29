@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonBackButton } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular';
+import { IonBackButton, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { saveOutline, closeOutline, eyeOutline } from 'ionicons/icons';
+import { saveOutline, closeOutline, eyeOutline, checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
 import { AuthService } from 'src/app/auth/service/auth.service';
 import { ApprovalCommentsComponent } from 'src/app/components/approval-comments/approval-comments.component';
 import { LibraryService } from 'src/app/services/library/library.service';
@@ -18,11 +20,12 @@ import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials
   styleUrls: ['./library-request-detail.page.scss'],
   standalone: true,
   imports: [
+    CommonModule,
+    IonSpinner,
     IonBackButton,
     BaseUiComponents,
     UiEssentials,
     FormEssentials,
-    CommonModule,
     ApprovalCommentsComponent,
   ],
 })
@@ -32,15 +35,19 @@ export class LibraryRequestDetailPage implements OnInit {
   isViewOnly: boolean = false;
   currentUserRole: 'admin' | 'manager' = 'admin';
   currentUserId!: string;
+  isApproving = false;
+
+  private functions = inject(Functions);
+  private toastController = inject(ToastController);
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private libraryService: LibraryService,
-    private authService: AuthService
+    private authService: AuthService,
   ) {
-    addIcons({ saveOutline, closeOutline, eyeOutline });
+    addIcons({ saveOutline, closeOutline, eyeOutline, checkmarkCircleOutline, closeCircleOutline });
 
     this.requestForm = this.fb.group({
       libraryManager: ['', Validators.required],
@@ -63,15 +70,12 @@ export class LibraryRequestDetailPage implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
       this.currentUserId = currentUser.uid;
-      // This is a simple role assignment, you might have a more complex logic
       this.currentUserRole = this.authService.getCurrentUser()?.role as 'admin' | 'manager';
     }
 
     if (this.requestId) {
       this.libraryService.getLibraryRegistrationById(this.requestId).subscribe((data) => {
         if (data) {
-          console.info('data', data);
-          // Convert Firestore Timestamps to readable dates and map nested data
           const mappedData = this._mapDataToForm(data);
           if (mappedData.createdAt && mappedData.createdAt.toDate) {
             mappedData.createdAt = mappedData.createdAt.toDate().toLocaleString();
@@ -116,18 +120,52 @@ export class LibraryRequestDetailPage implements OnInit {
     this.router.navigate(['/admin/pending-requests']);
   }
 
-  update() {
+  async approve() {
+    if (!this.requestId) return;
+    this.isApproving = true;
+
+    const approveFn = httpsCallable(this.functions, 'registration-approveLibrary');
+    try {
+      const result: any = await approveFn({ registrationId: this.requestId });
+      await this.presentToast(result.message, 'success');
+      this.router.navigate(['/admin/pending-requests']);
+    } catch (error: any) {
+      console.error('Error approving library:', error);
+      await this.presentToast(error.message, 'danger');
+    } finally {
+      this.isApproving = false;
+    }
+  }
+
+  async reject() {
+    if (this.requestForm.valid && this.requestId) {
+      const formValue = {
+        ...this.requestForm.value,
+        applicationStatus: 'rejected',
+      };
+      await this.libraryService.updateLibraryRegistration(this.requestId, formValue);
+      await this.presentToast('Application has been rejected.', 'warning');
+      this.router.navigate(['/admin/pending-requests']);
+    }
+  }
+
+  async saveChanges() {
     if (this.requestForm.valid && this.requestId) {
       const formValue = this.requestForm.value;
-      const isApproved = formValue.applicationStatus === 'approved';
-
-      this.libraryService.updateLibrary(this.requestId, formValue, isApproved).then(() => {
-        this.router.navigate(['/admin/pending-requests']);
-      });
+      await this.libraryService.updateLibraryRegistration(this.requestId, formValue);
+      await this.presentToast('Changes have been saved.', 'success');
     } else {
       console.log('Form is invalid');
-      // Optionally, mark all fields as touched to show validation errors
       this.requestForm.markAllAsTouched();
     }
+  }
+
+  private async presentToast(message: string, color: 'success' | 'danger' | 'warning') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      color: color,
+    });
+    toast.present();
   }
 }

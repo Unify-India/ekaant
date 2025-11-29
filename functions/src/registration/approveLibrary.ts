@@ -1,148 +1,106 @@
-import {onCall, HttpsError} from 'firebase-functions/v2/https';
-import * as logger from 'firebase-functions/logger';
-import {db, auth} from '../lib/firebaseAdmin';
-import {ApplicationStatus, UserRole} from '../types/enums';
-import type {Library, LibraryRegistrationRequest} from '../types';
+import * as functions from 'firebase-functions/v1';
+import * as admin from 'firebase-admin';
+import { CallableContext } from 'firebase-functions/v1/https';
 
 /**
- * Approves a library registration request.
+ * Handles the approval of a library registration request.
  *
- * This callable function is for admin use only. It performs the following
- * actions in a transaction:
- * 1. Validates the admin's authentication and the request payload.
- * 2. Reads the specified library registration request.
- * 3. Verifies the request is still in 'pending' status (idempotency).
- * 4. Creates a new document in the `libraries` collection.
- * 5. Sets custom claims on the user who submitted the request, granting them
- *    the 'manager' role.
- * 6. Updates the user's role in their `users` document.
- * 7. Updates the original request's status to 'approved'.
+ * This HTTP-triggered function performs the following actions:
+ * 1. Verifies that the request is made by an authenticated admin user.
+ * 2. Reads the library registration request from Firestore.
+ * 3. Creates a new Firebase Authentication user for the library manager.
+ * 4. Sets custom claims (`role: 'manager'`, `libraryId`) for the new manager user.
+ * 5. Creates a new public document for the library in the `libraries` collection.
+ * 6. Updates the original registration request's status to 'approved'.
  *
- * @param {functions.https.CallableRequest} request - The request object from the
- *   callable function, containing auth and data.
- * @returns {Promise<{success: boolean, message: string}>} An object with a
- *   success message.
- * @throws {functions.https.HttpsError} - `unauthenticated` if the user is
- *   not logged in.
- * @throws {functions.https.HttpsError} - `permission-denied` if the user is
- *   not an admin.
- * @throws {functions.https.HttpsError} - `invalid-argument` if the
- *   `registrationRequestId` is missing or invalid.
- * @throws {functions.https.HttpsError} - `not-found` if the registration
- *   request does not exist.
- * @throws {functions.https.HttpsError} - `failed-precondition` if the request
- *   is not in a 'pending' state.
+ * @param {functions.https.Request} request - The HTTP request object, containing the `registrationId`.
+ * @param {functions.https.Response} response - The HTTP response object.
  */
-export const approveLibrary = onCall(async (request) => {
-  // 1. Validate the admin's authentication
-  if (!request.auth) {
-    throw new HttpsError(
-      'unauthenticated',
-      'The function must be called while authenticated.',
-    );
-  }
-  if (request.auth.token.role !== UserRole.Admin) {
-    throw new HttpsError(
-      'permission-denied',
-      'Only admins can approve library requests.',
-    );
-  }
-
-  // 2. Validate the request payload
-  const {registrationRequestId} = request.data as {
-    registrationRequestId: string
-  };
-  if (!registrationRequestId || typeof registrationRequestId !== 'string') {
-    throw new HttpsError(
-      'invalid-argument',
-      'The function must be called with a valid "registrationRequestId".',
-    );
-  }
-
-  const requestRef = db.collection('libraryRegistrationRequests')
-    .doc(registrationRequestId);
-
-  try {
-    await db.runTransaction(async (transaction) => {
-      // 3. Read the library registration request
-      const requestDoc = await transaction.get(requestRef);
-      if (!requestDoc.exists) {
-        throw new HttpsError(
-          'not-found',
-          `Registration request with ID ${registrationRequestId} not found.`,
-        );
-      }
-
-      const registrationRequest = requestDoc.data() as
-        LibraryRegistrationRequest;
-
-      // 4. Verify the request is still in 'pending' status (idempotency check)
-      if (registrationRequest.status !== ApplicationStatus.Pending) {
-        throw new HttpsError(
-          'failed-precondition',
-          `Request is already in '${registrationRequest.status}' status ` +
-            'and cannot be approved.',
-        );
-      }
-
-      const userId = registrationRequest.userId;
-      const userRef = db.collection('users').doc(userId);
-      const userDoc = await transaction.get(userRef);
-
-      if (!userDoc.exists) {
-        throw new HttpsError(
-          'not-found',
-          `User with ID ${userId} who submitted the request does not exist.`,
-        );
-      }
-
-      // 5. Create a new document in the `libraries` collection
-      const newLibraryRef = db.collection('libraries').doc();
-      const newLibrary: Omit<Library, 'id' | 'createdAt' | 'updatedAt'> = {
-        name: registrationRequest.libraryName,
-        ownerId: userId,
-        managerIds: [userId],
-        location: {
-          address: registrationRequest.address,
-          city: registrationRequest.city,
-          pincode: registrationRequest.pincode,
-        },
-        seatConfig: {
-          totalSeats: registrationRequest.totalSeats,
-          slots: [], // Manager can configure this later
-        },
-        status: 'approved',
-      };
-      transaction.set(newLibraryRef, {
-        ...newLibrary,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      // 6. Set custom claims for the manager role
-      await auth.setCustomUserClaims(userId, {role: UserRole.Manager});
-
-      // 7. Update the user's role in their `users` document
-      transaction.update(userRef, {role: UserRole.Manager});
-
-      // 8. Update the original request's status to 'approved'
-      transaction.update(requestRef, {
-        status: ApplicationStatus.Approved,
-        updatedAt: new Date(),
-      });
-    });
-
-    return {success: true, message: `Library ${registrationRequestId}` +
-      ' approved successfully.'};
-  } catch (error) {
-    logger.error('Error approving library:', error);
-    // Re-throw HTTPS errors or convert others
-    if (error instanceof HttpsError) {
-      throw error;
+export const approveLibrary = functions
+  .region('asia-south1')
+  .https.onCall(async (data: { registrationId: string }, context: CallableContext) => {
+    // 1. Authentication & Authorization Check
+    if (!context.auth || context.auth.token.role !== 'admin') {
+      throw new functions.https.HttpsError('permission-denied', 'This function must be called by an admin.');
     }
-    throw new HttpsError(
-      'internal',
-      'An unexpected error occurred while approving the library.',
-    );
-  }
-});
+
+    const { registrationId } = data;
+    if (!registrationId) {
+      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with a "registrationId".');
+    }
+
+    const db = admin.firestore();
+    const registrationRequestRef = db.collection('library-registrations').doc(registrationId);
+
+    try {
+      const registrationDoc = await registrationRequestRef.get();
+      if (!registrationDoc.exists) {
+        throw new functions.https.HttpsError('not-found', `Registration request with ID ${registrationId} not found.`);
+      }
+
+      const registrationData = registrationDoc.data()!;
+
+      // Prevent re-approval
+      if (registrationData.applicationStatus === 'approved') {
+        throw new functions.https.HttpsError('failed-precondition', 'This library has already been approved.');
+      }
+
+      // 2. Create Library Manager Auth User
+      const managerEmail = registrationData.contactInfo.email;
+      const managerPassword = Math.random().toString(36).slice(-8); // Generate a random temporary password
+
+      const managerUserRecord = await admin.auth().createUser({
+        email: managerEmail,
+        password: managerPassword,
+        displayName: registrationData.contactInfo.name,
+      });
+
+      // 3. Set Custom Claims
+      const libraryId = registrationRequestRef.id; // Use the registration ID as the new library ID
+      await admin.auth().setCustomUserClaims(managerUserRecord.uid, {
+        role: 'manager',
+        libraryId: libraryId,
+      });
+
+      // 4. Create Public `libraries` Document
+      const libraryRef = db.collection('libraries').doc(libraryId);
+      await libraryRef.set({
+        name: registrationData.libraryName,
+        ownerId: managerUserRecord.uid,
+        managerIds: [managerUserRecord.uid],
+        location: registrationData.location,
+        seatConfig: registrationData.seatConfig,
+        amenities: registrationData.amenities,
+        status: 'approved',
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        // Initialize ratings
+        averageRating: 0,
+        totalReviews: 0,
+        ratingsBreakdown: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+      });
+
+      // 5. Update Original Request Status
+      await registrationRequestRef.update({
+        applicationStatus: 'approved',
+        approvedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      // TODO: 6. Send Welcome Email
+      // This part can be implemented later. It would involve a transactional email service.
+      console.log(
+        `Successfully approved library ${libraryId}. Manager: ${managerEmail}, Temp Password: ${managerPassword}`,
+      );
+
+      return {
+        status: 'success',
+        message: `Library ${registrationData.libraryName} approved successfully.`,
+        tempPassword: managerPassword, // Sending back for admin's info
+      };
+    } catch (error) {
+      console.error('Error approving library:', error);
+      if (error instanceof functions.https.HttpsError) {
+        throw error;
+      }
+      throw new functions.https.HttpsError('internal', 'An unexpected error occurred while approving the library.');
+    }
+  });
