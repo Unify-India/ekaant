@@ -1,8 +1,8 @@
-import {onCall, HttpsError} from 'firebase-functions/v2/https';
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
-import {db} from '../lib/firebaseAdmin';
-import {ApplicationStatus, UserRole} from '../types/enums';
-import type {LibraryRegistrationRequest} from '../types';
+import { db } from '../lib/firebaseAdmin';
+import { ApplicationStatus, UserRole } from '../types/enums';
+import type { LibraryRegistrationRequest } from '../types';
 
 /**
  * Rejects a library registration request.
@@ -26,47 +26,38 @@ import type {LibraryRegistrationRequest} from '../types';
 export const rejectLibrary = onCall(async (request) => {
   // 1. Validate the admin's authentication
   if (!request.auth) {
-    throw new HttpsError('unauthenticated',
-      'The function must be called while authenticated.');
+    throw new HttpsError('unauthenticated', 'The function must be called while authenticated.');
   }
   if (request.auth.token.role !== UserRole.Admin) {
-    throw new HttpsError('permission-denied',
-      'Only admins can reject library requests.');
+    throw new HttpsError('permission-denied', 'Only admins can reject library requests.');
   }
 
   // 2. Validate the request payload
-  const {registrationRequestId, adminComments} = request.data as {
-    registrationRequestId: string,
-    adminComments: string
+  const { registrationRequestId, adminComments } = request.data as {
+    registrationRequestId: string;
+    adminComments: string;
   };
   if (!registrationRequestId || typeof registrationRequestId !== 'string') {
-    throw new HttpsError('invalid-argument',
-      'The function must be called with a valid "registrationRequestId".');
+    throw new HttpsError('invalid-argument', 'The function must be called with a valid "registrationRequestId".');
   }
-  if (!adminComments || typeof adminComments !== 'string' ||
-      adminComments.length < 10) {
-    throw new HttpsError('invalid-argument',
-      'The "adminComments" must be a string of at least 10 characters.');
+  if (!adminComments || typeof adminComments !== 'string' || adminComments.length < 10) {
+    throw new HttpsError('invalid-argument', 'The "adminComments" must be a string of at least 10 characters.');
   }
 
-  const requestRef = db.collection('libraryRegistrationRequests')
-    .doc(registrationRequestId);
+  const requestRef = db.collection('libraryRegistrationRequests').doc(registrationRequestId);
 
   try {
     await db.runTransaction(async (transaction) => {
       const requestDoc = await transaction.get(requestRef);
       if (!requestDoc.exists) {
-        throw new HttpsError('not-found',
-          `Registration request with ID ${registrationRequestId} not found.`);
+        throw new HttpsError('not-found', `Registration request with ID ${registrationRequestId} not found.`);
       }
 
-      const registrationRequest = requestDoc.data() as
-        LibraryRegistrationRequest;
+      const registrationRequest = requestDoc.data() as LibraryRegistrationRequest;
 
       // Idempotency check
       if (registrationRequest.status !== ApplicationStatus.Pending) {
-        throw new HttpsError('failed-precondition',
-          `Request is already in '${registrationRequest.status}' status.`);
+        throw new HttpsError('failed-precondition', `Request is already in '${registrationRequest.status}' status.`);
       }
 
       // Update the request status and comments
@@ -77,14 +68,12 @@ export const rejectLibrary = onCall(async (request) => {
       });
     });
 
-    return {success: true, message: `Library request ${registrationRequestId}` +
-      ' rejected.'};
+    return { success: true, message: `Library request ${registrationRequestId}` + ' rejected.' };
   } catch (error) {
     logger.error('Error rejecting library:', error);
     if (error instanceof HttpsError) {
       throw error;
     }
-    throw new HttpsError('internal',
-      'An unexpected error occurred while rejecting the library.');
+    throw new HttpsError('internal', 'An unexpected error occurred while rejecting the library.');
   }
 });

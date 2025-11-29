@@ -4,11 +4,10 @@ import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { AuthService } from 'src/app/auth/service/auth.service';
 import { ApprovalCommentsComponent } from 'src/app/components/approval-comments/approval-comments.component';
+import { IUser } from 'src/app/models/global.interface';
 import { PreviewComponent } from 'src/app/pages/library-registration-form/components/preview/preview.component';
 import { LibraryRegistrationFormService } from 'src/app/pages/library-registration-form/service/library-registration-form.service';
 import { LibraryService } from 'src/app/services/library/library.service';
-
-import { IUser } from 'src/app/models/global.interface';
 
 @Component({
   selector: 'app-application-status',

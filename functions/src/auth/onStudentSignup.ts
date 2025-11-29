@@ -1,6 +1,6 @@
-import {db} from '../lib/firebaseAdmin';
-import {UserRole} from '../types/enums';
-import type {User} from '../types';
+import { db } from '../lib/firebaseAdmin';
+import { UserRole } from '../types/enums';
+import type { User } from '../types';
 import * as logger from 'firebase-functions/logger';
 // Import for typing only
 import type * as functions from 'firebase-functions/v1';
@@ -14,7 +14,7 @@ import type * as functions from 'firebase-functions/v1';
  * @return {Promise<void>} A promise that resolves when the document is created.
  */
 export const onStudentSignupLogic = async (user: functions.auth.UserRecord) => {
-  const {uid, email, displayName, phoneNumber} = user;
+  const { uid, email, displayName, phoneNumber } = user;
 
   const userRef = db.collection('users').doc(uid);
 

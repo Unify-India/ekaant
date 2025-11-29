@@ -1,5 +1,5 @@
-import {Timestamp} from 'firebase-admin/firestore';
-import {ApplicationStatus, PaymentStatus, UserRole} from './enums';
+import { Timestamp } from 'firebase-admin/firestore';
+import { ApplicationStatus, PaymentStatus, UserRole } from './enums';
 
 // Base interface for all documents
 interface BaseDoc {

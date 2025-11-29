@@ -12,7 +12,8 @@ import { add } from 'date-fns';
  * @param {string} libraryId - The ID of the library where a seat was freed.
  */
 async function assignSeatFromWaitingList(libraryId: string) {
-  const waitingListRef = db.collection('waiting_list')
+  const waitingListRef = db
+    .collection('waiting_list')
     .where('libraryId', '==', libraryId)
     .where('status', '==', 'active')
     .orderBy('createdAt', 'asc')
@@ -36,7 +37,7 @@ async function assignSeatFromWaitingList(libraryId: string) {
   const studentId = nextStudentEntry.data().studentId;
   logger.info(
     `Offered seat to student ${studentId} from waiting list for library ` +
-    `${libraryId}. Offer expires at ${thirtyMinutesFromNow.toISOString()}.`
+      `${libraryId}. Offer expires at ${thirtyMinutesFromNow.toISOString()}.`,
   );
 
   // TODO: Implement actual push notification logic
@@ -65,15 +66,12 @@ export const transferSeatOnCheckout = functions.firestore
     if (justCheckedOut) {
       const libraryId = afterData.libraryId;
       if (!libraryId) {
-        logger.error(
-          `Attendance log ${change.after.id} is missing a libraryId.`
-        );
+        logger.error(`Attendance log ${change.after.id} is missing a libraryId.`);
         return;
       }
 
       logger.info(
-        `Student ${afterData.studentId} checked out from library ` +
-        `${libraryId}. Checking waiting list...`
+        `Student ${afterData.studentId} checked out from library ` + `${libraryId}. Checking waiting list...`,
       );
 
       await assignSeatFromWaitingList(libraryId);

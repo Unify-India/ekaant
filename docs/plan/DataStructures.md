@@ -126,58 +126,60 @@ erDiagram
 
 ## Notes & Index Recommendations
 
-*   **Real-time Dashboard Data:**
-    *   The `LIBRARIES.realtimeStats` map is updated by a Cloud Function that triggers on changes to `ATTENDANCE_LOGS`.
+- **Real-time Dashboard Data:**
+  - The `LIBRARIES.realtimeStats` map is updated by a Cloud Function that triggers on changes to `ATTENDANCE_LOGS`.
 
-*   **Rating Aggregation (Cloud Function):**
-    *   A Cloud Function (`onReviewChange`) triggers whenever a document in the `REVIEWS` collection is created, updated, or deleted.
-    *   This function performs an aggregation query on the `REVIEWS` collection for the specific `libraryId`.
-    *   It calculates the new `averageRating`, `totalReviews`, `ratingsBreakdown` map, and aggregates the top positive/negative tags.
-    *   It then updates these fields in the corresponding `LIBRARIES` document. This ensures that the library details page can load all rating information with a single document read, making it highly performant.
+- **Rating Aggregation (Cloud Function):**
+  - A Cloud Function (`onReviewChange`) triggers whenever a document in the `REVIEWS` collection is created, updated, or deleted.
+  - This function performs an aggregation query on the `REVIEWS` collection for the specific `libraryId`.
+  - It calculates the new `averageRating`, `totalReviews`, `ratingsBreakdown` map, and aggregates the top positive/negative tags.
+  - It then updates these fields in the corresponding `LIBRARIES` document. This ensures that the library details page can load all rating information with a single document read, making it highly performant.
 
-*   **Denormalization for UI Performance:**
-    *   `studentName` is denormalized into `STUDENT_REQUESTS`, `PAYMENTS`, `WAITING_LIST`, and `REVIEWS`.
-    *   `libraryName` and `libraryLogoUrl` are denormalized into `PAYMENTS` and `ATTENDANCE_LOGS`.
+- **Denormalization for UI Performance:**
+  - `studentName` is denormalized into `STUDENT_REQUESTS`, `PAYMENTS`, `WAITING_LIST`, and `REVIEWS`.
+  - `libraryName` and `libraryLogoUrl` are denormalized into `PAYMENTS` and `ATTENDANCE_LOGS`.
 
-*   **Aggregate Data Reporting:**
-    *   The `REPORTS` collection is populated by a scheduled Cloud Function for fast dashboard loading.
+- **Aggregate Data Reporting:**
+  - The `REPORTS` collection is populated by a scheduled Cloud Function for fast dashboard loading.
 
-*   **Composite Indexes**:
-    *   `libraries` by `location.pincode` and `status`.
-    *   `libraries` by `managerIds` (array-contains query).
-    *   `student_requests` composite index: `libraryId, status, appliedAt`.
-    *   `waiting_list` composite index: `libraryId, status, createdAt`.
-    *   `attendance_logs` composite: `libraryId, checkIn (desc)`.
-    *   `payments` composite: `libraryId, status, createdAt`.
-    *   **`reviews` composite: `libraryId, createdAt (desc)`.**
+- **Composite Indexes**:
+  - `libraries` by `location.pincode` and `status`.
+  - `libraries` by `managerIds` (array-contains query).
+  - `student_requests` composite index: `libraryId, status, appliedAt`.
+  - `waiting_list` composite index: `libraryId, status, createdAt`.
+  - `attendance_logs` composite: `libraryId, checkIn (desc)`.
+  - `payments` composite: `libraryId, status, createdAt`.
+  - **`reviews` composite: `libraryId, createdAt (desc)`.**
 
-*   **TTL / Cleanup:** Use `expiresAt` on `waiting_list` for cleanup.
+- **TTL / Cleanup:** Use `expiresAt` on `waiting_list` for cleanup.
 
 ---
 
 ## Sample Documents
 
 **Sample Document (library)**
+
 ```json
 {
   "libraryId": "LIB001",
   "name": "Ranchi Study Hub",
   "ownerId": "UID999",
   "managerIds": ["UID999", "UID998"],
-  "location": {"city":"Ranchi","pincode":"834001","mapUrl":"..."},
-  "seatConfig": {"totalSeats":50,"slots":[{"slotType":"4hr","price":40}]},
-  "realtimeStats": {"occupiedSeats": 12, "availableSeats": 38},
-  "status":"approved",
+  "location": { "city": "Ranchi", "pincode": "834001", "mapUrl": "..." },
+  "seatConfig": { "totalSeats": 50, "slots": [{ "slotType": "4hr", "price": 40 }] },
+  "realtimeStats": { "occupiedSeats": 12, "availableSeats": 38 },
+  "status": "approved",
   "averageRating": 4.5,
   "totalReviews": 128,
   "ratingsBreakdown": { "5": 78, "4": 32, "3": 12, "2": 4, "1": 2 },
   "positiveAspects": ["Fast Wi-Fi", "Cleanliness", "Quiet Atmosphere"],
   "areasForImprovement": ["Crowded", "AC Issues"],
-  "createdAt":"2025-11-01T00:00:00Z"
+  "createdAt": "2025-11-01T00:00:00Z"
 }
 ```
 
 **Sample Document (review)**
+
 ```json
 // Document ID: LIB001_UID123
 {
@@ -243,7 +245,8 @@ erDiagram
   "createdAt": "2025-11-28T10:00:00Z"
 }
 ```
---- 
+
+---
 
 ### Feature Spotlight: Ratings & Reviews
 
@@ -252,31 +255,31 @@ This section provides a deep-dive into the review system's architecture, logic, 
 #### 1. Core Logic & User Flow
 
 1.  **One Review Per Student, Per Library**: To maintain authenticity, a student can only submit one review for any given library.
-    *   **Implementation**: We enforce this by creating a composite **Document ID** for each review using the format `{libraryId}_{studentId}`.
-    *   **User Experience**: When a student who has already left a review attempts to write another, the UI will present them with their existing review in an "edit" mode instead of a "create" mode.
+    - **Implementation**: We enforce this by creating a composite **Document ID** for each review using the format `{libraryId}_{studentId}`.
+    - **User Experience**: When a student who has already left a review attempts to write another, the UI will present them with their existing review in an "edit" mode instead of a "create" mode.
 
 2.  **Verified Reviews**: To combat fake or paid reviews, we mark reviews as "verified" only if the student is a legitimate member of the library.
-    *   **Implementation**: The `isVerified` flag on a `REVIEWS` document is set by a Cloud Function. When a review is written, the function checks if the `studentId` has an `approved` application in `STUDENT_REQUESTS` or a recent `PAYMENTS` record for that `libraryId`.
-    *   **User Experience**: Verified reviews are given more prominence in the UI, potentially with a distinct badge.
+    - **Implementation**: The `isVerified` flag on a `REVIEWS` document is set by a Cloud Function. When a review is written, the function checks if the `studentId` has an `approved` application in `STUDENT_REQUESTS` or a recent `PAYMENTS` record for that `libraryId`.
+    - **User Experience**: Verified reviews are given more prominence in the UI, potentially with a distinct badge.
 
 3.  **Review Tags**: Users can add descriptive tags (e.g., "Cleanliness", "Crowded") to their reviews, similar to the Google Play Store.
-    *   **Implementation**: The `REVIEWS` document contains a `tags` array. Each tag is an object with `text` and `type` ('positive' or 'negative').
-    *   **Aggregation**: The `onReviewChange` Cloud Function will also aggregate the most frequently mentioned tags and update the `positiveAspects` and `areasForImprovement` arrays in the main `LIBRARIES` document.
+    - **Implementation**: The `REVIEWS` document contains a `tags` array. Each tag is an object with `text` and `type` ('positive' or 'negative').
+    - **Aggregation**: The `onReviewChange` Cloud Function will also aggregate the most frequently mentioned tags and update the `positiveAspects` and `areasForImprovement` arrays in the main `LIBRARIES` document.
 
 #### 2. Backend Implementation (`onReviewChange` Cloud Function)
 
 A single Cloud Function, `onReviewChange`, handles all rating and review aggregation. It is triggered by `onCreate`, `onUpdate`, and `onDelete` events in the `REVIEWS` collection.
 
-*   **Trigger**: `functions.firestore.document('reviews/{reviewId}')`
-*   **Process**:
-    1.  Get the `libraryId` from the changed document.
-    2.  Query all documents in the `REVIEWS` collection where `libraryId` matches.
-    3.  **Recalculate**:
-        *   `totalReviews`: The count of all documents.
-        *   `averageRating`: The average of the `rating` field across all documents.
-        *   `ratingsBreakdown`: A map counting the occurrences of each star rating (1 through 5).
-        *   `positiveAspects` / `areasForImprovement`: Count occurrences of each tag and take the top 3-5 for each category.
-    4.  **Update**: Write the aggregated data back to the corresponding document in the `LIBRARIES` collection.
+- **Trigger**: `functions.firestore.document('reviews/{reviewId}')`
+- **Process**:
+  1.  Get the `libraryId` from the changed document.
+  2.  Query all documents in the `REVIEWS` collection where `libraryId` matches.
+  3.  **Recalculate**:
+      - `totalReviews`: The count of all documents.
+      - `averageRating`: The average of the `rating` field across all documents.
+      - `ratingsBreakdown`: A map counting the occurrences of each star rating (1 through 5).
+      - `positiveAspects` / `areasForImprovement`: Count occurrences of each tag and take the top 3-5 for each category.
+  4.  **Update**: Write the aggregated data back to the corresponding document in the `LIBRARIES` collection.
 
 #### 3. Security Rules (`firestore.rules`)
 
@@ -318,24 +321,25 @@ This section details the implementation of the real-time commenting feature used
 
 #### 1. User Story
 
-*   **As an Admin**, I want to leave comments and ask questions about a library's application directly on the review page so I can communicate requirements clearly.
-*   **As a Library Manager**, I want to see the admin's comments and reply to them on my application status page so I can resolve issues quickly.
-*   **As both**, I want the conversation to be real-time without needing to refresh the page.
+- **As an Admin**, I want to leave comments and ask questions about a library's application directly on the review page so I can communicate requirements clearly.
+- **As a Library Manager**, I want to see the admin's comments and reply to them on my application status page so I can resolve issues quickly.
+- **As both**, I want the conversation to be real-time without needing to refresh the page.
 
 #### 2. Data Structure
 
 Comments are stored in a sub-collection within each library registration document to ensure data is co-located and easy to query.
 
-*   **Collection:** `library-registrations`
-    *   **Document:** `{registrationId}`
-        *   **Sub-collection:** `comments`
-            *   **Document:** `{commentId}` (auto-generated)
-                *   `message`: `string` - The content of the comment.
-                *   `role`: `string` ('admin' or 'manager') - The role of the user who left the comment.
-                *   `uid`: `string` - The Firebase Auth UID of the user.
-                *   `timestamp`: `Timestamp` - The server-side timestamp for chronological ordering.
+- **Collection:** `library-registrations`
+  - **Document:** `{registrationId}`
+    - **Sub-collection:** `comments`
+      - **Document:** `{commentId}` (auto-generated)
+        - `message`: `string` - The content of the comment.
+        - `role`: `string` ('admin' or 'manager') - The role of the user who left the comment.
+        - `uid`: `string` - The Firebase Auth UID of the user.
+        - `timestamp`: `Timestamp` - The server-side timestamp for chronological ordering.
 
 **Sample Comment Document:**
+
 ```json
 // /library-registrations/REG123/comments/CMT456
 {
@@ -350,10 +354,10 @@ Comments are stored in a sub-collection within each library registration documen
 
 The logic is encapsulated within the client-side application using Angular and `@angular/fire`.
 
-*   **`ApprovalCommentsComponent`:** A reusable UI component responsible for displaying the comment thread and the input form. It is used in both the admin's `library-request-detail` page and the manager's `application-status` page.
-*   **`LibraryService`:** This service contains the methods for interacting with Firestore.
-    *   `getComments(registrationId)`: Uses `collectionData` from `@angular/fire` to get a real-time `Observable` of the comments sub-collection, ordered by `timestamp`.
-    *   `addComment(registrationId, comment)`: Uses `addDoc` to create a new document in the `comments` sub-collection, adding a `serverTimestamp()` to the payload.
+- **`ApprovalCommentsComponent`:** A reusable UI component responsible for displaying the comment thread and the input form. It is used in both the admin's `library-request-detail` page and the manager's `application-status` page.
+- **`LibraryService`:** This service contains the methods for interacting with Firestore.
+  - `getComments(registrationId)`: Uses `collectionData` from `@angular/fire` to get a real-time `Observable` of the comments sub-collection, ordered by `timestamp`.
+  - `addComment(registrationId, comment)`: Uses `addDoc` to create a new document in the `comments` sub-collection, adding a `serverTimestamp()` to the payload.
 
 #### 4. Backend Implementation
 
@@ -386,17 +390,19 @@ match /library-registrations/{regId} {
   }
 }
 ```
-*Note: The security rules are illustrative. The actual implementation should be carefully tested.*
+
+_Note: The security rules are illustrative. The actual implementation should be carefully tested._
 
 ---
+
 # Brainstorming: B2B SaaS Pricing Model Integration (v3)
 
 This section details the necessary data structure changes to incorporate a SaaS pricing model for libraries.
 
 ### 1. Current Model Analysis
 
-*   **Student Payments (B2C):** The current `PAYMENTS` collection tracks payments from a **student** to a **library**. This is well-defined.
-*   **Library Subscription (B2B - SaaS):** The core gap is modeling how a **library** pays **Ekaant** for using the platform. The `LIBRARIES` collection lacks fields for subscription plan, status, or payment history.
+- **Student Payments (B2C):** The current `PAYMENTS` collection tracks payments from a **student** to a **library**. This is well-defined.
+- **Library Subscription (B2B - SaaS):** The core gap is modeling how a **library** pays **Ekaant** for using the platform. The `LIBRARIES` collection lacks fields for subscription plan, status, or payment history.
 
 ### 2. Proposed ER Diagram & Schema Changes (v3)
 
@@ -409,7 +415,7 @@ To properly integrate the SaaS pricing model, we will add two new collections an
 
 #### Updated `LIBRARIES` Collection:
 
-*   Add a `subscriptionStatus` field for quick, performant checks on a library's active status.
+- Add a `subscriptionStatus` field for quick, performant checks on a library's active status.
 
 Here is the proposed **v3 ER Diagram**:
 

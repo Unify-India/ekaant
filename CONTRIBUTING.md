@@ -8,7 +8,6 @@ git update-index --assume-unchanged src/environments/environment.ts
 
 This command flags the file for your local Git instance, and you only need to run it once. If you ever need to commit an intentional change to this file's template, you can re-enable tracking with `--no-assume-unchanged`.
 
-
 ## Commit Message Guidelines
 
 ### Commit Message Format
@@ -42,7 +41,6 @@ Updated token expiration and signing key handling for better security.
 
 Closes #123
 ```
-
 
 ### Reverting a Commit
 
@@ -85,13 +83,13 @@ This reverts commit <hash>.
 ### Merge Request Title Format
 
 ```
-docs: add request response document 
+docs: add request response document
 ```
 
 ```
-fix: fix ticket sorting bug 
+fix: fix ticket sorting bug
 ```
 
 ```
-feat: allow multiple owners for an organisation 
+feat: allow multiple owners for an organisation
 ```

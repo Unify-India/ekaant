@@ -1,4 +1,4 @@
-import {db} from '../lib/firebaseAdmin';
+import { db } from '../lib/firebaseAdmin';
 import * as logger from 'firebase-functions/logger';
 // Import for typing only
 import type * as functions from 'firebase-functions/v1';
@@ -12,7 +12,7 @@ import type * as functions from 'firebase-functions/v1';
  * @return {Promise<void>} A promise that resolves when the document is deleted.
  */
 export const onUserDeleteLogic = async (user: functions.auth.UserRecord) => {
-  const {uid} = user;
+  const { uid } = user;
   const userRef = db.collection('users').doc(uid);
 
   try {

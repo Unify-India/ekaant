@@ -9,7 +9,7 @@ describe('ApprovalCommentsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [IonicModule.forRoot(), ApprovalCommentsComponent]
+      imports: [IonicModule.forRoot(), ApprovalCommentsComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ApprovalCommentsComponent);

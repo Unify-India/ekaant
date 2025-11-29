@@ -31,7 +31,7 @@ We leverage two main types of Cloud Function triggers:
 
 To provide clarity in Firebase logs and the console, functions are exported with a consistent naming convention: **`{groupName}-{functionName}`**.
 
--   **Example**: The `approveLibrary` function within the `registration` group is exported as `registration-approveLibrary`.
+- **Example**: The `approveLibrary` function within the `registration` group is exported as `registration-approveLibrary`.
 
 This grouping is handled in the main `index.ts` file.
 
@@ -43,6 +43,6 @@ The `functions/src/index.ts` file acts as the central hub for all Cloud Function
 
 Security is a primary consideration in our backend architecture.
 
--   **Callable Functions**: Every callable function begins with a check on `context.auth`. It verifies that a user is authenticated and, where necessary, checks for specific custom claims (e.g., `context.auth.token.role === 'admin'`) to enforce role-based access control (RBAC).
+- **Callable Functions**: Every callable function begins with a check on `context.auth`. It verifies that a user is authenticated and, where necessary, checks for specific custom claims (e.g., `context.auth.token.role === 'admin'`) to enforce role-based access control (RBAC).
 
--   **Firestore Security Rules**: While Cloud Functions operate in a trusted, server-side environment (bypassing security rules by default), our database is still protected by comprehensive Firestore Security Rules (`firestore.rules`). This ensures that even if a client-side action is attempted, the database remains secure. Functions provide the *logic*, while rules provide the *security layer*.
+- **Firestore Security Rules**: While Cloud Functions operate in a trusted, server-side environment (bypassing security rules by default), our database is still protected by comprehensive Firestore Security Rules (`firestore.rules`). This ensures that even if a client-side action is attempted, the database remains secure. Functions provide the _logic_, while rules provide the _security layer_.

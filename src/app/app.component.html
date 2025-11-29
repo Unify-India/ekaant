@@ -7,29 +7,30 @@
           <ion-note>Your way to study space</ion-note>
 
           @for (p of appPages; track p; let i = $index) {
-          <ion-menu-toggle auto-hide="false">
-            <ion-item
-              routerDirection="root"
-              [routerLink]="[p.url]"
-              lines="none"
-              detail="false"
-              routerLinkActive="selected"
-            >
-              <ion-icon
-                aria-hidden="true"
-                slot="start"
-                [color]="getIconColor(p)"
-                [ios]="p.icon + '-outline'"
-                [md]="p.icon + '-sharp'"
-              ></ion-icon>
-              <ion-label>{{ p.title }}</ion-label>
+            <ion-menu-toggle auto-hide="false">
+              <ion-item
+                routerDirection="root"
+                [routerLink]="[p.url]"
+                lines="none"
+                detail="false"
+                routerLinkActive="selected"
+              >
+                <ion-icon
+                  aria-hidden="true"
+                  slot="start"
+                  [color]="getIconColor(p)"
+                  [ios]="p.icon + '-outline'"
+                  [md]="p.icon + '-sharp'"
+                ></ion-icon>
+                <ion-label>{{ p.title }}</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          }
+          @if (isLoggedIn) {
+            <ion-item lines="none" detail="false" class="cursor-pointer" (click)="logout()">
+              <ion-icon slot="start" color="danger" [ios]="'log-out-outline'" [md]="'log-out-sharp'"></ion-icon>
+              <ion-label>Logout</ion-label>
             </ion-item>
-          </ion-menu-toggle>
-          } @if (isLoggedIn) {
-          <ion-item lines="none" detail="false" class="cursor-pointer" (click)="logout()">
-            <ion-icon slot="start" color="danger" [ios]="'log-out-outline'" [md]="'log-out-sharp'"></ion-icon>
-            <ion-label>Logout</ion-label>
-          </ion-item>
           }
         </ion-list>
       </ion-content>

@@ -3,14 +3,14 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>{{pageTitle}}</ion-title>
+    <ion-title>{{ pageTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">{{pageTitle}}</ion-title>
+      <ion-title size="large">{{ pageTitle }}</ion-title>
     </ion-toolbar>
   </ion-header>
   <section id="pricing-section" class="pricing-section ion-padding">
@@ -21,27 +21,27 @@
 
     <div class="pricing-container">
       @for (plan of pricingPlans; track plan) {
-      <ion-card class="pricing-card info-card" [ngClass]="{'popular': plan.popular}">
-        @if (plan.popular) {
-        <div class="badge">MOST POPULAR</div>
-        }
-        <img [src]="plan.image" alt="Plan Image" class="plan-image" />
+        <ion-card class="pricing-card info-card" [ngClass]="{ popular: plan.popular }">
+          @if (plan.popular) {
+            <div class="badge">MOST POPULAR</div>
+          }
+          <img [src]="plan.image" alt="Plan Image" class="plan-image" />
 
-        <ion-card-header>
-          <ion-card-title>{{ plan.title }}</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <p class="description">{{ plan.description }}</p>
-          <div class="btn-get-started">
-            <p class="price">
-              {{ plan.price }}
-              <span class="duration">{{ plan.duration }}</span>
-            </p>
+          <ion-card-header>
+            <ion-card-title>{{ plan.title }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p class="description">{{ plan.description }}</p>
+            <div class="btn-get-started">
+              <p class="price">
+                {{ plan.price }}
+                <span class="duration">{{ plan.duration }}</span>
+              </p>
 
-            <ion-button expand="block" [color]="plan.buttonColor">{{ plan.buttonText }}</ion-button>
-          </div>
-        </ion-card-content>
-      </ion-card>
+              <ion-button expand="block" [color]="plan.buttonColor">{{ plan.buttonText }}</ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
       }
     </div>
   </section>

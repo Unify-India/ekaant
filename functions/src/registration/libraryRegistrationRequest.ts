@@ -1,8 +1,8 @@
-import {onCall, HttpsError} from 'firebase-functions/v2/https';
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
-import {db} from '../lib/firebaseAdmin';
-import {ApplicationStatus} from '../types/enums';
-import type {LibraryRegistrationRequest} from '../types';
+import { db } from '../lib/firebaseAdmin';
+import { ApplicationStatus } from '../types/enums';
+import type { LibraryRegistrationRequest } from '../types';
 
 /**
  * Submits a new library registration request.
@@ -22,48 +22,42 @@ import type {LibraryRegistrationRequest} from '../types';
 export const libraryRegistrationRequest = onCall(async (request) => {
   // 1. Validate user authentication
   if (!request.auth) {
-    throw new HttpsError('unauthenticated',
-      'You must be logged in to submit a request.');
+    throw new HttpsError('unauthenticated', 'You must be logged in to submit a request.');
   }
 
   // 2. Validate the request payload
   // In a real app, use a library like Zod for robust validation.
-  const {libraryName, managerName, managerEmail, managerPhone,
-    address, city, pincode, totalSeats} = request.data as {
-      libraryName: string,
-      managerName: string,
-      managerEmail: string,
-      managerPhone: string,
-      address: string,
-      city: string,
-      pincode: string,
-      totalSeats: number
-    };
-  if (!libraryName || !managerName || !managerEmail || !managerPhone ||
-      !address || !city || !pincode || !totalSeats) {
-    throw new HttpsError('invalid-argument',
-      'Missing required fields in the registration request.');
+  const { libraryName, managerName, managerEmail, managerPhone, address, city, pincode, totalSeats } = request.data as {
+    libraryName: string;
+    managerName: string;
+    managerEmail: string;
+    managerPhone: string;
+    address: string;
+    city: string;
+    pincode: string;
+    totalSeats: number;
+  };
+  if (!libraryName || !managerName || !managerEmail || !managerPhone || !address || !city || !pincode || !totalSeats) {
+    throw new HttpsError('invalid-argument', 'Missing required fields in the registration request.');
   }
   if (typeof totalSeats !== 'number' || totalSeats <= 0) {
-    throw new HttpsError('invalid-argument', '"totalSeats" must be' +
-      ' a positive number.');
+    throw new HttpsError('invalid-argument', '"totalSeats" must be' + ' a positive number.');
   }
 
   const newRequestRef = db.collection('libraryRegistrationRequests').doc();
 
-  const newRequest: Omit<LibraryRegistrationRequest, 'id' | 'createdAt' |
-    'updatedAt'> = {
-      userId: request.auth.uid,
-      libraryName,
-      managerName,
-      managerEmail,
-      managerPhone,
-      address,
-      city,
-      pincode,
-      totalSeats,
-      status: ApplicationStatus.Pending,
-    };
+  const newRequest: Omit<LibraryRegistrationRequest, 'id' | 'createdAt' | 'updatedAt'> = {
+    userId: request.auth.uid,
+    libraryName,
+    managerName,
+    managerEmail,
+    managerPhone,
+    address,
+    city,
+    pincode,
+    totalSeats,
+    status: ApplicationStatus.Pending,
+  };
 
   try {
     await newRequestRef.set({
@@ -72,11 +66,9 @@ export const libraryRegistrationRequest = onCall(async (request) => {
       updatedAt: new Date(),
     });
 
-    return {success: true, registrationId: newRequestRef.id};
+    return { success: true, registrationId: newRequestRef.id };
   } catch (error) {
     logger.error('Error submitting library registration request:', error);
-    throw new HttpsError('internal',
-      'An unexpected error occurred while submitting your request.');
+    throw new HttpsError('internal', 'An unexpected error occurred while submitting your request.');
   }
 });
-
