@@ -93,14 +93,16 @@ export class ApplicationFormPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscription.add(
-      this.activatedRoute.paramMap.subscribe((params) => {
-        this.libraryId = params.get('id');
-        if (this.libraryId) {
-          this.fetchData(this.libraryId);
-        } else {
-          console.error('Library ID is missing from route parameters.');
-          this.isLoading = false;
-        }
+      this.activatedRoute.paramMap.subscribe({
+        next: (params) => {
+          this.libraryId = params.get('id');
+          if (this.libraryId) {
+            this.fetchData(this.libraryId);
+          } else {
+            console.error('Library ID is missing from route parameters.');
+            this.isLoading = false;
+          }
+        },
       }),
     );
   }
@@ -111,17 +113,17 @@ export class ApplicationFormPage implements OnInit, OnDestroy {
       combineLatest([
         this.userService.getCurrentUserProfile(),
         this.libraryService.getLibraryById(libraryId),
-      ]).subscribe(
-        ([studentProfile, libraryDetails]) => {
+      ]).subscribe({
+        next: ([studentProfile, libraryDetails]) => {
           this.studentProfile = studentProfile;
           this.libraryDetails = libraryDetails;
           this.isLoading = false;
         },
-        (error) => {
+        error: (error) => {
           console.error('Error fetching data:', error);
           this.isLoading = false;
         },
-      ),
+      }),
     );
   }
 
