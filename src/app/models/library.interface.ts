@@ -1,10 +1,11 @@
 export interface ILibraryState {
-  applicationStatus: 'approved' | 'pending' | 'rejected' | 'changes-required' | 'none';
   // Allow other properties from the library/registration documents
   [key: string]: any;
+  applicationStatus: 'approved' | 'pending' | 'rejected' | 'changes-required' | 'none';
 }
 
 export interface IFirestoreLibrary {
+  [key: string]: any; // Allow other properties
   basicInformation: {
     libraryName: string;
     addressLine1: string;
@@ -17,15 +18,12 @@ export interface IFirestoreLibrary {
   hostProfile?: {
     fullName: string;
   };
-  seatManagement?: {
-    totalSeats: number;
-  };
-  realtimeStats?: {
-    availableSeats: number;
-  };
   libraryImages?: {
     libraryPhotos: { previewUrl: string }[];
   };
+  seatManagement?: {
+    totalSeats: number;
+    occupiedSeats: number;
+  };
   status: 'approved' | 'pending' | 'rejected';
-  [key: string]: any; // Allow other properties
 }

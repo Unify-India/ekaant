@@ -1,9 +1,8 @@
 export interface Library {
   address: string;
-  availableSeats: number;
   id?: string | number;
-  isFull: boolean;
   name: string;
+  occupiedSeats: number;
   totalSeats: number;
   type: string;
 }

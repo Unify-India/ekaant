@@ -218,15 +218,14 @@ export class LibraryService {
             .join(', ');
 
           const totalSeats = data.seatManagement?.totalSeats ?? 0;
-          const availableSeats = data.realtimeStats?.availableSeats ?? 0;
+          const occupiedSeats = 0; // As per user, currently all libraries are vacant.
 
           return {
             id: doc.id,
             name: data.basicInformation?.libraryName,
             address: address,
-            availableSeats: availableSeats,
+            occupiedSeats: occupiedSeats,
             totalSeats: totalSeats,
-            isFull: availableSeats === 0,
             type: data.basicInformation?.genderCategory,
             // TODO: Add a proper placeholder image
             photoURL: data.libraryImages?.libraryPhotos?.[0]?.previewUrl || null,

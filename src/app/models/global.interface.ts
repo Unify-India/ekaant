@@ -6,12 +6,22 @@ export interface IMenuOptions {
 }
 
 export interface IUser {
+  bookingPreference?: 'ac' | 'non-ac';
   createdAt: Date;
   email: string;
+  fullAddress?: string;
+  idDocumentUrl?: string;
+  idNumber?: string;
   linkedLibraryId?: string;
   managedLibraryIds?: string[];
   name: string;
-  profileCompleted: boolean;
+  // Fields from IStudentProfile
+  phoneNumber?: string;
+  preferredEndTime?: string;
+
+  preferredStartTime?: string;
+  profileCompleted?: boolean;
+  profileCompletion?: number;
   role: string | 'admin' | 'manager' | 'student';
   subscriptionExpiry: Date;
   uid: string;

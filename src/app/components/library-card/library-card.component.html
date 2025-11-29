@@ -3,9 +3,9 @@
     <div class="badge" [ngClass]="getLibraryTypeClass">
       {{ library.type }}
     </div>
-    <div class="badge" [ngClass]="library.isFull ? 'full' : 'available'">
+    <div class="badge" [ngClass]="isFull ? 'full' : 'available'">
       <span class="dot"></span>
-      {{ library.isFull ? 'Full' : 'Available' }}
+      {{ isFull ? 'Full' : 'Available' }}
     </div>
   </div>
 
@@ -22,7 +22,7 @@
   <ion-card-content>
     <div class="availability">
       <ion-icon name="people-outline"></ion-icon>
-      {{ library.availableSeats }} / {{ library.totalSeats }} seats available
+      {{ availabilityText }}
     </div>
   </ion-card-content>
 
@@ -33,7 +33,7 @@
     </ion-button>
     <ion-button [color]="actionColor" (click)="onActionClick(library)">
       <span>{{ actionLabel }}</span>
-      <ion-icon slot="end" [name]="library.isFull ? 'notifications-outline' : 'arrow-forward'"></ion-icon>
+      <ion-icon slot="end" [name]="isFull ? 'notifications-outline' : 'arrow-forward'"></ion-icon>
     </ion-button>
   </div>
 </ion-card>

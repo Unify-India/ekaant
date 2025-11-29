@@ -37,20 +37,24 @@ export class LibraryCardComponent {
 
   /** readable availability text */
   get availabilityText(): string {
-    return `${this.library.availableSeats} / ${this.library.totalSeats} seats available`;
+    return `${this.library.occupiedSeats} / ${this.library.totalSeats} seats occupied`;
   }
 
   /** derived values for label and type */
+  get isFull(): boolean {
+    return this.library.occupiedSeats >= this.library.totalSeats;
+  }
+
   get actionType(): 'enroll' | 'waitlist' {
-    return this.library.isFull ? 'waitlist' : 'enroll';
+    return this.isFull ? 'waitlist' : 'enroll';
   }
 
   get actionLabel(): string {
-    return this.library.isFull ? 'Waitlist' : 'Enroll';
+    return this.isFull ? 'Waitlist' : 'Enroll';
   }
 
   get actionColor(): string {
-    return this.library.isFull ? 'danger' : 'primary';
+    return this.isFull ? 'danger' : 'primary';
   }
 
   get getLibraryTypeClass(): string {
