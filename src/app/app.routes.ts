@@ -70,14 +70,7 @@ export const routes: Routes = [
     path: 'register-library',
     loadComponent: () => import('./pages/register-library/register-library.page').then((m) => m.RegisterLibraryPage),
   },
-  {
-    path: 'application-form',
-    loadComponent: () => import('./pages/application-form/application-form.page').then((m) => m.ApplicationFormPage),
-  },
-  {
-    path: 'apply-library/:id',
-    loadComponent: () => import('./pages/application-form/application-form.page').then((m) => m.ApplicationFormPage),
-  },
+
   {
     path: 'library-registration-form',
     loadComponent: () =>
