@@ -99,20 +99,25 @@ export class RegisterLibraryPage implements OnInit {
       businessOutline,
       sparklesOutline,
     });
+  }
 
+  ngOnInit() {
     authState(this.auth).subscribe((user) => {
       this.isAuthenticated = !!user;
     });
   }
 
-  ngOnInit() {}
-
   async proceedToRegistration() {
-    this.router.navigate(['/login'], {
-      queryParams: {
-        fromRegistration: 'true',
-        redirectTo: '/library-registration-form',
-      },
-    });
+    // console.info('isAuthenticated:', this.isAuthenticated);
+    if (this.isAuthenticated) {
+      this.router.navigate(['library-registration-form']);
+    } else {
+      this.router.navigate(['/login'], {
+        queryParams: {
+          fromRegistration: 'true',
+          redirectTo: '/library-registration-form',
+        },
+      });
+    }
   }
 }
