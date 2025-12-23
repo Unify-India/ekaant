@@ -1,6 +1,6 @@
 <ion-card class="registration-section-card">
-  <h2>{{ pageTitle }}</h2>
-  <p>{{ pageDescription }}</p>
+  <h2>{{ photosSectionTitle }}</h2>
+  <p>{{ photosSectionDescription }}</p>
 
   <!-- Warning Glass Box -->
   @if (imagesForm.invalid) {
@@ -14,8 +14,6 @@
 
   <!-- Main Content Form -->
   <form [formGroup]="imagesForm">
-    <h3>{{ photosSectionTitle }}</h3>
-    <p>{{ photosSectionDescription }}</p>
 
     <!-- File Upload Area -->
     <div class="section-header">

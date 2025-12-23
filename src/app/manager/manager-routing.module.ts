@@ -15,8 +15,12 @@ const routes: Routes = [
         loadComponent: () => import('./dashboard/dashboard.page').then((m) => m.DashboardPage),
       },
       {
-        path: 'complete-profile',
-        loadComponent: () => import('./complete-profile/complete-profile.page').then((m) => m.CompleteProfilePage),
+        path: 'library-profile',
+        loadComponent: () => import('./library-profile/library-profile.page').then((m) => m.LibraryProfilePage),
+      },
+      {
+        path: 'manager-profile',
+        loadComponent: () => import('./manager-profile/manager-profile.page').then((m) => m.ManagerProfilePage),
       },
       {
         path: 'student-applications',

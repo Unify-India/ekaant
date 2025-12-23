@@ -17,6 +17,10 @@
   }
 }
 
+.ion-margin-left {
+  display: block;
+  -webkit-margin-start: 1rem;
+}
 .char-counter {
   display: block;
   text-align: right;
@@ -28,14 +32,19 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 1rem;
-  background-color: #e9efff;
+  padding: 0.5rem;
   border: 1px solid var(--ion-color-primary-tint);
   border-radius: 12px;
-  margin-top: 2rem;
+  margin-top: 1rem;
 
   ion-icon {
     font-size: 2rem;
     color: var(--ion-color-primary);
   }
+}
+
+ion-note {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--ion-color-dark-tint);
 }

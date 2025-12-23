@@ -11,8 +11,8 @@ const routes: Routes = [
         pathMatch: 'full',
       },
       {
-        path: 'apply-library',
-        loadComponent: () => import('./apply-library/apply-library.page').then((m) => m.ApplyLibraryPage),
+        path: 'application-form/:id',
+        loadComponent: () => import('./application-form/application-form.page').then((m) => m.ApplicationFormPage),
       },
       {
         path: 'browse-libraries',

@@ -2,9 +2,9 @@ The Firebase client config (`apiKey`, `authDomain`, `projectId`, etc.) **is not 
 
 Here’s why:
 
-* That `apiKey` is more of an **identifier** than a secret. Anyone can see it in your app bundle or the browser’s DevTools anyway.
-* Firebase protects access via **Firestore/Storage Security Rules** + Firebase Auth, not by hiding the key.
-* Only the **Admin SDK service account JSON** is a true secret — and since you’re not using it, you’re safe.
+- That `apiKey` is more of an **identifier** than a secret. Anyone can see it in your app bundle or the browser’s DevTools anyway.
+- Firebase protects access via **Firestore/Storage Security Rules** + Firebase Auth, not by hiding the key.
+- Only the **Admin SDK service account JSON** is a true secret — and since you’re not using it, you’re safe.
 
 So you **can** safely commit your `environment.ts` and `environment.prod.ts` configs to GitHub. Many open-source Firebase projects do exactly that.
 
@@ -90,7 +90,7 @@ jobs:
 
 #### 3. Security Trade-off
 
-* If you commit the Firebase config directly: ✅ totally safe, but public.
-* If you inject via GitHub Actions: ✅ keeps your repo clean, but technically still public after deployment (because the built app exposes it).
+- If you commit the Firebase config directly: ✅ totally safe, but public.
+- If you inject via GitHub Actions: ✅ keeps your repo clean, but technically still public after deployment (because the built app exposes it).
 
 Either way, **the real protection is your Firebase Security Rules**.

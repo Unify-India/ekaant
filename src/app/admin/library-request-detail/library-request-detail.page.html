@@ -67,40 +67,46 @@
             fill="outline"
             formControlName="contactPhone"
           ></ion-input>
-          <ion-textarea
-            label="Admin Comments"
-            labelPlacement="floating"
-            fill="outline"
-            formControlName="adminComments"
-            [autoGrow]="true"
-          ></ion-textarea>
-          <ion-input
-            label="Created At"
-            labelPlacement="floating"
-            fill="outline"
-            formControlName="createdAt"
-          ></ion-input>
-          <ion-input
-            label="Updated At"
-            labelPlacement="floating"
-            fill="outline"
-            formControlName="updatedAt"
-          ></ion-input>
+        </div>
+
+        <div class="timestamp-container">
+          <h3 class="ion-color-light">Created At : {{ requestForm.get('createdAt')?.value }}</h3>
+          <h3 class="ion-color-light">Last Updated : {{ requestForm.get('updatedAt')?.value }}</h3>
         </div>
 
         @if (!isViewOnly) {
-        <div class="form-actions">
-          <ion-button fill="outline" color="medium" (click)="cancel()">
-            <ion-icon slot="start" name="close-outline"></ion-icon>
-            Cancel
-          </ion-button>
-          <ion-button color="primary" (click)="update()">
-            <ion-icon slot="start" name="save-outline"></ion-icon>
-            Update
-          </ion-button>
-        </div>
+          <div class="form-actions">
+            <ion-button fill="outline" color="medium" (click)="cancel()">
+              <ion-icon slot="start" name="close-outline"></ion-icon>
+              Cancel
+            </ion-button>
+            <ion-button color="primary" (click)="saveChanges()">
+              <ion-icon slot="start" name="save-outline"></ion-icon>
+              Save Changes
+            </ion-button>
+          </div>
+          @if (currentUserRole === 'admin') {
+            <div class="admin-actions">
+              <ion-button color="danger" (click)="reject()">
+                <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+                Reject
+              </ion-button>
+              <ion-button color="success" (click)="approve()" [disabled]="isApproving">
+                <ion-spinner *ngIf="isApproving" name="crescent"></ion-spinner>
+                <ion-icon *ngIf="!isApproving" slot="start" name="checkmark-circle-outline"></ion-icon>
+                {{ isApproving ? 'Approving...' : 'Approve & Create Library' }}
+              </ion-button>
+            </div>
+          }
         }
       </ion-card-content>
     </ion-card>
+
+    <app-approval-comments
+      *ngIf="requestId"
+      [registrationId]="requestId"
+      [currentUserRole]="currentUserRole"
+      [currentUserId]="currentUserId"
+    ></app-approval-comments>
   </div>
 </ion-content>

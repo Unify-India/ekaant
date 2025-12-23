@@ -4,13 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 @Component({
-  selector: 'app-apply-library',
-  templateUrl: './apply-library.page.html',
-  styleUrls: ['./apply-library.page.scss'],
+  selector: 'app-manager-profile',
+  templateUrl: './manager-profile.page.html',
+  styleUrls: ['./manager-profile.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule],
 })
-export class ApplyLibraryPage implements OnInit {
+export class ManagerProfilePage implements OnInit {
   constructor() {}
 
   ngOnInit() {}

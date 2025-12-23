@@ -35,16 +35,11 @@ export class HostProfileComponent implements OnInit {
 
   constructor() {
     addIcons({ warningOutline, personCircleOutline, shieldCheckmarkOutline });
-
-    // --- LOGIC MOVED FROM ngOnInit TO constructor ---
     this.hostProfileForm = this.lrfService.getFormGroup('hostProfile');
 
-    // Create Signals from FormControls for Reactive Masking
-    const phoneSignal = toSignal(
-      this.hostProfileForm.get('phoneNumber')!.valueChanges,
-      // Use the control's current value as the initial value
-      { initialValue: this.hostProfileForm.get('phoneNumber')!.value },
-    );
+    const phoneSignal = toSignal(this.hostProfileForm.get('phoneNumber')!.valueChanges, {
+      initialValue: this.hostProfileForm.get('phoneNumber')!.value,
+    });
     const maskPhoneSignal = toSignal(this.hostProfileForm.get('maskPhoneNumber')!.valueChanges, {
       initialValue: this.hostProfileForm.get('maskPhoneNumber')!.value,
     });
@@ -55,13 +50,12 @@ export class HostProfileComponent implements OnInit {
       initialValue: this.hostProfileForm.get('maskEmail')!.value,
     });
 
-    // Computed signals are also created here
     this.maskedPhoneNumber = computed(() => {
       const phone = phoneSignal();
       if (!phone || !maskPhoneSignal()) {
         return phone;
       }
-      return phone.length > 4 ? `+91 ******${phone.slice(-4)}` : phone;
+      return phone.length === 10 ? `******${phone.slice(-4)}` : phone;
     });
 
     this.maskedEmail = computed(() => {
@@ -83,7 +77,13 @@ export class HostProfileComponent implements OnInit {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      this.hostProfileForm.patchValue({ profilePhoto: input.files[0], profilePhotoProgress: 0 });
+      const file = input.files[0];
+      const previewUrl = URL.createObjectURL(file);
+      this.hostProfileForm.patchValue({
+        profilePhoto: file,
+        photoURL: previewUrl,
+        profilePhotoProgress: 0,
+      });
     }
   }
 }

@@ -3,7 +3,7 @@
   flex-direction: column;
   height: 100%;
   border-radius: 0.5rem;
-  min-width: 24%;
+  min-width: max(24%, 230px);
   margin: 0;
 
   ion-card-header {

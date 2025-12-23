@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs';
 
 import { AuthService } from './auth/service/auth.service';
 import { IMenuOptions, IUser } from './models/global.interface';
+import { ILibraryState } from './models/library.interface';
 import { LibraryService } from './services/library/library.service';
 import { TranslateConfigService } from './services/translation/translation.service';
 import { UsedIcons } from './shared/core/icons/used-icons';
@@ -81,7 +82,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
         console.warn('Error fetching data from RTDB:', error);
       });
 
-    console.info('isLoggedIn', this.isLoggedIn);
+    // console.info('isLoggedIn', this.isLoggedIn);
   }
 
   ngAfterViewInit() {
@@ -102,13 +103,9 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
           this.appPages = MenuData.adminAppPages;
           break;
         case 'manager': {
-          await this.libraryService.hasLibrary(user);
-          const libraryString = localStorage.getItem('library');
-          const library = libraryString ? JSON.parse(libraryString) : {};
-          if (library.registration === 'registered') {
+          const libraryState: ILibraryState | null = await this.libraryService.getManagerLibraryState(user);
+          if (libraryState?.applicationStatus === 'approved') {
             this.appPages = MenuData.managerAppPages;
-          } else if (library.registration === 'pending') {
-            this.appPages = MenuData.libraryRegistrationPending;
           } else {
             this.appPages = MenuData.libraryRegistrationPending;
           }

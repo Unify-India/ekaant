@@ -1,11 +1,13 @@
-// Custom styling for each amenity checkbox item
+ion-col {
+  padding: 0;
+}
 .amenity-item {
   --border-radius: 12px;
   --border-color: var(--ion-color-light-shade);
   --padding-start: 16px;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  margin-bottom: 12px;
+  margin-bottom: 0.5rem;
   background-color: var(--ion-color-light-tint);
   transition: all 0.2s ease-in-out;
 
@@ -26,11 +28,17 @@
 // Center the prompt at the bottom
 .select-prompt {
   text-align: center;
-  margin-top: 2rem;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 
   ion-icon {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: var(--ion-color-primary);
     margin-bottom: 0.5rem;
+  }
+  ion-note {
+    font-size: 1rem;
   }
 }

@@ -1,0 +1,174 @@
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonSpinner,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonItem,
+  IonInput,
+  IonList,
+  IonButton,
+  IonBackButton,
+  IonButtons,
+  ToastController,
+  IonCheckbox,
+  IonIcon,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  informationCircleOutline,
+  bookOutline,
+  personCircleOutline,
+  personOutline,
+  arrowForwardOutline,
+} from 'ionicons/icons';
+import { Subscription, combineLatest } from 'rxjs';
+import { PriceCardComponent } from 'src/app/components/price-card/price-card.component';
+import { IUser } from 'src/app/models/global.interface';
+import { LibraryService } from 'src/app/services/library/library.service';
+import { UserService } from 'src/app/services/user/user.service';
+import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
+
+@Component({
+  selector: 'app-application-form',
+  templateUrl: './application-form.page.html',
+  styleUrls: ['./application-form.page.scss'],
+  standalone: true,
+  imports: [
+    IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonSpinner,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonItem,
+    IonInput,
+    IonList,
+    IonButton,
+    IonBackButton,
+    IonButtons,
+    CommonModule,
+    FormsModule,
+    PriceCardComponent,
+    IonCheckbox,
+    IonIcon,
+    BaseUiComponents,
+  ],
+})
+export class ApplicationFormPage implements OnInit, OnDestroy {
+  pageTitle = 'Enroll now';
+  totalFee = 0; // Will be calculated based on selected plan
+  reservationFee = 0; // Will be calculated based on selected plan
+
+  confirmInfo = false;
+  acceptTerms = false;
+
+  libraryId: string | null = null;
+  studentProfile: IUser | null = null;
+  libraryDetails: any | null = null;
+  selectedPlan: any | null = null;
+  isLoading = true;
+  private subscription: Subscription = new Subscription();
+
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private userService: UserService,
+    private libraryService: LibraryService,
+    private router: Router,
+    private toastController: ToastController,
+  ) {
+    addIcons({ bookOutline, personOutline, arrowForwardOutline, personCircleOutline, informationCircleOutline });
+  }
+
+  ngOnInit() {
+    this.subscription.add(
+      this.activatedRoute.paramMap.subscribe({
+        next: (params) => {
+          this.libraryId = params.get('id');
+          if (this.libraryId) {
+            this.fetchData(this.libraryId);
+          } else {
+            console.error('Library ID is missing from route parameters.');
+            this.isLoading = false;
+          }
+        },
+      }),
+    );
+  }
+
+  fetchData(libraryId: string) {
+    this.isLoading = true;
+    this.subscription.add(
+      combineLatest([
+        this.userService.getCurrentUserProfile(),
+        this.libraryService.getLibraryById(libraryId),
+      ]).subscribe({
+        next: ([studentProfile, libraryDetails]) => {
+          this.studentProfile = studentProfile;
+          this.libraryDetails = libraryDetails;
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+          this.isLoading = false;
+        },
+      }),
+    );
+  }
+
+  selectPlan(plan: any) {
+    this.selectedPlan = plan;
+    this.totalFee = plan.price; // Assuming the plan object has a 'price' property
+    this.reservationFee = this.totalFee * 0.05; // 5% reservation fee
+  }
+
+  async submitApplication() {
+    if (!this.studentProfile || !this.libraryDetails || !this.selectedPlan) {
+      this.presentToast('Please ensure all details are loaded and a plan is selected.', 'danger');
+      return;
+    }
+
+    const applicationData = {
+      studentId: this.studentProfile.uid,
+      studentName: this.studentProfile.name,
+      studentEmail: this.studentProfile.email,
+      libraryId: this.libraryDetails.id,
+      libraryName: this.libraryDetails.basicInformation?.libraryName,
+      selectedPlan: this.selectedPlan,
+      applicationStatus: 'pending', // Initial status
+    };
+
+    try {
+      await this.libraryService.submitLibraryApplication(applicationData);
+      this.presentToast('Application submitted successfully!', 'success');
+      this.router.navigate(['/student/dashboard']); // Navigate to student dashboard or a confirmation page
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      this.presentToast('Failed to submit application. Please try again.', 'danger');
+    }
+  }
+
+  async presentToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      color: color,
+    });
+    toast.present();
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+}

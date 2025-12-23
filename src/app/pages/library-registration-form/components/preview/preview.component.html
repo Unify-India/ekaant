@@ -1,7 +1,9 @@
-<div class="ion-text-center">
-  <h2>{{ pageTitle }}</h2>
-  <p>{{ pageDescription }}</p>
-</div>
+@if (showRegistrationHeader) {
+  <div class="ion-text-center">
+    <h2>{{ pageTitle }}</h2>
+    <p>{{ pageDescription }}</p>
+  </div>
+}
 
 <!-- Basic Information -->
 @if (getSectionAsFormGroup('basicInformation'); as section) {
@@ -21,7 +23,15 @@
     </div>
     <div class="section-content">
       <h3>{{ section.value.libraryName }}</h3>
-      <p>{{ section.value.fullAddress }}</p>
+      <p>
+        {{ section.value.addressLine1 }}
+        <br />
+        @if (section.value.addressLine2) {
+          {{ section.value.addressLine2 }}
+          <br />
+        }
+        {{ section.value.city }}, {{ section.value.state }} - {{ section.value.zipCode }}
+      </p>
       <ion-chip>{{ section.value.genderCategory }}</ion-chip>
       <ion-chip>{{ section.value.operatingHours }}</ion-chip>
     </div>
@@ -124,14 +134,19 @@
       </ion-button>
     </div>
     <div class="section-content">
-      <h4>{{ section.value.totalSeats }} Total Seats</h4>
+      <h4>
+        <ion-icon name="people-outline"></ion-icon>
+        {{ section.value.totalSeats }} Total Seats
+      </h4>
       <!-- fixme: if no facility range hide h5 also -->
-      <h5>Facility Ranges:</h5>
-      <ul>
-        @for (range of section.value.facilityRanges; track $index) {
-          <li>Seats {{ range.from }}-{{ range.to }}: {{ range.facility }}</li>
-        }
-      </ul>
+      @if (section.value.facilityRanges.length > 0) {
+        <p>Facility Ranges:</p>
+        <ul class="facility-range-list">
+          @for (range of section.value.facilityRanges; track $index) {
+            <li>Seats {{ range.from }}-{{ range.to }}: {{ range.facility }}</li>
+          }
+        </ul>
+      }
     </div>
   </div>
 }
@@ -188,8 +203,8 @@
   </div>
 }
 
-@if (getSectionAsFormGroup('pricingPlans'); as section) {
-  <div class="preview-section" [formGroup]="section">
+@if (getSectionAsFormArray('pricingPlans'); as section) {
+  <div class="preview-section">
     <div class="section-header">
       <h4>
         Pricing Plans
@@ -203,10 +218,10 @@
         Edit
       </ion-button>
     </div>
-    <div class="section-content">
+    <div class="pricing-plans">
       <ion-grid>
         <ion-row>
-          @for (plan of section.value.pricingPlans; track $index) {
+          @for (plan of section.value; track $index) {
             <ion-col size="12" size-md="6">
               <ion-card class="pricing-card-grid">
                 <ion-card-header class="card-header">

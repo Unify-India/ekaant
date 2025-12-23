@@ -3,6 +3,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { AuthService } from 'src/app/auth/service/auth.service';
+import { ApprovalCommentsComponent } from 'src/app/components/approval-comments/approval-comments.component';
+import { IUser } from 'src/app/models/global.interface';
 import { PreviewComponent } from 'src/app/pages/library-registration-form/components/preview/preview.component';
 import { LibraryRegistrationFormService } from 'src/app/pages/library-registration-form/service/library-registration-form.service';
 import { LibraryService } from 'src/app/services/library/library.service';
@@ -12,7 +14,7 @@ import { LibraryService } from 'src/app/services/library/library.service';
   templateUrl: './application-status.page.html',
   styleUrls: ['./application-status.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, PreviewComponent, RouterModule],
+  imports: [IonicModule, CommonModule, PreviewComponent, RouterModule, ApprovalCommentsComponent],
 })
 export class ApplicationStatusPage implements OnInit {
   private authService = inject(AuthService);
@@ -21,32 +23,36 @@ export class ApplicationStatusPage implements OnInit {
 
   isLoading = true;
   application: any;
+  currentUserRole: 'admin' | 'manager' = 'manager';
+  currentUserId!: string;
 
   ngOnInit() {
-    this.loadApplicationStatus();
-  }
-
-  loadApplicationStatus() {
-    this.isLoading = true;
     const user = this.authService.getCurrentUser();
     if (user) {
-      this.libraryService.getLibraryRegistration(user.uid).subscribe({
-        next: (data) => {
-          this.application = data;
-          if (data) {
-            this.lrfService.loadRegistrationData(data);
-            this.lrfService.setEditMode(true, data.id);
-          }
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error fetching application status:', err);
-          this.isLoading = false;
-        },
-      });
+      this.currentUserId = user.uid;
+      this.loadApplicationStatus(user.uid);
     } else {
       this.isLoading = false;
+      console.log('No user found, cannot load application status.');
     }
+  }
+
+  loadApplicationStatus(userId: string) {
+    this.isLoading = true;
+    this.libraryService.getLibraryRegistration(userId).subscribe({
+      next: (data) => {
+        this.application = data;
+        if (data) {
+          this.lrfService.loadRegistrationData(data);
+          this.lrfService.setEditMode(true, data.id);
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error fetching application status:', err);
+        this.isLoading = false;
+      },
+    });
   }
 
   getStatusClass(status: string): string {

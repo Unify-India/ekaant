@@ -78,7 +78,7 @@ export class LibraryRegistrationFormPage implements OnInit {
   sections = this.lrfService.steps;
 
   ngOnInit() {
-    console.log('Library Registration Form initialized');
+    // console.log('Library Registration Form initialized');
     if (!this.lrfService.editMode) {
       this.draftService.loadDraft(this.masterForm).catch((e) => {
         console.error('Failed to load draft', e);

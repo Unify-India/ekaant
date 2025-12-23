@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="content">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Libraries Near You</ion-title>
@@ -34,16 +34,18 @@
       </div>
     </div>
   </section>
-  <div class="ion-padding">
+  <div class="library-card-container ion-padding">
     <div class="libraries-grid">
       @for (library of libraries; track $index) {
-      <app-library-card
-        class="no-padding"
-        [library]="library"
-        (action)="handleLibraryAction($event)"
-      ></app-library-card>
+        <app-library-card
+          class="no-padding"
+          [library]="library"
+          (action)="handleLibraryAction($event)"
+        ></app-library-card>
       }
     </div>
   </div>
-  <app-footer></app-footer>
+  <div class="footer-container">
+    <app-footer></app-footer>
+  </div>
 </ion-content>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, Input } from '@angular/core';
 import { FormGroup, AbstractControl, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
@@ -30,6 +30,7 @@ import { LibraryRegistrationFormService } from '../../service/library-registrati
   imports: [IonicModule, CommonModule, ReactiveFormsModule],
 })
 export class PreviewComponent implements OnInit {
+  @Input() showRegistrationHeader = true;
   lrfService = inject(LibraryRegistrationFormService);
   private router = inject(Router);
   public mainForm!: FormGroup;
@@ -97,6 +98,9 @@ export class PreviewComponent implements OnInit {
   }
   getSectionAsFormGroup(name: string): FormGroup {
     return this.mainForm.get(name) as FormGroup;
+  }
+  getSectionAsFormArray(name: string): FormArray {
+    return this.mainForm.get(name) as FormArray;
   }
   asFormArray(control: AbstractControl | null): FormArray {
     return control as FormArray;

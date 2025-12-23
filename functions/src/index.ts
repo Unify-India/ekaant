@@ -1,19 +1,57 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import * as logger from 'firebase-functions/logger';
+import * as functionsV1 from 'firebase-functions/v1'; // For V1 auth triggers
 
-import * as logger from "firebase-functions/logger";
-import {onRequest} from "firebase-functions/v2/https";
+// This file is the main entrypoint for all Firebase Functions.
+// We import functions from their individual files and export them here,
+// grouped by feature, to ensure they are discovered and deployed by Firebase.
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+// Auth Triggers Logic
+import { onUserSignupLogic } from './auth/onUserSignup';
+import { onUserDeleteLogic } from './auth/onUserDelete';
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// Registration Callable Functions
+import { approveLibrary } from './registration/approveLibrary';
+import { rejectLibrary } from './registration/rejectLibrary';
+import { libraryRegistrationRequest } from './registration/libraryRegistrationRequest';
+
+// Booking Triggers
+import { transferSeatOnCheckout } from './booking/transferSeatOnCheckout';
+
+// Booking Callables
+import { getLibraryConfig } from './booking/getLibraryConfig';
+import { getAvailableSlots } from './booking/getAvailableSlots';
+import { allocateSeat } from './booking/allocateSeat';
+import { cancelBooking } from './booking/cancelBooking';
+import { createSubscription } from './booking/createSubscription';
+
+// Uploads
+import { getSignedUploadUrl } from './uploads/getSignedUploadUrl';
+
+
+logger.info('Functions cold start');
+
+// Export V1 Auth Triggers (as V2 does not directly support them yet)
+export const authOnUserSignup = functionsV1.auth.user().onCreate(onUserSignupLogic);
+export const authOnUserDelete = functionsV1.auth.user().onDelete(onUserDeleteLogic);
+
+// Export V1 Booking Triggers
+export const bookingOnSeatCheckout = transferSeatOnCheckout;
+
+// Export V2 Callable Functions
+export const registration = {
+  approveLibrary: approveLibrary,
+  rejectLibrary: rejectLibrary,
+  libraryRegistrationRequest: libraryRegistrationRequest,
+};
+
+export const booking = {
+  getLibraryConfig: getLibraryConfig,
+  getAvailableSlots: getAvailableSlots,
+  allocateSeat: allocateSeat,
+  cancelBooking: cancelBooking,
+  createSubscription: createSubscription,
+};
+
+export const uploads = {
+  getSignedUploadUrl: getSignedUploadUrl,
+};

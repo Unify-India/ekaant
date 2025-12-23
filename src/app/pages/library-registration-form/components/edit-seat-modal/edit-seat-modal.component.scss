@@ -1,0 +1,14 @@
+ion-content {
+  display: block;
+  min-height: 300px;
+  // max-height: 500px;
+  overflow-y: auto;
+}
+
+p {
+  margin: 0.5rem auto;
+}
+
+ion-footer {
+  padding: 0 1rem;
+}

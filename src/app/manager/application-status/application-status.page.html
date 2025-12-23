@@ -21,25 +21,26 @@
         <ion-card-subtitle>Submitted on: {{ application.createdAt?.toDate() | date: 'medium' }}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
-        <ion-item lines="none">
-          <ion-label>
-            <h2><strong>Status</strong></h2>
-            <p [ngClass]="getStatusClass(application.applicationStatus)">
-              {{ application.applicationStatus | titlecase }}
-            </p>
-          </ion-label>
-        </ion-item>
-        <ion-item *ngIf="application.adminComments" lines="none">
-          <ion-label>
-            <h2><strong>Admin Comments</strong></h2>
-            <p class="admin-comments">{{ application.adminComments }}</p>
-          </ion-label>
-        </ion-item>
+        <h2>
+          <strong>Status:</strong>
+          <span [ngClass]="getStatusClass(application.applicationStatus)">
+            {{ application.applicationStatus | titlecase }}
+          </span>
+        </h2>
       </ion-card-content>
     </ion-card>
 
+    <div class="approval-comments">
+      <app-approval-comments
+        *ngIf="application.id"
+        [registrationId]="application.id"
+        [currentUserRole]="currentUserRole"
+        [currentUserId]="currentUserId"
+      ></app-approval-comments>
+    </div>
+
     <!-- Application Preview -->
-    <app-preview></app-preview>
+    <app-preview [showRegistrationHeader]="false"></app-preview>
   </div>
 
   <div *ngIf="!isLoading && !application">

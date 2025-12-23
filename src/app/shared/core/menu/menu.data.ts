@@ -30,7 +30,8 @@ export class MenuData {
     { title: 'Notifications', url: 'manager/notifications', icon: 'notifications', color: 'primary' },
     { title: 'Reports', url: 'manager/performance-report', icon: 'stats-chart', color: 'tertiary' },
     { title: 'Campaign', url: 'manager/campaign', icon: 'megaphone', color: 'warning' },
-    { title: 'Profile', url: 'manager/complete-profile', icon: 'person', color: 'secondary' },
+    { title: 'Library Profile', url: 'manager/library-profile', icon: 'business', color: 'secondary' },
+    { title: 'My Profile', url: 'manager/manager-profile', icon: 'person', color: 'secondary' },
   ];
 
   public static studentAppPages = [

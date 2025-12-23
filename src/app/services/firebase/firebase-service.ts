@@ -22,7 +22,7 @@ export class FirebaseService {
         const host = url.hostname;
         const port = Number(url.port) || environment.ports?.firestore || 9100;
         connectFirestoreEmulator(this.firestore, host, port);
-        console.log('FirebaseService: connected Firestore to emulator at', host + ':' + port);
+        // console.log('FirebaseService: connected Firestore to emulator at', host + ':' + port);
       }
     } catch (e) {
       // ignore emulator connection errors

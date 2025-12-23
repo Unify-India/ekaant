@@ -2,10 +2,12 @@
   <h2>{{ pageTitle }}</h2>
   <p>{{ subTitle }}</p>
 
-  <div *ngIf="seatManagementForm.invalid && seatManagementForm.touched" class="warning-glass-box ion-margin-bottom">
-    <ion-icon name="warning-outline"></ion-icon>
-    <ion-note>{{ completionWarning }}</ion-note>
-  </div>
+  @if (seatManagementForm.invalid && seatManagementForm.touched) {
+    <div class="warning-glass-box ion-margin-bottom">
+      <ion-icon name="warning-outline"></ion-icon>
+      <ion-note>{{ completionWarning }}</ion-note>
+    </div>
+  }
 
   <form [formGroup]="seatManagementForm">
     <div class="outlined-box">
@@ -17,93 +19,117 @@
           <ion-button (click)="decrementSeats()" [disabled]="totalSeats() <= 0" fill="clear" color="danger">
             <ion-icon name="remove-outline" slot="icon-only"></ion-icon>
           </ion-button>
-          <!-- FIXME: REMOVE AQUA COLOR AND MAKE TEXT CENTER -->
-          <ion-input type="number" formControlName="totalSeats" class="seat-count-input"></ion-input>
-
+          <ion-input type="number" formControlName="totalSeats"></ion-input>
           <ion-button (click)="incrementSeats()" color="success" fill="clear">
             <ion-icon name="add-outline" slot="icon-only"></ion-icon>
           </ion-button>
         </div>
       </div>
-      <ion-note *ngIf="totalSeats() > 0">{{ seatsHelperText(totalSeats()) }}</ion-note>
+      @if (totalSeats() > 0) {
+        <ion-note>{{ seatsHelperText(totalSeats()) }}</ion-note>
+      }
     </div>
 
-    <div *ngIf="totalSeats() > 0" class="outlined-box">
-      <h4>{{ facilityRangesTitle }}</h4>
-      <p class="description">{{ facilityRangesDescription }}</p>
-      <!-- Fixme: Add range button should be in line with heading and description , floating towards right -->
-      <div formArrayName="facilityRanges">
-        <div
-          *ngFor="let rangeGroup of facilityRanges.controls; let i = index"
-          [formGroupName]="i"
-          class="assigned-range-display"
-        >
-          <span>
-            <ion-icon name="checkmark-circle" class="success"></ion-icon>
-            Seats {{ rangeGroup.get('from')?.value }} to {{ rangeGroup.get('to')?.value }}:
-            {{ getFacilityLabel(rangeGroup.get('facility')?.value) }}
-          </span>
-          <ion-buttons>
-            <ion-button fill="clear" color="medium">
-              <ion-icon name="create-outline"></ion-icon>
-            </ion-button>
-            <ion-button fill="clear" color="danger" (click)="removeFacilityRange(i)">
-              <ion-icon name="trash-outline"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-        </div>
-      </div>
-      <div [formGroup]="newRangeForm" class="ion-margin-top">
-        <div class="range-row">
-          <ion-label>{{ seatsLabel }}</ion-label>
-
-          <ion-item fill="outline" class="small-input">
-            <ion-input type="number" formControlName="from"></ion-input>
-          </ion-item>
-
-          <ion-label>{{ toLabel }}</ion-label>
-
-          <ion-item fill="outline" class="small-input">
-            <ion-input
-              type="number"
-              formControlName="to"
-              [min]="newRangeForm.value.from"
-              [max]="totalSeatsControl.value"
-            ></ion-input>
-          </ion-item>
-
-          <ion-item fill="outline">
-            <ion-select placeholder="Select Facility" formControlName="facility" multiple>
-              <ion-select-option *ngFor="let option of facilityOptions" [value]="option.value">
-                {{ option.label }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
-          <!-- Fixme: here we should have green save button with outline just like we have edit/delete button above. Add range button should be on top as described in above fix me -->
-          <ion-button (click)="addFacilityRange()" expand="block" fill="solid">
-            <ion-icon slot="start" name="add-outline"></ion-icon>
-            {{ addRangeButtonText }}
+    @if (totalSeats() > 0) {
+      <div class="outlined-box">
+        <div class="facility-range-header">
+          <div class="facility-range-title">
+            <h4>{{ facilityRangesTitle }}</h4>
+            <p class="description">{{ facilityRangesDescription }}</p>
+          </div>
+          <ion-button fill="clear">
+            <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
           </ion-button>
         </div>
-      </div>
-    </div>
 
-    <div *ngIf="totalSeats() > 0" class="outlined-box">
-      <h4>{{ individualSeatConfigTitle }}</h4>
-      <p class="description">{{ individualSeatConfigDescription }}</p>
-      <!-- fixme: check why every 3rd seat is already has checkmark option -->
-      <div class="seat-grid">
-        <ng-container *ngFor="let seatNum of seatNumbers()">
-          <ion-button
-            (click)="selectIndividualSeat(seatNum)"
-            [class.selected]="selectedIndividualSeat() === seatNum"
-            [class.has-config]="hasSeatConfig(seatNum)"
-          >
-            <ion-icon [name]="hasSeatConfig(seatNum) ? 'checkmark-circle' : 'cog-outline'"></ion-icon>
-            {{ seatNum }}
-          </ion-button>
-        </ng-container>
+        <div formArrayName="facilityRanges">
+          @for (rangeGroup of facilityRanges.controls; track rangeGroup; let i = $index) {
+            <div [formGroupName]="i" class="assigned-range-display">
+              <span>
+                <ion-icon name="checkmark-circle" class="success"></ion-icon>
+                Seats {{ rangeGroup.get('from')?.value }} to {{ rangeGroup.get('to')?.value }}:
+                {{ getFacilityLabel(rangeGroup.get('facility')?.value) }}
+              </span>
+              <ion-buttons>
+                <ion-button fill="clear" color="medium">
+                  <ion-icon name="create-outline"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" (click)="removeFacilityRange(i)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </div>
+          }
+        </div>
+
+        <div [formGroup]="newRangeForm" class="ion-margin-top">
+          <div class="range-row">
+            <div class="inline-flex">
+              <ion-input
+                type="number"
+                label="From"
+                fill="outline"
+                labelPlacement="stacked"
+                formControlName="from"
+                [max]="totalSeats()"
+              ></ion-input>
+
+              <ion-input
+                type="number"
+                label="To"
+                fill="outline"
+                labelPlacement="stacked"
+                formControlName="to"
+                [min]="newRangeForm.get('from')?.value"
+                [max]="totalSeats()"
+              ></ion-input>
+            </div>
+
+            <div class="inline-flex">
+              <ion-select
+                label="Facilities"
+                labelPlacement="stacked"
+                fill="outline"
+                placeholder="Select"
+                formControlName="facility"
+                multiple
+              >
+                @for (option of facilityOptions; track option.value) {
+                  <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
+                }
+              </ion-select>
+
+              <ion-button (click)="addFacilityRange()" fill="solid" color="success" [disabled]="newRangeForm.invalid">
+                <ion-icon slot="start" name="save-outline"></ion-icon>
+                Save Facility
+              </ion-button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    }
+
+    @if (totalSeats() > 0) {
+      <div class="outlined-box">
+        <h4>{{ individualSeatConfigTitle }}</h4>
+        <p class="description">{{ individualSeatConfigDescription }}</p>
+        <div class="seat-grid">
+          @for (seatNum of seatNumbers(); track seatNum) {
+            <ion-button
+              (click)="selectIndividualSeat(seatNum)"
+              [class.selected]="selectedIndividualSeat() === seatNum"
+              [class.has-config]="hasSeatConfig(seatNum)"
+              color="light"
+            >
+              <ion-icon
+                [name]="hasSeatConfig(seatNum) ? 'checkmark-circle' : 'cog-outline'"
+                [color]="hasSeatConfig(seatNum) ? 'success' : 'primary'"
+              ></ion-icon>
+              {{ seatNum }}
+            </ion-button>
+          }
+        </div>
+      </div>
+    }
   </form>
 </ion-card>

@@ -14,81 +14,113 @@
     </ion-toolbar>
   </ion-header>
   <ion-content class="ion-padding">
-    <!-- Section: Profile Details -->
-    <ion-card class="profile-card ion-margin-bottom">
-      <ion-card-header>
-        <ion-card-title>Personal Details</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="form-group">
-          <ion-input
-            label="Full Name"
-            label-placement="floating"
-            fill="outline"
-            placeholder="Enter Full Name"
-          ></ion-input>
-          <ion-input
-            label="Phone Number"
-            label-placement="floating"
-            fill="outline"
-            placeholder="e.g., 9876543210"
-          ></ion-input>
-
-          <ion-input
-            label="Full Address"
-            label-placement="floating"
-            fill="outline"
-            placeholder="Enter text"
-          ></ion-input>
-        </div>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Section: ID Information -->
-    <ion-card class="profile-card ion-margin-bottom">
-      <ion-card-header>
-        <ion-card-title>ID Information</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-input
-          label="ID Number (Aadhaar, etc.)"
-          label-placement="floating"
-          fill="outline"
-          placeholder="Enter your ID number"
-        ></ion-input>
-
-        <div class="upload-box" (click)="fileInput.click()">
-          <ion-icon name="cloud-upload-outline"></ion-icon>
-          <span>Click to upload or drag and drop</span>
-          <input #fileInput type="file" hidden />
-        </div>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Section: Booking Preferences -->
-    <ion-card class="profile-card ion-margin-bottom">
-      <ion-card-header>
-        <ion-card-title>Booking Preferences</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-radio-group value="end">
-          <ion-radio value="end" labelPlacement="end">AC</ion-radio>
-          <ion-radio value="end" labelPlacement="end">Non-AC</ion-radio>
-        </ion-radio-group>
-
-        <div class="time-picker">
-          <ion-input label="Start Time" label-placement="floating" fill="outline" type="time"></ion-input>
-          <ion-input label="End Time" label-placement="floating" fill="outline" type="time"></ion-input>
-        </div>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Save Button -->
-    <div class="ion-text-center">
-      <ion-button expand="block" color="primary">
-        <ion-icon name="save-outline" slot="start"></ion-icon>
-        Save Profile
-      </ion-button>
+    <div class="completion-meter ion-margin-bottom">
+      <ion-label>Profile Completion</ion-label>
+      <ion-progress-bar [value]="profileCompletion / 100"></ion-progress-bar>
+      <ion-text>{{ profileCompletion }}%</ion-text>
     </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+      <!-- Section: Profile Details -->
+      <ion-card class="profile-card ion-margin-bottom">
+        <ion-card-header>
+          <ion-card-title>Personal Details</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="form-group">
+            <ion-input
+              label="Full Name"
+              label-placement="floating"
+              fill="outline"
+              placeholder="Enter Full Name"
+              formControlName="name"
+            ></ion-input>
+            <ion-input
+              label="Email"
+              label-placement="floating"
+              fill="outline"
+              placeholder="Enter Email"
+              formControlName="email"
+              [disabled]="true"
+            ></ion-input>
+            <ion-input
+              label="Phone Number"
+              label-placement="floating"
+              fill="outline"
+              placeholder="e.g., 9876543210"
+              formControlName="phoneNumber"
+            ></ion-input>
+
+            <ion-input
+              label="Full Address"
+              label-placement="floating"
+              fill="outline"
+              placeholder="Enter text"
+              formControlName="fullAddress"
+            ></ion-input>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Section: ID Information -->
+      <ion-card class="profile-card ion-margin-bottom">
+        <ion-card-header>
+          <ion-card-title>ID Information</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-input
+            label="ID Number (Aadhaar, etc.)"
+            label-placement="floating"
+            fill="outline"
+            placeholder="Enter your ID number"
+            formControlName="idNumber"
+          ></ion-input>
+
+          <div class="upload-box" (click)="fileInput.click()">
+            <ion-icon name="cloud-upload-outline"></ion-icon>
+            <span>Click to upload or drag and drop</span>
+            <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Section: Booking Preferences -->
+      <ion-card class="profile-card ion-margin-bottom">
+        <ion-card-header>
+          <ion-card-title>Booking Preferences</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-radio-group value="end" formControlName="bookingPreference">
+            <ion-radio value="ac" labelPlacement="end">AC</ion-radio>
+            <ion-radio value="non-ac" labelPlacement="end">Non-AC</ion-radio>
+          </ion-radio-group>
+
+          <div class="time-picker">
+            <ion-input
+              label="Start Time"
+              label-placement="floating"
+              fill="outline"
+              type="time"
+              formControlName="preferredStartTime"
+            ></ion-input>
+            <ion-input
+              label="End Time"
+              label-placement="floating"
+              fill="outline"
+              type="time"
+              formControlName="preferredEndTime"
+            ></ion-input>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Save Button -->
+      <div class="ion-text-center">
+        <ion-button expand="block" color="primary" type="submit" [disabled]="!profileForm.valid">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Save Profile
+        </ion-button>
+      </div>
+    </form>
   </ion-content>
 </ion-content>
