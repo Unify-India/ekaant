@@ -33,11 +33,9 @@ export class AuthService {
 
   constructor() {
     this.loadUserFromSession();
-    // Connect Auth emulator per-service if configured (keeps main.ts unchanged)
     try {
       if (environment.useEmulators && environment.emulatorUrls?.auth) {
         connectAuthEmulator(this.auth, environment.emulatorUrls.auth, { disableWarnings: true });
-        console.log('AuthService: connected to Auth emulator at', environment.emulatorUrls.auth);
       }
     } catch (e) {
       console.warn('AuthService: failed to connect to Auth emulator', e);
@@ -150,6 +148,30 @@ export class AuthService {
     return !querySnapshot.empty;
   }
 
+  private async _getInitialUserStatus(role: string): Promise<{ verified: boolean; autoLogin: boolean }> {
+    const isEmulator = !!environment?.useEmulators;
+    let verified = false;
+    let autoLogin = false;
+
+    if (isEmulator) {
+      verified = true;
+      autoLogin = true;
+    } else {
+      if (role === 'student') {
+        verified = true;
+        autoLogin = true;
+      } else if (role === 'manager') {
+        verified = false; // Still requires admin approval
+        autoLogin = true; // Auto-login for managers
+      } else if (role === 'admin') {
+        const adminExists = await this.checkAdminExists();
+        verified = !adminExists;
+        autoLogin = !adminExists;
+      }
+    }
+    return { verified, autoLogin };
+  }
+
   async registerWithEmailAndPassword(email: string, password: string, role: string, name: string): Promise<void> {
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
@@ -157,43 +179,36 @@ export class AuthService {
       // By default, follow production rules. When running against the Firebase emulator
       // we simplify the flow for developers and auto-verify / auto-login accounts so
       // manager/admin flows can be tested without requiring admin approval.
-      const isEmulator = !!environment?.useEmulators;
-
-      let verified = false;
-      let autoLogin = false;
-
-      if (isEmulator) {
-        // In emulator mode, mark user as verified and allow auto-login for all roles
-        verified = true;
-        autoLogin = true;
-      } else {
-        // Production behavior: enforce verification rules based on role
-        if (role === 'student') {
-          verified = true;
-          autoLogin = true;
-        } else if (role === 'manager') {
-          verified = false; // Requires admin approval
-          autoLogin = false;
-        } else if (role === 'admin') {
-          const adminExists = await this.checkAdminExists();
-          verified = !adminExists;
-          autoLogin = !adminExists;
-        }
-      }
+      const { verified, autoLogin } = await this._getInitialUserStatus(role);
 
       // Save user data to Firestore
       await this.saveUserData(uid, email, role, name, verified);
 
       if (autoLogin) {
-        this.toaster.showToast('Registration successful!', 'success');
+        if (verified) {
+          this.toaster.showToast('Registration successful!', 'success');
+        } else {
+          // This case applies to managers who auto-login but are unverified
+          if (role === 'manager') {
+            this.toaster.showToast(
+              'Registration successful! Your account is pending admin approval. Please complete your library registration.',
+              'success',
+            );
+          } else if (role === 'admin') {
+            // This case applies to the first admin in emulator mode
+            this.toaster.showToast('Registration successful! Your admin account is pending approval.', 'success');
+          }
+        }
         // Auth state listener will handle the rest (and in emulator the user is active)
       } else {
+        // This 'else' block now only applies to non-first admins in production
         if (role === 'admin') {
           this.toaster.showToast('Registration successful! Your admin account is pending approval.', 'success');
         } else {
-          this.toaster.showToast('Registration successful! Your account is pending admin approval.', 'success');
+          // Fallback, though this path should ideally not be hit with current _getInitialUserStatus logic
+          this.toaster.showToast('Registration successful! Your account is pending approval.', 'success');
         }
-        // Only sign out and redirect when not auto-logging in (production pending flows)
+        // Only sign out and redirect when autoLogin is false (production pending flows for non-first admins)
         await this.auth.signOut();
         this.router.navigate(['/login']);
       }
@@ -299,22 +314,35 @@ export class AuthService {
       this.toaster.showToast(`${provider} login successful!`, 'success');
     } else {
       // New user - create account with selected role
-      let verified = false;
-
-      if (role === 'student') {
-        verified = true;
-      } else if (role === 'manager') {
-        verified = false; // Requires admin approval
-      } else if (role === 'admin') {
-        const adminExists = await this.checkAdminExists();
-        verified = !adminExists;
-      }
+      const { verified, autoLogin } = await this._getInitialUserStatus(role);
 
       await this.saveUserData(uid, user.email!, role, user.displayName || 'User', verified);
 
-      if (verified) {
-        this.toaster.showToast(`${provider} registration successful!`, 'success');
+      if (autoLogin) {
+        // Use autoLogin here
+        if (verified) {
+          this.toaster.showToast(`${provider} registration successful!`, 'success');
+        } else {
+          // This applies to managers in production and potentially first admin in emulator mode
+          if (role === 'manager') {
+            this.toaster.showToast(
+              `${provider} registration successful! Your account is pending approval. Please complete your library registration.`,
+              'success',
+            );
+          } else if (role === 'admin') {
+            // First admin in emulator or other unverified auto-login scenarios
+            this.toaster.showToast(
+              `${provider} registration successful! Your admin account is pending approval.`,
+              'success',
+            );
+          } else {
+            // Default pending message for other roles if they auto-login but are unverified
+            this.toaster.showToast(`${provider} registration successful! Your account is pending approval.`, 'success');
+          }
+        }
+        // User remains logged in
       } else {
+        // This 'else' block now only applies to non-first admins in production
         this.toaster.showToast(`${provider} registration successful! Your account is pending approval.`, 'success');
         await this.auth.signOut();
         this.router.navigate(['/login']);
@@ -372,7 +400,9 @@ export class AuthService {
   }
 
   hasValidSubscription(): boolean {
-    if (!this.currentUser?.subscriptionExpiry) return false;
+    if (!this.currentUser?.subscriptionExpiry) {
+      return false;
+    }
     return new Date(this.currentUser.subscriptionExpiry) > new Date();
   }
 
