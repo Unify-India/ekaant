@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+I<ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/student/dashboard"></ion-back-button>
@@ -8,130 +8,142 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div *ngIf="isLoading" class="ion-text-center ion-padding">
-    <ion-spinner name="crescent"></ion-spinner>
-    <p>Loading application form...</p>
-  </div>
-
-  <div *ngIf="!isLoading && studentProfile && libraryDetails" id="content">
-    <!-- Header Icon + Title -->
-    <div class="header ion-padding ion-margin">
-      <div class="blue-violet-gradient icon-container">
-        <ion-icon name="book-outline" size="large"></ion-icon>
-      </div>
-      <h2 class="section-title">Apply for Membership at {{ libraryDetails.basicInformation?.libraryName }}</h2>
-      <p class="section-subtitle">
-        Your information is pre-filled from your profile. Please review it, select a plan, and confirm to apply.
-      </p>
+  @if (isLoading) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading application form...</p>
     </div>
-
-    <div class="info-card ion-padding ion-margin">
-      <div class="prefill-info">
-        <ion-icon color="primary" name="person-outline"></ion-icon>
-        <p>Information pre-filled from your profile. Need to update it?</p>
+  } @else if (studentProfile && libraryDetails) {
+    <div id="content">
+      <!-- Header Icon + Title -->
+      <div class="header ion-padding ion-margin">
+        <div class="blue-violet-gradient icon-container">
+          <ion-icon name="book-outline" size="large"></ion-icon>
+        </div>
+        <h2 class="section-title">Apply for Membership at {{ libraryDetails.basicInformation?.libraryName }}</h2>
+        <p class="section-subtitle">
+          Your information is pre-filled from your profile. Please review it, select a plan, and confirm to apply.
+        </p>
       </div>
-      <div class="action-btn-container">
-        <ion-button color="primary" routerLink="/student/profile">Update Profile</ion-button>
+
+      <div class="info-card ion-padding ion-margin">
+        <div class="prefill-info">
+          <ion-icon color="primary" name="person-outline"></ion-icon>
+          <p>Information pre-filled from your profile. Need to update it?</p>
+        </div>
+        <div class="action-btn-container">
+          <ion-button color="primary" routerLink="/student/profile">Update Profile</ion-button>
+        </div>
       </div>
-    </div>
 
-    <section class="membership-form">
-      <!-- Student Details -->
-      <ion-card class="ion-margin">
-        <ion-card-header>
-          <ion-card-title>1. Your details</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <div class="form-group">
-            <ion-input
-              label="Full Name"
-              label-placement="floating"
-              fill="outline"
-              [value]="studentProfile.name"
-              readonly
-            ></ion-input>
-            <ion-input
-              label="Email Address"
-              label-placement="floating"
-              fill="outline"
-              [value]="studentProfile.email"
-              readonly
-            ></ion-input>
-            <ion-input
-              label="Phone Number"
-              label-placement="floating"
-              fill="outline"
-              [value]="studentProfile.phoneNumber"
-              readonly
-            ></ion-input>
-          </div>
-        </ion-card-content>
-      </ion-card>
+      <section class="membership-form">
+        <!-- Student Details -->
+        <ion-card class="ion-margin">
+          <ion-card-header>
+            <ion-card-title>1. Your details</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="form-group">
+              <ion-input
+                label="Full Name"
+                label-placement="floating"
+                fill="outline"
+                [value]="studentProfile.name"
+                readonly
+              ></ion-input>
+              <ion-input
+                label="Email Address"
+                label-placement="floating"
+                fill="outline"
+                [value]="studentProfile.email"
+                readonly
+              ></ion-input>
+              <ion-input
+                label="Phone Number"
+                label-placement="floating"
+                fill="outline"
+                [value]="studentProfile.phoneNumber"
+                readonly
+              ></ion-input>
+            </div>
+          </ion-card-content>
+        </ion-card>
 
-      <!-- Pricing Plans -->
-      <ion-card class="ion-margin">
-        <ion-card-header>
-          <ion-card-title>2. Select your plan</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-list *ngIf="libraryDetails.pricingPlans && libraryDetails.pricingPlans.length > 0">
-            <ion-item *ngFor="let plan of libraryDetails.pricingPlans" (click)="selectPlan(plan)" class="plan-item" [class.selected]="selectedPlan?.id === plan.id">
-              <app-price-card
-                [pricing]="plan"
-              ></app-price-card>
+        <!-- Pricing Plans -->
+        <ion-card class="ion-margin">
+          <ion-card-header>
+            <ion-card-title>2. Select your plan</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            @if (libraryDetails.pricingPlans && libraryDetails.pricingPlans.length > 0) {
+              <ion-list>
+                @for (plan of libraryDetails.pricingPlans; track plan.id) {
+                  <ion-item (click)="selectPlan(plan)" class="plan-item" [class.selected]="selectedPlan?.id === plan.id">
+                    <app-price-card [pricing]="plan"></app-price-card>
+                  </ion-item>
+                }
+              </ion-list>
+            } @else {
+              <p class="ion-padding">No pricing plans are available for this library at the moment.</p>
+            }
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Confirmation -->
+        <ion-card class="confirmation-card ion-margin">
+          <ion-card-header>
+            <ion-card-title>
+              <strong>3. Confirmation</strong>
+            </ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            @if (selectedPlan) {
+              <div class="fee-summary">
+                <div class="fee-row">
+                  <span>Total Fee ({{ selectedPlan.name }})</span>
+                  <strong class="fee-amount">₹{{ totalFee | number: '1.2-2' }}</strong>
+                </div>
+                <div class="fee-row">
+                  <span>Reservation Fee (5%)</span>
+                  <strong class="fee-amount highlight">₹{{ reservationFee | number: '1.2-2' }}</strong>
+                </div>
+              </div>
+            }
+
+            <ion-item lines="none" class="checkbox-item">
+              <ion-checkbox [(ngModel)]="confirmInfo" labelPlacement="end" aria-label="Confirm information accuracy">
+                I confirm that all information provided is accurate and up to date.
+              </ion-checkbox>
             </ion-item>
-          </ion-list>
-          <p *ngIf="!libraryDetails.pricingPlans || libraryDetails.pricingPlans.length === 0" class="ion-padding">
-            No pricing plans are available for this library at the moment.
-          </p>
-        </ion-card-content>
+
+            <ion-item lines="none" class="checkbox-item">
+              <ion-checkbox [(ngModel)]="acceptTerms" labelPlacement="end" aria-label="Accept terms and conditions">
+                I accept the <a routerLink="/terms" class="link">Terms and Conditions</a> and
+                <a routerLink="/privacy-policy" class="link">Privacy Policy</a>.
+              </ion-checkbox>
+            </ion-item>
+
+            <ion-button
+              (click)="submitApplication()"
+              expand="block"
+              shape="round"
+              [disabled]="!confirmInfo || !acceptTerms || !selectedPlan"
+              class="proceed-btn"
+            >
+              Submit Application
+              <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </section>
+    </div>
+  } @else {
+    <div>
+      <ion-card class="ion-margin ion-padding">
+        <ion-card-title>Error</ion-card-title>
+        <p>Could not load the application form. Please go back and try again.</p>
       </ion-card>
-
-      <!-- Confirmation -->
-      <ion-card class="confirmation-card ion-margin">
-        <ion-card-header>
-          <ion-card-title>
-            <strong>3. Confirmation</strong>
-          </ion-card-title>
-        </ion-card-header>
-
-        <ion-card-content>
-          <div class="fee-summary" *ngIf="selectedPlan">
-            <div class="fee-row">
-              <span>Total Fee ({{ selectedPlan.name }})</span>
-              <strong class="fee-amount">₹{{ totalFee | number: '1.2-2' }}</strong>
-            </div>
-            <div class="fee-row">
-              <span>Reservation Fee (5%)</span>
-              <strong class="fee-amount highlight">₹{{ reservationFee | number: '1.2-2' }}</strong>
-            </div>
-          </div>
-
-          <ion-item lines="none" class="checkbox-item">
-            <ion-checkbox [(ngModel)]="confirmInfo" labelPlacement="end" aria-label="Confirm information accuracy">
-              I confirm that all information provided is accurate and up to date.
-            </ion-checkbox>
-          </ion-item>
-
-          <ion-item lines="none" class="checkbox-item">
-            <ion-checkbox [(ngModel)]="acceptTerms" labelPlacement="end" aria-label="Accept terms and conditions">
-              I accept the <a routerLink="/terms" class="link">Terms and Conditions</a> and <a routerLink="/privacy-policy" class="link">Privacy Policy</a>.
-            </ion-checkbox>
-          </ion-item>
-
-          <ion-button (click)="submitApplication()" expand="block" shape="round" [disabled]="!confirmInfo || !acceptTerms || !selectedPlan" class="proceed-btn">
-            Submit Application
-            <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
-          </ion-button>
-        </ion-card-content>
-      </ion-card>
-    </section>
-  </div>
-
-  <div *ngIf="!isLoading && (!studentProfile || !libraryDetails)">
-    <ion-card class="ion-margin ion-padding">
-      <ion-card-title>Error</ion-card-title>
-      <p>Could not load the application form. Please go back and try again.</p>
-    </ion-card>
-  </div>
+    </div>
+  }
 </ion-content>
