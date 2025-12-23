@@ -54,7 +54,10 @@ export class PricingPlansComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.pricingPlansForm = this.lrfService.getFormGroup('pricingPlans');
+    const plansFormArray = this.lrfService.mainForm.get('pricingPlans') as FormArray;
+    this.pricingPlansForm = this.fb.group({
+      pricingPlans: plansFormArray,
+    });
   }
 
   get pricingPlans(): FormArray {
