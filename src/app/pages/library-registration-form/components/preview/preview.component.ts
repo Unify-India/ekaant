@@ -99,6 +99,9 @@ export class PreviewComponent implements OnInit {
   getSectionAsFormGroup(name: string): FormGroup {
     return this.mainForm.get(name) as FormGroup;
   }
+  getSectionAsFormArray(name: string): FormArray {
+    return this.mainForm.get(name) as FormArray;
+  }
   asFormArray(control: AbstractControl | null): FormArray {
     return control as FormArray;
   }

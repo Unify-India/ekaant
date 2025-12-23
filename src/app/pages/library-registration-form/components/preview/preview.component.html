@@ -203,8 +203,8 @@
   </div>
 }
 
-@if (getSectionAsFormGroup('pricingPlans'); as section) {
-  <div class="preview-section" [formGroup]="section">
+@if (getSectionAsFormArray('pricingPlans'); as section) {
+  <div class="preview-section">
     <div class="section-header">
       <h4>
         Pricing Plans
@@ -221,7 +221,7 @@
     <div class="pricing-plans">
       <ion-grid>
         <ion-row>
-          @for (plan of section.value.pricingPlans; track $index) {
+          @for (plan of section.value; track $index) {
             <ion-col size="12" size-md="6">
               <ion-card class="pricing-card-grid">
                 <ion-card-header class="card-header">
