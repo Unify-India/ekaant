@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, user } from '@angular/fire/auth';
-import { Firestore, doc, getDoc, collection } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, collection, collectionData } from '@angular/fire/firestore';
 import { from, map, Observable, switchMap } from 'rxjs';
+import { AuthService } from 'src/app/auth/service/auth.service';
 import { IUser } from 'src/app/models/global.interface';
 
 @Injectable({
@@ -10,6 +11,7 @@ import { IUser } from 'src/app/models/global.interface';
 export class UserService {
   private auth = inject(Auth);
   private firestore = inject(Firestore);
+  private authService = inject(AuthService);
 
   constructor() {}
 
@@ -35,5 +37,10 @@ export class UserService {
         }
       }),
     );
+  }
+
+  getAllUsers(): Observable<IUser[]> {
+    const usersCollection = collection(this.firestore, 'users');
+    return collectionData(usersCollection, { idField: 'uid' }) as Observable<IUser[]>;
   }
 }
