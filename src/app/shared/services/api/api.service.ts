@@ -11,7 +11,7 @@ export class ApiService {
   constructor() {
     if (environment.useEmulators) {
       const dbPort = 9000;
-      console.log('Using Firebase Realtime Database Emulator on port:', dbPort);
+      // console.log('Using Firebase Realtime Database Emulator on port:', dbPort);
       connectDatabaseEmulator(this.db, 'localhost', dbPort);
     } else {
       console.log('Using Firebase Realtime Database Cloud');
@@ -28,7 +28,7 @@ export class ApiService {
 
   async getDataFromRealtimeDB(path: string) {
     const dbRef = ref(this.db, path);
-    console.log('dbRef:', dbRef);
+    // console.log('dbRef:', dbRef);
 
     const snapshot = await get(dbRef);
     if (snapshot.exists()) {
