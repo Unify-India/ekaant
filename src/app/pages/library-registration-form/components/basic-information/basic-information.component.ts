@@ -82,7 +82,13 @@ export class BasicInformationComponent implements OnInit {
   get genderCategory() {
     return this.basicInfoForm.get('genderCategory');
   }
-  get operatingHours() {
-    return this.basicInfoForm.get('operatingHours');
+  get is24Hours() {
+    return this.basicInfoForm.get('is24Hours');
+  }
+  get openTime() {
+    return this.basicInfoForm.get('openTime');
+  }
+  get closeTime() {
+    return this.basicInfoForm.get('closeTime');
   }
 }

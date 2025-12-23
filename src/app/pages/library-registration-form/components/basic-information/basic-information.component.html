@@ -11,116 +11,126 @@
     </div>
   }
   <form [formGroup]="basicInfoForm">
-    <ion-item lines="none">
-      <ion-label position="stacked">
-        {{ libraryNameLabel }}
+    <ion-input
+      class="ion-margin-top"
+      labelPlacement="floating"
+      fill="outline"
+      label="{{ libraryNameLabel }} *"
+      formControlName="libraryName"
+      [placeholder]="libraryNamePlaceholder"
+      [class.ion-invalid]="libraryName?.invalid && libraryName?.touched"
+      errorText="{{ requiredFieldError }}"
+    ></ion-input>
+
+    <ion-input
+      class="ion-margin-top"
+      labelPlacement="floating"
+      fill="outline"
+      label="{{ addressLine1Label }} *"
+      formControlName="addressLine1"
+      [placeholder]="addressLine1Placeholder"
+      [class.ion-invalid]="addressLine1?.invalid && addressLine1?.touched"
+      errorText="{{ requiredFieldError }}"
+    ></ion-input>
+
+    <ion-input
+      class="ion-margin-top"
+      labelPlacement="floating"
+      fill="outline"
+      label="{{ addressLine2Label }}"
+      formControlName="addressLine2"
+      [placeholder]="addressLine2Placeholder"
+      [class.ion-invalid]="addressLine2?.invalid && addressLine2?.touched"
+      errorText="{{ requiredFieldError }}"
+    ></ion-input>
+
+    <ion-input
+      class="ion-margin-top"
+      labelPlacement="floating"
+      fill="outline"
+      label="{{ cityLabel }} *"
+      formControlName="city"
+      [placeholder]="cityPlaceholder"
+      [class.ion-invalid]="city?.invalid && city?.touched"
+      errorText="{{ requiredFieldError }}"
+    ></ion-input>
+
+    <ion-input
+      class="ion-margin-top"
+      labelPlacement="floating"
+      fill="outline"
+      label="{{ stateLabel }} *"
+      formControlName="state"
+      [placeholder]="statePlaceholder"
+      [class.ion-invalid]="state?.invalid && state?.touched"
+      errorText="{{ requiredFieldError }}"
+    ></ion-input>
+
+    <ion-input
+      class="ion-margin-top"
+      labelPlacement="floating"
+      fill="outline"
+      type="number"
+      label="{{ zipCodeLabel }} *"
+      formControlName="zipCode"
+      [placeholder]="zipCodePlaceholder"
+      [class.ion-invalid]="zipCode?.invalid && zipCode?.touched"
+      errorText="Please enter a valid 6-digit zip code."
+    ></ion-input>
+
+    <div class="ion-margin-top">
+      <ion-label
+        class="ion-margin-bottom"
+        style="display: block; font-size: 12px; margin-left: 4px; color: var(--ion-color-medium)"
+      >
+        {{ genderCategoryLabel }}
         <span class="required-star">*</span>
       </ion-label>
-      <ion-input
-        [placeholder]="libraryNamePlaceholder"
-        formControlName="libraryName"
-        [class.ion-invalid]="libraryName?.invalid && libraryName?.touched"
-        errorText="{{ requiredFieldError }}"
-      ></ion-input>
-    </ion-item>
-
-    <ion-item lines="none">
-      <ion-label position="stacked">
-        {{ addressLine1Label }}
-        <span class="required-star">*</span>
-      </ion-label>
-      <ion-input
-        [placeholder]="addressLine1Placeholder"
-        formControlName="addressLine1"
-        [class.ion-invalid]="addressLine1?.invalid && addressLine1?.touched"
-        errorText="{{ requiredFieldError }}"
-      ></ion-input>
-    </ion-item>
-
-    <ion-item lines="none">
-      <ion-label position="stacked">
-        {{ addressLine2Label }}
-      </ion-label>
-      <ion-input
-        [placeholder]="addressLine2Placeholder"
-        formControlName="addressLine2"
-        [class.ion-invalid]="addressLine2?.invalid && addressLine2?.touched"
-        errorText="{{ requiredFieldError }}"
-      ></ion-input>
-    </ion-item>
-
-    <ion-item lines="none">
-      <ion-label position="stacked">
-        {{ cityLabel }}
-        <span class="required-star">*</span>
-      </ion-label>
-      <ion-input
-        [placeholder]="cityPlaceholder"
-        formControlName="city"
-        [class.ion-invalid]="city?.invalid && city?.touched"
-        errorText="{{ requiredFieldError }}"
-      ></ion-input>
-    </ion-item>
-
-    <ion-item lines="none">
-      <ion-label position="stacked">
-        {{ stateLabel }}
-        <span class="required-star">*</span>
-      </ion-label>
-      <ion-input
-        [placeholder]="statePlaceholder"
-        formControlName="state"
-        [class.ion-invalid]="state?.invalid && state?.touched"
-        errorText="{{ requiredFieldError }}"
-      ></ion-input>
-    </ion-item>
-
-    <ion-item lines="none">
-      <ion-label position="stacked">
-        {{ zipCodeLabel }}
-        <span class="required-star">*</span>
-      </ion-label>
-      <ion-input
-        type="number"
-        [placeholder]="zipCodePlaceholder"
-        formControlName="zipCode"
-        [class.ion-invalid]="zipCode?.invalid && zipCode?.touched"
-        errorText="Please enter a valid 6-digit zip code."
-      ></ion-input>
-    </ion-item>
-
-    <ion-list>
       <ion-radio-group formControlName="genderCategory">
-        <ion-list-header>
-          <ion-label>
-            {{ genderCategoryLabel }}
-            <span class="required-star">*</span>
-          </ion-label>
-        </ion-list-header>
-
         @for (option of genderCategoryOptions; track option.value) {
           <ion-item lines="none">
             <ion-radio [value]="option.value">
-              <strong>{{ option.label }}</strong>
-              <p>{{ option.description }}</p>
+              <div style="padding: 5px 0">
+                <strong>{{ option.label }}</strong>
+                <p style="margin: 0; font-size: 0.9em; color: var(--ion-color-medium)">{{ option.description }}</p>
+              </div>
             </ion-radio>
           </ion-item>
         }
       </ion-radio-group>
-    </ion-list>
+    </div>
 
-    <ion-item lines="none">
-      <ion-label position="stacked">
-        {{ operatingHoursLabel }}
-        <span class="required-star">*</span>
-      </ion-label>
-      <ion-input
-        [placeholder]="operatingHoursPlaceholder"
-        formControlName="operatingHours"
-        [class.ion-invalid]="operatingHours?.invalid && operatingHours?.touched"
-        errorText="{{ requiredFieldError }}"
-      ></ion-input>
-      <ion-note slot="helper">{{ operatingHoursHelper }}</ion-note>
-    </ion-item>
+    <div class="ion-margin-top">
+      <ion-checkbox formControlName="is24Hours" labelPlacement="end">Open 24 Hours</ion-checkbox>
+    </div>
+
+    @if (!is24Hours?.value) {
+      <ion-grid class="ion-no-padding ion-margin-top">
+        <ion-row>
+          <ion-col size="6" class="ion-padding-end">
+            <ion-input
+              label="Opens At"
+              labelPlacement="floating"
+              fill="outline"
+              type="time"
+              formControlName="openTime"
+              [class.ion-invalid]="openTime?.invalid && openTime?.touched"
+              errorText="{{ requiredFieldError }}"
+            ></ion-input>
+          </ion-col>
+          <ion-col size="6" class="ion-padding-start">
+            <ion-input
+              label="Closes At"
+              labelPlacement="floating"
+              fill="outline"
+              type="time"
+              formControlName="closeTime"
+              [class.ion-invalid]="closeTime?.invalid && closeTime?.touched"
+              errorText="{{ requiredFieldError }}"
+            ></ion-input>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    }
   </form>
 </ion-card>
