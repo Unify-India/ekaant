@@ -13,7 +13,7 @@ export class TranslateConfigService {
   }
 
   private initTranslate() {
-    console.log('initTranslate');
+    // console.log('initTranslate');
 
     this.translate.addLangs(['en', 'hi']);
     this.translate.setDefaultLang('en');
@@ -28,9 +28,9 @@ export class TranslateConfigService {
 
     this.http.get(apiUrl).subscribe({
       next: (translations: any) => {
-        console.log('Fetched translations from local:', translations);
+        // console.log('Fetched translations from local:', translations);
         if (!translations) {
-          console.info('Translations not found:', translations);
+          // console.info('Translations not found:', translations);
           return;
         } else {
           this.translate.setTranslation(lang, translations, true);
