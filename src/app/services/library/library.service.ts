@@ -66,7 +66,7 @@ export class LibraryService {
   }
 
   public getLibraryRegistration(userId: string): Observable<any> {
-    console.log('Fetching library registration for user:', userId);
+    // console.log('Fetching library registration for user:', userId);
     const q = query(collection(this.firestore, 'library-registrations'), where('ownerId', '==', userId), limit(1));
     return from(getDocs(q)).pipe(
       switchMap((snapshot) => {
@@ -96,7 +96,7 @@ export class LibraryService {
   }
 
   public getApprovedLibrary(userId: string): Observable<any> {
-    console.log('Fetching approved library for user:', userId);
+    // console.log('Fetching approved library for user:', userId);
     const q = query(collection(this.firestore, 'libraries'), where('managerIds', 'array-contains', userId), limit(1));
     return from(getDocs(q)).pipe(
       switchMap((snapshot) => {
@@ -202,22 +202,17 @@ export class LibraryService {
 
   public getLibraryById(libraryId: string): Observable<any> {
     const libraryDocRef = doc(this.firestore, `libraries/${libraryId}`);
+
     return from(getDoc(libraryDocRef)).pipe(
-      switchMap((librarySnapshot) => {
+      map((librarySnapshot) => {
         if (!librarySnapshot.exists()) {
-          return of(null);
+          return null;
         }
-        const libraryData = { id: librarySnapshot.id, ...librarySnapshot.data() };
-        const pricingPlansColRef = collection(this.firestore, `libraries/${libraryId}/pricingPlans`);
-        return from(getDocs(pricingPlansColRef)).pipe(
-          map((pricingPlansSnapshot) => {
-            const pricingPlans = pricingPlansSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-            return {
-              ...libraryData,
-              pricingPlans: pricingPlans,
-            };
-          }),
-        );
+        const data = librarySnapshot.data();
+        return {
+          id: librarySnapshot.id,
+          ...data,
+        };
       }),
     );
   }
@@ -240,7 +235,7 @@ export class LibraryService {
             .join(', ');
 
           const totalSeats = data.seatManagement?.totalSeats ?? 0;
-          const occupiedSeats = 0; // As per user, currently all libraries are vacant.
+          const occupiedSeats = 0;
 
           return {
             id: doc.id,
@@ -285,6 +280,14 @@ export class LibraryService {
 
   public async updateLibraryRegistration(docId: string, data: any): Promise<void> {
     const ref = doc(this.firestore, 'library-registrations', docId);
+    return await updateDoc(ref, {
+      ...data,
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  public async updateApprovedLibrary(docId: string, data: any): Promise<void> {
+    const ref = doc(this.firestore, 'libraries', docId);
     return await updateDoc(ref, {
       ...data,
       updatedAt: serverTimestamp(),
