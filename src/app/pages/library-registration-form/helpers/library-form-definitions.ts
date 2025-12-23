@@ -1,4 +1,5 @@
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { IPricingPlan } from 'src/app/models/library.interface';
 
 export function createBasicInformationForm(fb: FormBuilder): FormGroup {
   // todo: add pattern validation for operation hours like 6AM - 10PM
@@ -8,9 +9,11 @@ export function createBasicInformationForm(fb: FormBuilder): FormGroup {
     addressLine2: ['', []],
     city: ['', [Validators.required, Validators.minLength(3)]],
     state: ['', [Validators.required, Validators.minLength(2)]],
-    zipCode: ['', [Validators.required, Validators.pattern('^[1-9]{1}[0-9]{5}$')]], // Indian pincode pattern
+    zipCode: ['', [Validators.required, Validators.pattern('^[1-9]{1}[0-9]{5}$')]],
     genderCategory: ['Co-ed (Mixed)', Validators.required],
-    operatingHours: ['', Validators.required],
+    is24Hours: [false],
+    openTime: ['06:00', Validators.required],
+    closeTime: ['22:00', Validators.required],
   });
 }
 
@@ -91,6 +94,22 @@ export function createSeatManagementForm(fb: FormBuilder): FormGroup {
   return fb.group({
     totalSeats: [0, [Validators.required, Validators.min(1)]],
     facilityRanges: fb.array([]),
+    // This will hold the final, granular configuration for each seat
+    seats: fb.array([]),
+  });
+}
+
+/**
+ * Creates a FormGroup for a single seat's configuration.
+ * @param fb The FormBuilder instance.
+ * @param seatNumber The number of the seat.
+ * @param facilities An array of strings representing the facilities for this seat.
+ * @returns A FormGroup for a single seat.
+ */
+export function createSeatConfigGroup(fb: FormBuilder, seatNumber: number, facilities: string[] = []): FormGroup {
+  return fb.group({
+    seatNumber: [seatNumber, Validators.required],
+    facilities: fb.array(facilities),
   });
 }
 
@@ -102,7 +121,7 @@ export function createFacilityRangeGroup(fb: FormBuilder, from = 0, to = 0, faci
   });
 }
 
-export function createPricingPlanGroup(fb: FormBuilder, plan: any = {}): FormGroup {
+export function createPricingPlanGroup(fb: FormBuilder, plan: Partial<IPricingPlan> = {}): FormGroup {
   return fb.group({
     planType: [plan.planType || '', Validators.required],
     timeSlot: [plan.timeSlot || '', Validators.required],
@@ -111,10 +130,8 @@ export function createPricingPlanGroup(fb: FormBuilder, plan: any = {}): FormGro
   });
 }
 
-export function createPricingPlansForm(fb: FormBuilder): FormGroup {
-  return fb.group({
-    pricingPlans: fb.array([], [Validators.required, Validators.minLength(1)]),
-  });
+export function createPricingPlansForm(fb: FormBuilder): FormArray {
+  return fb.array([], [Validators.required, Validators.minLength(1)]);
 }
 
 export function createRequirementsForm(fb: FormBuilder): FormGroup {
