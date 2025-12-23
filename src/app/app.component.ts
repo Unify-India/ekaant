@@ -82,7 +82,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
         console.warn('Error fetching data from RTDB:', error);
       });
 
-    console.info('isLoggedIn', this.isLoggedIn);
+    // console.info('isLoggedIn', this.isLoggedIn);
   }
 
   ngAfterViewInit() {

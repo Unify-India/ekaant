@@ -15,10 +15,8 @@ export interface IUser {
   linkedLibraryId?: string;
   managedLibraryIds?: string[];
   name: string;
-  // Fields from IStudentProfile
   phoneNumber?: string;
   preferredEndTime?: string;
-
   preferredStartTime?: string;
   profileCompleted?: boolean;
   profileCompletion?: number;

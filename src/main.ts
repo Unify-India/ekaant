@@ -38,7 +38,7 @@ bootstrapApplication(AppComponent, {
         try {
           // Connect to auth emulator (runs on http(s) origin)
           connectAuthEmulator(auth, environment.emulatorUrls.auth, { disableWarnings: true });
-          console.log('Auth connected to emulator at', environment.emulatorUrls.auth);
+          // console.log('Auth connected to emulator at', environment.emulatorUrls.auth);
         } catch (e) {
           console.warn('Failed to connect Auth emulator:', e);
         }
@@ -69,7 +69,7 @@ bootstrapApplication(AppComponent, {
           const hostname = url.hostname;
           const port = Number(url.port) || environment.ports?.firestore || 9100;
           connectFirestoreEmulator(firestore, hostname, port);
-          console.log('Firestore connected to emulator at', hostname + ':' + port);
+          // console.log('Firestore connected to emulator at', hostname + ':' + port);
         } catch (e) {
           console.warn('Failed to connect Firestore emulator:', e);
         }
@@ -82,7 +82,7 @@ bootstrapApplication(AppComponent, {
         try {
           const dbPort = environment.ports?.database || 9000;
           connectDatabaseEmulator(db, '127.0.0.1', dbPort);
-          console.log('Realtime Database connected to emulator on port', dbPort);
+          // console.log('Realtime Database connected to emulator on port', dbPort);
         } catch (e) {
           console.warn('Failed to connect RTDB emulator:', e);
         }
@@ -103,7 +103,7 @@ bootstrapApplication(AppComponent, {
           const hostname = url.hostname;
           const port = Number(url.port) || environment.ports?.storage || 9199;
           connectStorageEmulator(storage, hostname, port);
-          console.log('Storage connected to emulator at', hostname + ':' + port);
+          // console.log('Storage connected to emulator at', hostname + ':' + port);
         } catch (e) {
           console.warn('Failed to connect Storage emulator:', e);
         }

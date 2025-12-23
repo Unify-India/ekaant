@@ -62,7 +62,7 @@
 
 .registration-section-card {
   margin: 0;
-  padding: 1.5rem;
+  padding: 0.9rem;
   color: var(--ion-color-dark-shade);
 }
 .form-section-navigator {
@@ -92,7 +92,7 @@
   border-color: var(--ion-color-success);
 }
 .warning-glass-box {
-  background-color: color-mix(in srgb, var(--ion-color-warning) 10%, #fff 10%);
+  background-color: color-mix(in srgb, var(--ion-color-warning) 4%, #fff 4%);
   border-color: var(--ion-color-warning);
 }
 
@@ -127,4 +127,11 @@
   color: var(--ion-color-success);
   font-size: 0.875rem;
   margin-top: 0.25rem;
+}
+
+.label-floating.input-fill-outline.sc-ion-input-md-h .label-text-wrapper.sc-ion-input-md {
+  -webkit-transform: translateY(-50%) scale(0.9) !important;
+  transform: translateY(-50%) scale(0.9) !important;
+  background-color: var(--ion-color-dark-contrast);
+  padding: 2px 4px 0 0;
 }
