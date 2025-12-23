@@ -6,7 +6,7 @@ import * as functionsV1 from 'firebase-functions/v1'; // For V1 auth triggers
 // grouped by feature, to ensure they are discovered and deployed by Firebase.
 
 // Auth Triggers Logic
-import { onStudentSignupLogic } from './auth/onStudentSignup';
+import { onUserSignupLogic } from './auth/onUserSignup';
 import { onUserDeleteLogic } from './auth/onUserDelete';
 
 // Registration Callable Functions
@@ -17,13 +17,21 @@ import { libraryRegistrationRequest } from './registration/libraryRegistrationRe
 // Booking Triggers
 import { transferSeatOnCheckout } from './booking/transferSeatOnCheckout';
 
+// Booking Callables
+import { getLibraryConfig } from './booking/getLibraryConfig';
+import { getAvailableSlots } from './booking/getAvailableSlots';
+import { allocateSeat } from './booking/allocateSeat';
+import { cancelBooking } from './booking/cancelBooking';
+import { createSubscription } from './booking/createSubscription';
+
 // Uploads
 import { getSignedUploadUrl } from './uploads/getSignedUploadUrl';
+
 
 logger.info('Functions cold start');
 
 // Export V1 Auth Triggers (as V2 does not directly support them yet)
-export const authOnStudentSignup = functionsV1.auth.user().onCreate(onStudentSignupLogic);
+export const authOnUserSignup = functionsV1.auth.user().onCreate(onUserSignupLogic);
 export const authOnUserDelete = functionsV1.auth.user().onDelete(onUserDeleteLogic);
 
 // Export V1 Booking Triggers
@@ -32,10 +40,18 @@ export const bookingOnSeatCheckout = transferSeatOnCheckout;
 // Export V2 Callable Functions
 export const registration = {
   approveLibrary: approveLibrary,
-  rejectlibrary: rejectLibrary,
-  libraryregistrationrequest: libraryRegistrationRequest,
+  rejectLibrary: rejectLibrary,
+  libraryRegistrationRequest: libraryRegistrationRequest,
+};
+
+export const booking = {
+  getLibraryConfig: getLibraryConfig,
+  getAvailableSlots: getAvailableSlots,
+  allocateSeat: allocateSeat,
+  cancelBooking: cancelBooking,
+  createSubscription: createSubscription,
 };
 
 export const uploads = {
-  getsigneduploadurl: getSignedUploadUrl,
+  getSignedUploadUrl: getSignedUploadUrl,
 };
