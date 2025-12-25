@@ -47,15 +47,15 @@ export class LibraryRegistrationFormService {
   public editMode = false;
   public registrationDocId: string | null = null;
   public isApproved = false;
+  private hasLocalDraft = false;
 
   constructor(
     private fb: FormBuilder,
     private firebase: FirebaseService,
     private draft: DraftService,
     private libraryService: LibraryService,
-    private authService: AuthService, // Inject AuthService
+    private authService: AuthService,
   ) {
-    // Initialize Firebase service (connect emulators if configured)
     try {
       this.firebase.init();
     } catch (e) {
@@ -72,60 +72,60 @@ export class LibraryRegistrationFormService {
       requirements: createRequirementsForm(this.fb),
       codeOfConduct: createCodeOfConductForm(this.fb),
     });
-    // try load draft if exists (deferred so mainForm is assigned first)
-    (async (form) => {
+
+    (async () => {
       try {
-        await this.draft.loadDraft(form);
+        const data = await this.draft.getDraft();
+        if (data) {
+          this.hasLocalDraft = true;
+          this.loadRegistrationData(data);
+          this.recalculateMaxReachedIndex();
+        }
       } catch (e) {
         // ignore
       }
-    })(this.mainForm);
-    // console.log('Main Form Structure:', this.mainForm);
+    })();
 
-    // Subscribe to auth status to load library registration data
     this.authService
       .getAuthStatusListener()
       .pipe(
         switchMap((user) => {
           if (user && user.role === 'manager') {
-            // First, check for an approved library
             return this.libraryService.getApprovedLibrary(user.uid).pipe(
               switchMap((approvedData) => {
                 if (approvedData) {
-                  // Found an approved library
                   this.isApproved = true;
                   return of({ type: 'approved', data: approvedData });
                 } else {
-                  // No approved library, check for a registration document
                   return this.libraryService.getLibraryRegistration(user.uid).pipe(
                     map((registrationData) => {
                       if (registrationData) {
                         this.isApproved = false;
                         return { type: 'registration', data: registrationData };
                       }
-                      return null; // No data found
+                      return null;
                     }),
                   );
                 }
               }),
             );
           }
-          return of(null); // Not a manager or not logged in
+          return of(null);
         }),
       )
       .subscribe((result) => {
         if (result && result.data) {
-          this.loadRegistrationData(result.data);
           this.registrationDocId = result.data.id;
           this.editMode = true;
-          // Unlock all steps in edit mode
-          this.maxReachedIndex.set(this.steps.length - 1);
-          // console.log(`Loaded data from ${result.type}:`, result.data);
+
+          if (!this.hasLocalDraft) {
+            this.loadRegistrationData(result.data);
+            this.maxReachedIndex.set(this.steps.length - 1);
+          }
         } else {
           this.editMode = false;
           this.registrationDocId = null;
           this.isApproved = false;
-          // console.log('No existing library data found for manager.');
         }
       });
   }
@@ -138,71 +138,56 @@ export class LibraryRegistrationFormService {
   public loadRegistrationData(data: any): void {
     if (!data) return;
 
-    // Be explicit: patch each section to avoid issues with `patchValue` on the root form
-    // Handle basicInformation separately to parse fullAddress if necessary
-    if (data.basicInformation) {
-      const basicInfoData = { ...data.basicInformation };
-      // If an old 'fullAddress' exists, try to parse it into new fields
-      if (basicInfoData.fullAddress && !basicInfoData.addressLine1) {
-        // This is a simplistic parsing. A more robust solution might use a third-party library
-        // or a more sophisticated regex if the fullAddress format varies.
-        // For now, we'll just try to split by commas and assign,
-        // which might not be perfect but provides a starting point.
-        const addressParts = basicInfoData.fullAddress.split(',').map((part: string) => part.trim());
-        if (addressParts.length >= 3) {
-          basicInfoData.addressLine1 = addressParts[0];
-          basicInfoData.city = addressParts[addressParts.length - 3];
-          basicInfoData.state = addressParts[addressParts.length - 2];
-          basicInfoData.zipCode = addressParts[addressParts.length - 1];
-          basicInfoData.addressLine2 = addressParts.slice(1, addressParts.length - 3).join(', ');
-        } else {
-          basicInfoData.addressLine1 = basicInfoData.fullAddress;
-        }
-        delete basicInfoData.fullAddress;
-      }
-      this.mainForm.get('basicInformation')?.patchValue(basicInfoData);
+    this.mainForm.get('basicInformation')?.patchValue(data.basicInformation || {});
+    this.mainForm.get('hostProfile')?.patchValue(data.hostProfile || {});
+
+    const hostProfilePhoto = this.mainForm.get('hostProfile.profilePhoto')?.value;
+    if (hostProfilePhoto instanceof File) {
+      const newUrl = URL.createObjectURL(hostProfilePhoto);
+      this.mainForm.get('hostProfile')?.patchValue({ photoURL: newUrl });
     }
 
-    this.mainForm.get('hostProfile')?.patchValue(data.hostProfile || {});
     this.mainForm.get('bookCollection')?.patchValue(data.bookCollection || {});
     this.mainForm.get('amenities')?.patchValue(data.amenities || {});
     this.mainForm.get('codeOfConduct')?.patchValue(data.codeOfConduct || {});
 
-    // Handle complex groups with primitives and FormArrays separately
     if (data.seatManagement) {
       this.mainForm.get('seatManagement.totalSeats')?.patchValue(data.seatManagement.totalSeats);
       const rangesArray = this.mainForm.get('seatManagement.facilityRanges') as FormArray;
       rangesArray.clear();
-      // The facilityRanges are for UI only and may not be present in the stored data
       if (data.seatManagement.facilityRanges) {
         data.seatManagement.facilityRanges.forEach((range: any) => {
           rangesArray.push(createFacilityRangeGroup(this.fb, range.from, range.to, range.facility));
         });
       }
 
-      // If stored data has the new 'seats' structure, load it
       const seatsArray = this.mainForm.get('seatManagement.seats') as FormArray;
       seatsArray.clear();
       if (data.seatManagement.seats) {
         data.seatManagement.seats.forEach((seat: any) => {
-          seatsArray.push(createSeatConfigGroup(this.fb, seat.seatNumber, seat.facilities));
+          const facilities = [];
+          if (seat.isAC) facilities.push('AC');
+          if (seat.hasPower) facilities.push('Power Socket');
+          seatsArray.push(createSeatConfigGroup(this.fb, parseInt(seat.seatNumber), facilities));
         });
       }
     }
 
-    // Manually handle FormArrays in their respective sections
     if (data.libraryImages && data.libraryImages.libraryPhotos) {
       const photosArray = this.mainForm.get('libraryImages.libraryPhotos') as FormArray;
       photosArray.clear();
       data.libraryImages.libraryPhotos.forEach((photo: any) => {
-        photosArray.push(createPhotoGroup(this.fb, photo.previewUrl));
+        const group = createPhotoGroup(this.fb, photo.previewUrl);
+        if (photo.file) {
+          group.patchValue({ file: photo.file });
+        }
+        photosArray.push(group);
       });
     }
 
     if (data.pricingPlans) {
       const plansArray = this.mainForm.get('pricingPlans') as FormArray;
       plansArray.clear();
-      // Handle both old nested object and new direct array structures
       const plans = Array.isArray(data.pricingPlans) ? data.pricingPlans : data.pricingPlans.pricingPlans;
       if (plans && Array.isArray(plans)) {
         plans.forEach((plan: any) => {
@@ -211,32 +196,57 @@ export class LibraryRegistrationFormService {
       }
     }
 
-    if (data.requirements && data.requirements.selectedRequirements) {
-      const requirementsArray = this.mainForm.get('requirements.selectedRequirements') as FormArray;
+    const requirementsData = Array.isArray(data.requirements)
+      ? data.requirements
+      : data.requirements?.selectedRequirements;
+
+    if (requirementsData) {
+      const requirementsArray = this.mainForm.get('requirements') as FormArray;
       requirementsArray.clear();
-      data.requirements.selectedRequirements.forEach((req: any) => {
-        requirementsArray.push(createRequirementGroup(this.fb, req));
+      requirementsData.forEach((req: any) => {
+        const group = createRequirementGroup(this.fb, req);
+        if (req.sampleFile) {
+          group.patchValue({ sampleFile: req.sampleFile });
+        }
+        if (req.fileURL) {
+          group.patchValue({ fileURL: req.fileURL });
+        }
+        requirementsArray.push(group);
       });
     }
+  }
+
+  recalculateMaxReachedIndex() {
+    let max = 0;
+    for (let i = 0; i < this.steps.length; i++) {
+      const key = this.steps[i].key;
+      const control = this.mainForm.get(key);
+      if (control && control.valid) {
+        max = i + 1;
+      } else {
+        break;
+      }
+    }
+    if (max > this.steps.length - 1) {
+      max = this.steps.length - 1;
+    }
+    this.maxReachedIndex.set(max);
   }
 
   async updateLibrary(): Promise<void> {
     if (!this.registrationDocId) {
       throw new Error('No registration document ID found for updating.');
     }
-    console.log(`Updating ${this.isApproved ? 'approved library' : 'library registration'}...`);
     const payload = this.mainForm.value;
-    const { initialPayload, imagesArray, hostProfileFile, requirementsArray } = this.prepareInitialPayload(payload);
+    const { initialPayload, imagesArray, hostProfileFile, requirementsArray, pricingPlansArray } =
+      this.prepareInitialPayload(payload);
 
-    // TODO: remove this console log
-    console.log('DEBUG: Images array passed to uploader:', JSON.stringify(imagesArray, null, 2));
-
-    // Upload new files that might have been added during the edit
     await this.uploadImages(this.registrationDocId, imagesArray, this.isApproved);
     await this.uploadHostProfile(this.registrationDocId, hostProfileFile, this.isApproved);
     await this.uploadRequirements(this.registrationDocId, requirementsArray, this.isApproved);
 
-    // Update the main document with cleaned data
+    await this.libraryService.savePricingPlans(this.registrationDocId, pricingPlansArray, this.isApproved);
+
     if (this.isApproved) {
       await this.libraryService.updateApprovedLibrary(this.registrationDocId, initialPayload);
     } else {
@@ -245,24 +255,21 @@ export class LibraryRegistrationFormService {
   }
 
   async submitLibrary(): Promise<string> {
-    console.log('Submitting library registration form...');
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) {
       throw new Error('User not authenticated. Cannot submit form.');
     }
 
-    // orchestrate modular steps
     const payload = this.mainForm.value;
-    const { initialPayload, imagesArray, hostProfileFile, requirementsArray } = this.prepareInitialPayload(payload);
+    const { initialPayload, imagesArray, hostProfileFile, requirementsArray, pricingPlansArray } =
+      this.prepareInitialPayload(payload);
 
-    // Add owner and manager IDs
     initialPayload.ownerId = currentUser.uid;
     initialPayload.managerIds = [currentUser.uid];
     initialPayload.applicationStatus = 'pending';
 
     const libraryId = await this.createLibraryDoc(initialPayload);
 
-    // Update user document with the new library ID
     const currentManagedIds = currentUser.managedLibraryIds || [];
     await this.authService.updateUserProfile({
       managedLibraryIds: [...currentManagedIds, libraryId],
@@ -271,6 +278,7 @@ export class LibraryRegistrationFormService {
     await this.uploadImages(libraryId, imagesArray, false);
     await this.uploadHostProfile(libraryId, hostProfileFile, false);
     await this.uploadRequirements(libraryId, requirementsArray, false);
+    await this.libraryService.savePricingPlans(libraryId, pricingPlansArray, false);
 
     return libraryId;
   }
@@ -278,29 +286,28 @@ export class LibraryRegistrationFormService {
   private prepareInitialPayload(payload: any) {
     const imagesArray = payload.libraryImages?.libraryPhotos ?? [];
     const hostProfileFile: File | null = payload.hostProfile?.profilePhoto ?? null;
-    const requirementsArray = payload.requirements?.selectedRequirements ?? [];
+    const pricingPlansArray = payload.pricingPlans?.pricingPlans ?? payload.pricingPlans ?? [];
+
+    const requirementsArray = Array.isArray(payload.requirements)
+      ? payload.requirements
+      : payload.requirements?.selectedRequirements ?? [];
 
     const initialPayload = { ...payload };
 
-    // --- Seat Management Transformation ---
     if (initialPayload.seatManagement) {
       initialPayload.seatManagement = this.transformSeatManagementData(initialPayload.seatManagement);
     }
-    // --- End Seat Management Transformation ---
 
-    // Clean basicInformation to ensure only new address fields are present
     if (initialPayload.basicInformation) {
       const basicInfo = { ...initialPayload.basicInformation };
-      delete (basicInfo as any).fullAddress; // Remove old fullAddress if it somehow persists
+      delete (basicInfo as any).fullAddress;
       initialPayload.basicInformation = basicInfo;
     }
 
-    // Clean libraryImages to not store File objects
     if (initialPayload.libraryImages) {
-      initialPayload.libraryImages = { libraryPhotos: [] };
+      delete initialPayload.libraryImages;
     }
 
-    // Clean hostProfile to not store File object
     if (initialPayload.hostProfile) {
       const hp = { ...initialPayload.hostProfile };
       delete (hp as any).profilePhoto;
@@ -308,66 +315,67 @@ export class LibraryRegistrationFormService {
       initialPayload.hostProfile = hp;
     }
 
-    // Clean requirements to not store File objects in the main document
-    if (initialPayload.requirements && initialPayload.requirements.selectedRequirements) {
-      initialPayload.requirements.selectedRequirements = initialPayload.requirements.selectedRequirements.map(
-        (req: any) => {
-          const cleanReq = { ...req };
-          delete cleanReq.sampleFile;
-          delete cleanReq.sampleFileProgress;
-          return cleanReq;
-        },
-      );
+    delete initialPayload.pricingPlans;
+
+    if (initialPayload.requirements) {
+      initialPayload.requirements = initialPayload.requirements.map((req: any) => {
+        const { sampleFile, sampleFileProgress, ...rest } = req;
+        return rest;
+      });
     }
 
-    return { initialPayload, imagesArray, hostProfileFile, requirementsArray };
+    return { initialPayload, imagesArray, hostProfileFile, requirementsArray, pricingPlansArray };
   }
 
-  /**
-   * Transforms the seat management form data from a UI-friendly range-based structure
-   * to a granular, per-seat configuration array suitable for backend storage.
-   * @param seatManagementData The value from the `seatManagement` FormGroup.
-   * @returns A new object with `totalSeats` and a `seats` array.
-   */
   private transformSeatManagementData(seatManagementData: any): any {
     const { totalSeats, facilityRanges, seats: individualSeatConfigs } = seatManagementData;
 
-    // Initialize a map for all seats for efficient lookup
-    const seatsMap = new Map<number, { seatNumber: number; facilities: string[] }>();
-    for (let i = 1; i <= totalSeats; i++) {
-      seatsMap.set(i, { seatNumber: i, facilities: [] });
-    }
+    const seatsMap = new Map<
+      number,
+      { seatNumber: string; isAC: boolean; hasPower: boolean; status: string; id: string }
+    >();
 
-    // Apply facilities from ranges
+    const getSeat = (num: number) => {
+      if (!seatsMap.has(num)) {
+        seatsMap.set(num, {
+          seatNumber: `${num}`,
+          id: `s${num}`,
+          isAC: false,
+          hasPower: false,
+          status: 'active',
+        });
+      }
+      return seatsMap.get(num)!;
+    };
+
     if (facilityRanges && facilityRanges.length > 0) {
       for (const range of facilityRanges) {
         for (let i = range.from; i <= range.to; i++) {
-          const seat = seatsMap.get(i);
-          if (seat && range.facility) {
-            // Add facility if it's not already there
-            if (!seat.facilities.includes(range.facility)) {
-              seat.facilities.push(range.facility);
-            }
-          }
+          if (i > totalSeats) continue;
+          const seat = getSeat(i);
+          if (range.facility === 'AC') seat.isAC = true;
+          if (range.facility === 'Power Socket') seat.hasPower = true;
         }
       }
     }
 
-    // Apply individual seat configurations, which can override ranges
     if (individualSeatConfigs && individualSeatConfigs.length > 0) {
       for (const individualConfig of individualSeatConfigs) {
-        const seat = seatsMap.get(individualConfig.seatNumber);
+        if (individualConfig.seatNumber > totalSeats) continue;
+        const seat = getSeat(individualConfig.seatNumber);
         if (seat) {
-          // Replace the facilities with the ones from individual config
-          seat.facilities = [...individualConfig.facilities];
+          seat.isAC = individualConfig.facilities.includes('AC');
+          seat.hasPower = individualConfig.facilities.includes('Power Socket');
         }
       }
     }
 
-    // Convert map values to an array
-    const seats = Array.from(seatsMap.values());
+    for (let i = 1; i <= totalSeats; i++) {
+      getSeat(i);
+    }
 
-    // Return the transformed data, excluding the temporary 'facilityRanges'
+    const seats = Array.from(seatsMap.values()).sort((a, b) => parseInt(a.seatNumber) - parseInt(b.seatNumber));
+
     return {
       totalSeats,
       seats,
@@ -379,27 +387,31 @@ export class LibraryRegistrationFormService {
   }
 
   private async uploadImages(libraryId: string, imagesArray: any[], isApproved: boolean): Promise<void> {
-    console.log('uploading images...', imagesArray);
-    if (!Array.isArray(imagesArray) || imagesArray.length === 0) return;
-    for (let idx = 0; idx < imagesArray.length; idx++) {
-      const photo = imagesArray[idx];
-      const file: File = photo.file;
-      if (!file) continue;
-      try {
-        const imagesFormGroup = this.mainForm.get('libraryImages');
-        const photosArray = imagesFormGroup?.get('libraryPhotos');
-        const photoControl = (photosArray as any)?.at ? (photosArray as any).at(idx) : null;
+    if (!Array.isArray(imagesArray)) return;
 
-        await this.libraryService.addLibraryImage(libraryId, file, isApproved, { order: idx }, (percent) => {
-          try {
-            if (photoControl) photoControl.patchValue({ uploadProgress: percent });
-          } catch (e) {
-            // ignore
+    try {
+      const imagesFormGroup = this.mainForm.get('libraryImages');
+      const photosArray = imagesFormGroup?.get('libraryPhotos');
+
+      const imagesToSync = imagesArray.map((photo, idx) => ({
+        file: photo.file,
+        previewUrl: photo.previewUrl,
+        order: idx,
+        caption: photo.caption,
+      }));
+
+      await this.libraryService.syncLibraryImages(libraryId, imagesToSync, isApproved, (idx, percent) => {
+        try {
+          const photoControl = (photosArray as any)?.at ? (photosArray as any).at(idx) : null;
+          if (photoControl) {
+            photoControl.patchValue({ uploadProgress: percent });
           }
-        });
-      } catch (e) {
-        console.warn('Failed to upload image', e);
-      }
+        } catch (e) {
+          // ignore
+        }
+      });
+    } catch (e) {
+      throw e;
     }
   }
 
@@ -433,37 +445,31 @@ export class LibraryRegistrationFormService {
         // ignore
       }
     } catch (e) {
-      console.warn('Failed to upload host profile photo', e);
+      // ignore
     }
   }
 
   private async uploadRequirements(libraryId: string, requirementsArray: any[], isApproved: boolean): Promise<void> {
-    if (!Array.isArray(requirementsArray) || requirementsArray.length === 0) return;
-    for (let rIdx = 0; rIdx < requirementsArray.length; rIdx++) {
-      const req = requirementsArray[rIdx];
-      const file: File = req.sampleFile;
-      if (!file) continue;
-      try {
-        const reqsForm = this.mainForm.get('requirements');
-        const selectedArray = reqsForm?.get('selectedRequirements');
-        const reqControl = (selectedArray as any)?.at ? (selectedArray as any).at(rIdx) : null;
+    if (!Array.isArray(requirementsArray)) return;
+    try {
+      const selectedArray = this.mainForm.get('requirements') as FormArray;
 
-        await this.libraryService.addRequirementDocument(
-          libraryId,
-          file,
-          isApproved,
-          { description: req.description },
-          (percent) => {
-            try {
-              if (reqControl) reqControl.patchValue({ sampleFileProgress: percent });
-            } catch (e) {
-              // ignore
-            }
-          },
-        );
-      } catch (e) {
-        console.warn('Failed to upload requirement file', e);
-      }
+      const reqsToSync = requirementsArray.map((req) => ({
+        sampleFile: req.sampleFile,
+        fileURL: req.fileURL,
+        description: req.description,
+      }));
+
+      await this.libraryService.syncRequirements(libraryId, reqsToSync, isApproved, (idx, percent) => {
+        try {
+          const reqControl = selectedArray?.at(idx);
+          if (reqControl) reqControl.patchValue({ sampleFileProgress: percent });
+        } catch (e) {
+          // ignore
+        }
+      });
+    } catch (e) {
+      throw e;
     }
   }
 
@@ -473,7 +479,6 @@ export class LibraryRegistrationFormService {
 
   isCurrentStepValid(): boolean {
     const currentKey = this.steps[this.currentSectionIndex()].key;
-    // console.log('Form group info', this.getFormGroup(currentKey));
     return this.getFormGroup(currentKey)?.valid ?? false;
   }
 
@@ -481,9 +486,8 @@ export class LibraryRegistrationFormService {
     if (index <= this.maxReachedIndex()) {
       this.currentSectionIndex.set(index);
     }
-    // save draft when user navigates between steps
     try {
-      this.draft.saveDraft(this.mainForm);
+      this.draft.saveDraft(this.mainForm.getRawValue());
     } catch (e) {
       // ignore
     }
@@ -496,7 +500,7 @@ export class LibraryRegistrationFormService {
       this.maxReachedIndex.set(Math.max(this.maxReachedIndex(), newIndex));
     }
     try {
-      this.draft.saveDraft(this.mainForm);
+      this.draft.saveDraft(this.mainForm.getRawValue());
     } catch (e) {
       // ignore
     }
@@ -507,7 +511,7 @@ export class LibraryRegistrationFormService {
       this.currentSectionIndex.set(this.currentSectionIndex() - 1);
     }
     try {
-      this.draft.saveDraft(this.mainForm);
+      this.draft.saveDraft(this.mainForm.getRawValue());
     } catch (e) {
       // ignore
     }
