@@ -28,19 +28,17 @@
 }
 
 .image-preview-wrapper {
-  display: flex;
-  max-height: 120px;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-  align-items: center;
-  ion-img {
-    position: relative;
-    object-fit: contain;
-    overflow: hidden;
-  }
+  border-radius: 12px;
+  background-color: var(--ion-color-light-shade);
 
-  @media screen and (min-width: 768px) {
-    min-height: 300px;
-    align-items: flex-start;
+  ion-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 

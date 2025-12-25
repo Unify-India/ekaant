@@ -33,7 +33,11 @@
         {{ section.value.city }}, {{ section.value.state }} - {{ section.value.zipCode }}
       </p>
       <ion-chip>{{ section.value.genderCategory }}</ion-chip>
-      <ion-chip>{{ section.value.operatingHours }}</ion-chip>
+      @if (section.value.is24Hours) {
+        <ion-chip>Open 24 Hours</ion-chip>
+      } @else {
+        <ion-chip>{{ section.value.openTime }} - {{ section.value.closeTime }}</ion-chip>
+      }
     </div>
   </div>
 }
@@ -241,8 +245,8 @@
   </div>
 }
 
-@if (getSectionAsFormGroup('requirements'); as section) {
-  <div class="preview-section" [formGroup]="section">
+@if (getSectionAsFormArray('requirements'); as section) {
+  <div class="preview-section">
     <div class="section-header">
       <h4>
         Joining Requirements
@@ -251,13 +255,13 @@
           [color]="section.valid ? 'success' : 'warning'"
         ></ion-icon>
       </h4>
-      <ion-button fill="clear" (click)="navigateToSection(6)">
+      <ion-button fill="clear" (click)="navigateToSection(7)">
         <ion-icon slot="start" name="create-outline"></ion-icon>
         Edit
       </ion-button>
     </div>
     <div class="section-content">
-      @for (req of section.value.selectedRequirements; track $index) {
+      @for (req of section.value; track $index) {
         <div class="requirement-item">
           <ion-icon name="document-text-outline"></ion-icon>
           <div>
