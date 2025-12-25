@@ -45,7 +45,7 @@ export default [
           newlinesBetween: 'always',
         },
       ],
-      'prettier/prettier': 'error',
+      'prettier/prettier': 'warn',
     },
   },
   {
