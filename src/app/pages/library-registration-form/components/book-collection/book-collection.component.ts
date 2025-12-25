@@ -21,7 +21,7 @@ export class BookCollectionComponent implements OnInit {
   public readonly pageTitle = 'Book Collection';
   public readonly sectionDescription =
     'Select the categories of books and study materials available in your library. This helps students find libraries with relevant resources for their studies.';
-  public readonly completionWarning = 'This section needs to be completed';
+  public readonly completionWarning = 'This section is optional';
   public readonly selectPrompt = 'Select the book categories available in your library';
 
   public readonly bookCategories = [
