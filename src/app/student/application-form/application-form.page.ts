@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonContent,
   IonHeader,
@@ -64,6 +64,7 @@ import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.m
     IonCheckbox,
     IonIcon,
     BaseUiComponents,
+    RouterLink,
   ],
 })
 export class ApplicationFormPage implements OnInit, OnDestroy {
