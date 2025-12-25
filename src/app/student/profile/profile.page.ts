@@ -33,7 +33,7 @@ export class ProfilePage implements OnInit, OnDestroy {
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phoneNumber: [''],
+      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       fullAddress: [''],
       idNumber: [''],
       bookingPreference: ['ac'],
