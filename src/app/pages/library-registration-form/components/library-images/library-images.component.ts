@@ -1,5 +1,5 @@
 import { Component, inject, input, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import {
   IonIcon,
   IonNote,
@@ -11,9 +11,11 @@ import {
   IonFab,
   IonFabButton,
   IonProgressBar,
+  IonInput,
+  IonButton,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { imageOutline, warningOutline, closeCircle } from 'ionicons/icons';
+import { imageOutline, warningOutline, closeCircle, arrowUpOutline, arrowDownOutline } from 'ionicons/icons';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { FormEssentials } from 'src/app/shared/core/micro-components/form-essentials.module';
 
@@ -37,6 +39,8 @@ import { LibraryRegistrationFormService } from '../../service/library-registrati
     IonNote,
     IonProgressBar,
     FormEssentials,
+    IonInput,
+    IonButton,
   ],
 })
 export class LibraryImagesComponent implements OnInit {
@@ -67,7 +71,7 @@ export class LibraryImagesComponent implements OnInit {
   ];
 
   constructor() {
-    addIcons({ imageOutline, warningOutline, closeCircle });
+    addIcons({ imageOutline, warningOutline, closeCircle, arrowUpOutline, arrowDownOutline });
   }
 
   ngOnInit() {
@@ -76,6 +80,10 @@ export class LibraryImagesComponent implements OnInit {
 
   get libraryPhotosArray(): FormArray {
     return this.imagesForm.get('libraryPhotos') as FormArray;
+  }
+
+  asFormGroup(control: AbstractControl): FormGroup {
+    return control as FormGroup;
   }
 
   // TODO: add file size limit to 5MB. Implement compression if needed
@@ -87,10 +95,9 @@ export class LibraryImagesComponent implements OnInit {
       const file = input.files[i];
       const previewUrl = await this.readFileAsDataURL(file);
 
-      const photoGroup = createPhotoGroup(this.fb);
+      const photoGroup = createPhotoGroup(this.fb, previewUrl, '');
       photoGroup.patchValue({
         file: file,
-        previewUrl: previewUrl,
       });
 
       this.libraryPhotosArray.push(photoGroup);
@@ -108,6 +115,15 @@ export class LibraryImagesComponent implements OnInit {
 
   removePhoto(index: number): void {
     this.libraryPhotosArray.removeAt(index);
+  }
+
+  movePhoto(index: number, direction: number): void {
+    const newIndex = index + direction;
+    if (newIndex >= 0 && newIndex < this.libraryPhotosArray.length) {
+      const control = this.libraryPhotosArray.at(index);
+      this.libraryPhotosArray.removeAt(index);
+      this.libraryPhotosArray.insert(newIndex, control);
+    }
   }
 
   triggerFileUpload(fileInput: HTMLInputElement): void {

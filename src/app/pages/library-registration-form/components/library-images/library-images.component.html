@@ -41,23 +41,53 @@
     @if (libraryPhotosArray.controls.length > 0) {
       <ion-grid class="preview-grid ion-margin-top">
         <ion-row>
-          @for (photoControl of libraryPhotosArray.controls; track $index) {
-            <ion-col size="6" size-md="4" size-lg="3">
-              <div class="image-preview-wrapper">
-                <ion-img [src]="photoControl.get('previewUrl')?.value"></ion-img>
-                @if (photoControl.get('uploadProgress')?.value > 0 && photoControl.get('uploadProgress')?.value < 100) {
-                  <div class="progress-overlay">
-                    <ion-progress-bar
-                      [value]="(photoControl.get('uploadProgress')?.value || 0) / 100"
-                    ></ion-progress-bar>
-                    <div class="progress-text">{{ photoControl.get('uploadProgress')?.value }}%</div>
+          @for (photoControl of libraryPhotosArray.controls; track photoControl) {
+            <ion-col size="12" size-md="6" size-lg="4">
+              <div class="image-card" [formGroup]="asFormGroup(photoControl)">
+                <div class="image-preview-wrapper">
+                  <ion-img [src]="photoControl.get('previewUrl')?.value"></ion-img>
+                  @if (photoControl.get('uploadProgress')?.value > 0 && photoControl.get('uploadProgress')?.value < 100) {
+                    <div class="progress-overlay">
+                      <ion-progress-bar
+                        [value]="(photoControl.get('uploadProgress')?.value || 0) / 100"
+                      ></ion-progress-bar>
+                      <div class="progress-text">{{ photoControl.get('uploadProgress')?.value }}%</div>
+                    </div>
+                  }
+                  <ion-fab vertical="top" horizontal="end" slot="fixed">
+                    <ion-fab-button (click)="removePhoto($index)" color="danger" size="small">
+                      <ion-icon name="close-circle"></ion-icon>
+                    </ion-fab-button>
+                  </ion-fab>
+                </div>
+                
+                <div class="card-content">
+                  <ion-input
+                    label="Caption"
+                    labelPlacement="floating"
+                    fill="outline"
+                    placeholder="Enter caption..."
+                    formControlName="caption"
+                    maxlength="50"
+                  ></ion-input>
+                  
+                  <div class="reorder-actions">
+                    <ion-button 
+                      fill="clear" 
+                      size="small" 
+                      (click)="movePhoto($index, -1)" 
+                      [disabled]="$index === 0">
+                      <ion-icon slot="icon-only" name="arrow-up-outline"></ion-icon>
+                    </ion-button>
+                    <ion-button 
+                      fill="clear" 
+                      size="small" 
+                      (click)="movePhoto($index, 1)" 
+                      [disabled]="$index === libraryPhotosArray.controls.length - 1">
+                      <ion-icon slot="icon-only" name="arrow-down-outline"></ion-icon>
+                    </ion-button>
                   </div>
-                }
-                <ion-fab vertical="top" horizontal="end" slot="fixed">
-                  <ion-fab-button (click)="removePhoto($index)" color="danger" size="small">
-                    <ion-icon name="close-circle"></ion-icon>
-                  </ion-fab-button>
-                </ion-fab>
+                </div>
               </div>
             </ion-col>
           }

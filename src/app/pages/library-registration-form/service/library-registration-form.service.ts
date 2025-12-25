@@ -148,7 +148,15 @@ export class LibraryRegistrationFormService {
     }
 
     this.mainForm.get('bookCollection')?.patchValue(data.bookCollection || {});
-    this.mainForm.get('amenities')?.patchValue(data.amenities || {});
+    
+    if (Array.isArray(data.amenities)) {
+      const amObj: any = {};
+      data.amenities.forEach((k: string) => (amObj[k] = true));
+      this.mainForm.get('amenities')?.patchValue(amObj);
+    } else {
+      this.mainForm.get('amenities')?.patchValue(data.amenities || {});
+    }
+
     this.mainForm.get('codeOfConduct')?.patchValue(data.codeOfConduct || {});
 
     if (data.seatManagement) {
@@ -302,6 +310,11 @@ export class LibraryRegistrationFormService {
       const basicInfo = { ...initialPayload.basicInformation };
       delete (basicInfo as any).fullAddress;
       initialPayload.basicInformation = basicInfo;
+    }
+
+    if (initialPayload.amenities) {
+      const am = initialPayload.amenities;
+      initialPayload.amenities = Object.keys(am).filter((k) => am[k] === true);
     }
 
     if (initialPayload.libraryImages) {

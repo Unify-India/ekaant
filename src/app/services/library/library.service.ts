@@ -97,25 +97,28 @@ export class LibraryService {
 
     const imagesColRef = collection(this.firestore, collectionName, libraryId, 'libraryImages');
     const plansColRef = collection(this.firestore, collectionName, libraryId, 'pricingPlans');
-    const reqsColRef = collection(this.firestore, collectionName, libraryId, 'requirements');
+    // const reqsColRef = collection(this.firestore, collectionName, libraryId, 'requirements');
 
     const images$ = from(getDocs(imagesColRef)).pipe(
       map((sn) => sn.docs.map((d) => ({ previewUrl: d.data()['imageURL'], ...d.data() }))),
     );
     const plans$ = from(getDocs(plansColRef)).pipe(map((sn) => sn.docs.map((d) => d.data())));
-    const reqs$ = from(getDocs(reqsColRef)).pipe(map((sn) => sn.docs.map((d) => d.data())));
+    // const reqs$ = from(getDocs(reqsColRef)).pipe(map((sn) => sn.docs.map((d) => d.data())));
 
     return forkJoin({
       images: images$,
       plans: plans$,
-      reqs: reqs$,
+      // reqs: reqs$,
     }).pipe(
-      map(({ images, plans, reqs }) => ({
-        ...libraryData,
-        libraryImages: { libraryPhotos: images },
-        pricingPlans: plans,
-        requirements: reqs,
-      })),
+      map(({ images, plans }) => {
+        const fullData = {
+          ...libraryData,
+          libraryImages: { libraryPhotos: images },
+          pricingPlans: plans,
+        };
+        console.log('[LibraryService] Merged full library data:', fullData);
+        return fullData;
+      }),
     );
   }
 
@@ -124,7 +127,7 @@ export class LibraryService {
     return from(getDoc(docRef)).pipe(
       switchMap((snapshot) => {
         if (snapshot.exists()) {
-           return this.getFullLibraryData(snapshot, 'library-registrations');
+          return this.getFullLibraryData(snapshot, 'library-registrations');
         } else {
           return of(null);
         }
@@ -335,7 +338,13 @@ export class LibraryService {
       if (img.file) {
         // pass a callback that knows which index it is
         const progressCallback = onProgress ? (pct: number) => onProgress(idx, pct) : undefined;
-        await this.addLibraryImage(libraryId, img.file, isApproved, { order: idx, caption: img.caption }, progressCallback);
+        await this.addLibraryImage(
+          libraryId,
+          img.file,
+          isApproved,
+          { order: idx, caption: img.caption },
+          progressCallback,
+        );
       }
     }
   }

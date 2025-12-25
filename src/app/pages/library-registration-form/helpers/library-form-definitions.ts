@@ -35,12 +35,13 @@ export function createHostProfileForm(fb: FormBuilder): FormGroup {
 
 //  Validators.pattern('^(\\+91)?[6-9]\\d{9}$')
 
-export function createPhotoGroup(fb: FormBuilder, photoUrl: string = ''): FormGroup {
+export function createPhotoGroup(fb: FormBuilder, photoUrl: string = '', caption: string = ''): FormGroup {
   // todo: add validation to have only image in file type
   return fb.group({
     file: [null], // Not required when just displaying URL
     previewUrl: [photoUrl, Validators.required],
     uploadProgress: [0], // percentage 0-100
+    caption: [caption, Validators.maxLength(100)],
   });
 }
 
