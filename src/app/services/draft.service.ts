@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { FormGroup, FormArray } from '@angular/forms';
 
 type FileMeta = { id: string; name: string; type: string; size: number; preview?: string };
 
@@ -62,13 +61,12 @@ export class DraftService {
     });
   }
 
-  // Save draft: store serializable form state in localStorage + file blobs in IndexedDB
-  async saveDraft(form: FormGroup): Promise<void> {
-    const snapshot = form.getRawValue();
-
+  async saveDraft(formRawValue: any): Promise<void> {
+    const snapshot = formRawValue;
     const filesMeta: Record<string, FileMeta> = {};
-
     let counter = Date.now();
+
+    const draft = this;
 
     async function walk(node: any, parentKey = ''): Promise<any> {
       if (node === null || node === undefined) return node;
@@ -79,130 +77,80 @@ export class DraftService {
         try {
           filesMeta[id].preview = await draft.fileToDataUrl(node);
         } catch (e) {
-          // ignore preview failure
+          // ignore
         }
         return { __fileRef: id };
       }
       if (Array.isArray(node)) {
-        const arr = [];
-        for (const v of node) arr.push(await walk(v, parentKey));
-        return arr;
+        return Promise.all(node.map((v) => walk(v, parentKey)));
       }
       if (typeof node === 'object') {
         const out: any = {};
-        for (const k of Object.keys(node)) out[k] = await walk(node[k], `${parentKey}.${k}`);
+        for (const k of Object.keys(node)) {
+          out[k] = await walk(node[k], `${parentKey}.${k}`);
+        }
         return out;
       }
       return node;
     }
 
-    const draft = this;
-    const processed = await walk(snapshot);
-
-    const meta = { processed, filesMeta };
-    localStorage.setItem(this.metaKey, JSON.stringify(meta));
+    try {
+      const processed = await walk(snapshot);
+      const meta = { processed, filesMeta };
+      localStorage.setItem(this.metaKey, JSON.stringify(meta));
+    } catch (error) {
+      // ignore
+    }
   }
 
-  // Load draft and patch form (handles known file places: hostProfile.profilePhoto, libraryImages.libraryPhotos[*].file, requirements.selectedRequirements[*].sampleFile)
-  async loadDraft(form: FormGroup): Promise<boolean> {
+  async getDraft(): Promise<any | null> {
     const raw = localStorage.getItem(this.metaKey);
-    if (!raw) return false;
-    const meta = JSON.parse(raw);
-    const { processed, filesMeta } = meta as any;
+    if (!raw) return null;
 
-    // Patch non-file values first
-    const clone = JSON.parse(JSON.stringify(processed));
-    // Remove file refs from clone so patchValue won't choke
-    function stripFiles(node: any): any {
+    let meta: any;
+    try {
+      meta = JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+
+    const { processed, filesMeta } = meta;
+    if (!processed) return null;
+
+    const draft = this;
+
+    async function hydrate(node: any): Promise<any> {
       if (node === null || node === undefined) return node;
-      if (Array.isArray(node)) return node.map(stripFiles);
+
+      if (typeof node === 'object' && node.__fileRef) {
+        const ref = node.__fileRef;
+        const blob = await draft.getFile(ref);
+        if (blob && filesMeta[ref]) {
+          const metaF = filesMeta[ref];
+          return new File([blob], metaF.name, { type: metaF.type });
+        }
+        return null;
+      }
+
+      if (Array.isArray(node)) {
+        return Promise.all(node.map((v) => hydrate(v)));
+      }
+
       if (typeof node === 'object') {
-        if (node.__fileRef) return null;
         const out: any = {};
-        for (const k of Object.keys(node)) out[k] = stripFiles(node[k]);
+        for (const k of Object.keys(node)) {
+          out[k] = await hydrate(node[k]);
+        }
         return out;
       }
       return node;
     }
-    const stripped = stripFiles(clone);
-    try {
-      form.patchValue(stripped);
-    } catch (e) {
-      // ignore patch errors
-    }
 
-    // Now reconstruct file fields in known form locations
-    // hostProfile.profilePhoto
     try {
-      const hp = processed?.hostProfile;
-      if (hp && hp.profilePhoto && hp.profilePhoto.__fileRef) {
-        const ref = hp.profilePhoto.__fileRef;
-        const blob = await this.getFile(ref);
-        if (blob) {
-          const metaF = filesMeta[ref];
-          const file = new File([blob], metaF.name, { type: metaF.type });
-          form.get('hostProfile')?.patchValue({ profilePhoto: file });
-        }
-      }
-    } catch (e) {
-      // ignore
+      return await hydrate(processed);
+    } catch (error) {
+      return null;
     }
-
-    // libraryImages.libraryPhotos (array of { fileRef or preview })
-    try {
-      const photos = processed?.libraryImages?.libraryPhotos ?? [];
-      const arr = form.get(['libraryImages', 'libraryPhotos']) as FormArray;
-      if (arr && Array.isArray(photos)) {
-        // ensure form array length matches
-        while (arr.length > photos.length) arr.removeAt(arr.length - 1);
-        // if shorter, we won't create new groups automatically here; assume components push groups on UI when adding
-        for (let i = 0; i < photos.length && i < arr.length; i++) {
-          const p = photos[i];
-          if (p && p.__fileRef) {
-            const blob = await this.getFile(p.__fileRef);
-            if (blob) {
-              const metaF = filesMeta[p.__fileRef];
-              const file = new File([blob], metaF.name, { type: metaF.type });
-              try {
-                arr.at(i).patchValue({ file, previewUrl: metaF.preview ?? '' });
-              } catch (e) {
-                // ignore
-              }
-            }
-          }
-        }
-      }
-    } catch (e) {
-      // ignore
-    }
-
-    // requirements.selectedRequirements[*].sampleFile
-    try {
-      const reqs = processed?.requirements?.selectedRequirements ?? [];
-      const arr = form.get(['requirements', 'selectedRequirements']) as FormArray;
-      if (arr && Array.isArray(reqs)) {
-        while (arr.length > reqs.length) arr.removeAt(arr.length - 1);
-        for (let i = 0; i < reqs.length && i < arr.length; i++) {
-          const r = reqs[i];
-          if (r && r.sampleFile && r.sampleFile.__fileRef) {
-            const blob = await this.getFile(r.sampleFile.__fileRef);
-            if (blob) {
-              const metaF = filesMeta[r.sampleFile.__fileRef];
-              const file = new File([blob], metaF.name, { type: metaF.type });
-              try {
-                arr.at(i).patchValue({ sampleFile: file });
-              } catch (e) {
-                // ignore
-              }
-            }
-          }
-        }
-      }
-    } catch (e) {
-      // ignore
-    }
-
-    return true;
   }
 
   async clearDraft(): Promise<void> {
