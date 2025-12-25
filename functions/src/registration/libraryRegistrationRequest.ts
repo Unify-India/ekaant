@@ -3,6 +3,7 @@ import * as logger from 'firebase-functions/logger';
 import { db } from '../lib/firebaseAdmin';
 import { ApplicationStatus } from '../types/enums';
 import type { LibraryRegistrationRequest } from '../types';
+import { DEPLOYMENT_REGION } from '../config';
 
 /**
  * Submits a new library registration request.
@@ -19,7 +20,7 @@ import type { LibraryRegistrationRequest } from '../types';
  * @throws {HttpsError} - `invalid-argument` if the payload is missing or
  *   invalid.
  */
-export const libraryRegistrationRequest = onCall(async (request) => {
+export const libraryRegistrationRequest = onCall({ region: DEPLOYMENT_REGION }, async (request) => {
   // 1. Validate user authentication
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'You must be logged in to submit a request.');

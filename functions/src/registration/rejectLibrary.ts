@@ -2,7 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { db } from '../lib/firebaseAdmin';
 import { ApplicationStatus, UserRole } from '../types/enums';
-import type { LibraryRegistrationRequest } from '../types';
+import { DEPLOYMENT_REGION } from '../config';
 
 /**
  * Rejects a library registration request.
@@ -23,7 +23,7 @@ import type { LibraryRegistrationRequest } from '../types';
  * @throws {HttpsError} - `failed-precondition` if the request is not in a
  *   'pending' state.
  */
-export const rejectLibrary = onCall(async (request) => {
+export const rejectLibrary = onCall({ region: DEPLOYMENT_REGION }, async (request) => {
   // 1. Validate the admin's authentication
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'The function must be called while authenticated.');
@@ -40,11 +40,11 @@ export const rejectLibrary = onCall(async (request) => {
   if (!registrationRequestId || typeof registrationRequestId !== 'string') {
     throw new HttpsError('invalid-argument', 'The function must be called with a valid "registrationRequestId".');
   }
-  if (!adminComments || typeof adminComments !== 'string' || adminComments.length < 10) {
-    throw new HttpsError('invalid-argument', 'The "adminComments" must be a string of at least 10 characters.');
+  if (!adminComments || typeof adminComments !== 'string' || adminComments.length < 5) {
+    throw new HttpsError('invalid-argument', 'The "adminComments" must be a string of at least 5 characters.');
   }
 
-  const requestRef = db.collection('libraryRegistrationRequests').doc(registrationRequestId);
+  const requestRef = db.collection('library-registrations').doc(registrationRequestId);
 
   try {
     await db.runTransaction(async (transaction) => {
@@ -53,22 +53,22 @@ export const rejectLibrary = onCall(async (request) => {
         throw new HttpsError('not-found', `Registration request with ID ${registrationRequestId} not found.`);
       }
 
-      const registrationRequest = requestDoc.data() as LibraryRegistrationRequest;
+      const registrationRequest = requestDoc.data()!;
 
       // Idempotency check
-      if (registrationRequest.status !== ApplicationStatus.Pending) {
-        throw new HttpsError('failed-precondition', `Request is already in '${registrationRequest.status}' status.`);
+      if (registrationRequest.applicationStatus === ApplicationStatus.Rejected) {
+        throw new HttpsError('failed-precondition', 'Request is already rejected.');
       }
 
       // Update the request status and comments
       transaction.update(requestRef, {
-        status: ApplicationStatus.Rejected,
+        applicationStatus: ApplicationStatus.Rejected,
         adminComments: adminComments,
         updatedAt: new Date(),
       });
     });
 
-    return { success: true, message: `Library request ${registrationRequestId}` + ' rejected.' };
+    return { success: true, message: `Library request ${registrationRequestId} rejected.` };
   } catch (error) {
     logger.error('Error rejecting library:', error);
     if (error instanceof HttpsError) {
