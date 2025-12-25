@@ -44,6 +44,7 @@ export class ApplicationStatusPage implements OnInit {
         this.application = data;
         if (data) {
           this.lrfService.loadRegistrationData(data);
+          console.info('Library application data', data);
           this.lrfService.setEditMode(true, data.id);
         }
         this.isLoading = false;
