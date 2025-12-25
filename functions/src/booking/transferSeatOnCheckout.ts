@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions/v1';
 import * as logger from 'firebase-functions/logger';
 import { db } from '../lib/firebaseAdmin';
 import { add } from 'date-fns';
+import { DEPLOYMENT_REGION } from '../config';
 // Assume a utility function for sending notifications exists
 // import { sendNotification } from '../utils/sendNotification';
 
@@ -54,7 +55,9 @@ async function assignSeatFromWaitingList(libraryId: string) {
  * It checks if a user has just checked out, and if so, attempts to assign
  * the newly freed seat to the next person on the waiting list.
  */
-export const transferSeatOnCheckout = functions.firestore
+export const transferSeatOnCheckout = functions
+  .region(DEPLOYMENT_REGION)
+  .firestore
   .document('attendance_logs/{logId}')
   .onUpdate(async (change) => {
     const beforeData = change.before.data();

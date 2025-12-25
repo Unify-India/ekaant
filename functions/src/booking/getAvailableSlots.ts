@@ -8,6 +8,7 @@ import {
   IAvailableSlotInfo,
   IGetAvailableSlotsData,
 } from "../types/booking";
+import { DEPLOYMENT_REGION } from "../config";
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
@@ -28,6 +29,7 @@ const rtdb = admin.database();
  * @throws {HttpsError} - Throws an error for invalid arguments or if data is not found.
  */
 export const getAvailableSlots = onCall<IGetAvailableSlotsData, Promise<IAvailableSlotInfo[]>>(
+  { region: DEPLOYMENT_REGION },
   async (request) => {
     const { libraryId, date, seatRequirements } = request.data;
 

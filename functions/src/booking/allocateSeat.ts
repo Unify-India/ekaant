@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { IBooking, ISeat, IAllocateSeatData } from "../types/booking";
+import { DEPLOYMENT_REGION } from "../config";
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
@@ -22,7 +23,7 @@ const rtdb = admin.database();
  * @returns {Promise<IBooking>} - A promise that resolves with the confirmed booking details.
  * @throws {HttpsError} - Throws for auth errors, invalid arguments, or booking failures (e.g., no seats available).
  */
-export const allocateSeat = onCall<IAllocateSeatData, Promise<IBooking>>(async (request) => {
+export const allocateSeat = onCall<IAllocateSeatData, Promise<IBooking>>({ region: DEPLOYMENT_REGION }, async (request) => {
   // 1. Validate authentication
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
