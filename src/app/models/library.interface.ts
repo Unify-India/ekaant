@@ -1,3 +1,5 @@
+import { Timestamp } from '@angular/fire/firestore';
+
 export interface ILibraryState {
   // Allow other properties from the library/registration documents
   [key: string]: any;
@@ -36,12 +38,13 @@ export interface IManagerProfile {
   visionStatement: string;
 }
 export interface ISeatManagement {}
-export interface I {}
-export interface I {}
-export interface I {}
-export interface I {}
-export interface I {}
-export interface I {}
+export interface ILibraryImage {
+  caption?: string;
+  imageUrl: string;
+  order: number;
+  uploadedAt: Timestamp;
+}
+// export interface I {}
 export interface IFirestoreLibrary {
   basicInformation: {
     libraryName: string;
