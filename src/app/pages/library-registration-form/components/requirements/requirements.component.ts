@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, computed } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup, FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { IonProgressBar } from '@ionic/angular/standalone';
@@ -51,10 +52,17 @@ export class RequirementsComponent implements OnInit {
     'Security Deposit Receipt',
   ];
 
+  // Signal to track form array value changes
+  private selectedReqsSignal = toSignal(
+    (this.lrfService.mainForm.get('requirements') as FormArray).valueChanges,
+    { initialValue: (this.lrfService.mainForm.get('requirements') as FormArray).value }
+  );
+
   // A computed signal that reactively calculates which common requirements are available
   public availableRequirements = computed(() => {
-    const selected = this.selectedRequirements.value.map((req: any) => req.description);
-    return this.commonRequirements.filter((req) => !selected.includes(req));
+    const currentValues = this.selectedReqsSignal() || [];
+    const selectedDescriptions = currentValues.map((req: any) => req.description);
+    return this.commonRequirements.filter((req) => !selectedDescriptions.includes(req));
   });
 
   constructor() {
@@ -62,7 +70,10 @@ export class RequirementsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.requirementsForm = this.lrfService.getFormGroup('requirements');
+    const reqsArray = this.lrfService.mainForm.get('requirements') as FormArray;
+    this.requirementsForm = this.fb.group({
+      selectedRequirements: reqsArray,
+    });
   }
 
   get selectedRequirements(): FormArray {
