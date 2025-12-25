@@ -3,10 +3,27 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastController } from '@ionic/angular';
-import { IonBackButton, IonSpinner } from '@ionic/angular/standalone';
+import { ToastController, AlertController } from '@ionic/angular';
+import {
+  IonBackButton,
+  IonSpinner,
+  IonBadge,
+  IonFooter,
+  IonAccordionGroup,
+  IonAccordion,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { saveOutline, closeOutline, eyeOutline, checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
+import {
+  saveOutline,
+  closeOutline,
+  eyeOutline,
+  checkmarkCircleOutline,
+  closeCircleOutline,
+  refreshOutline,
+  documentTextOutline,
+  checkmarkCircle,
+  closeCircle,
+} from 'ionicons/icons';
 import { AuthService } from 'src/app/auth/service/auth.service';
 import { ApprovalCommentsComponent } from 'src/app/components/approval-comments/approval-comments.component';
 import { LibraryService } from 'src/app/services/library/library.service';
@@ -20,6 +37,10 @@ import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials
   styleUrls: ['./library-request-detail.page.scss'],
   standalone: true,
   imports: [
+    IonAccordion,
+    IonAccordionGroup,
+    IonFooter,
+    IonBadge,
     CommonModule,
     IonSpinner,
     IonBackButton,
@@ -35,10 +56,13 @@ export class LibraryRequestDetailPage implements OnInit {
   isViewOnly: boolean = false;
   currentUserRole: 'admin' | 'manager' = 'admin';
   currentUserId!: string;
-  isApproving = false;
+  isProcessing = false;
+  persistedStatus: string = 'pending';
+  fullLibraryData: any = null;
 
   private functions = inject(Functions);
   private toastController = inject(ToastController);
+  private alertController = inject(AlertController);
 
   constructor(
     private fb: FormBuilder,
@@ -47,7 +71,17 @@ export class LibraryRequestDetailPage implements OnInit {
     private libraryService: LibraryService,
     private authService: AuthService,
   ) {
-    addIcons({ saveOutline, closeOutline, eyeOutline, checkmarkCircleOutline, closeCircleOutline });
+    addIcons({
+      checkmarkCircle,
+      closeCircle,
+      documentTextOutline,
+      saveOutline,
+      closeCircleOutline,
+      refreshOutline,
+      checkmarkCircleOutline,
+      closeOutline,
+      eyeOutline,
+    });
 
     this.requestForm = this.fb.group({
       libraryManager: ['', Validators.required],
@@ -63,6 +97,10 @@ export class LibraryRequestDetailPage implements OnInit {
     });
   }
 
+  get currentStatus(): string {
+    return this.requestForm.get('applicationStatus')?.value;
+  }
+
   ngOnInit() {
     this.requestId = this.route.snapshot.paramMap.get('id');
     this.isViewOnly = this.route.snapshot.queryParamMap.get('mode') === 'view';
@@ -76,7 +114,10 @@ export class LibraryRequestDetailPage implements OnInit {
     if (this.requestId) {
       this.libraryService.getLibraryRegistrationById(this.requestId).subscribe((data) => {
         if (data) {
+          this.fullLibraryData = data;
           const mappedData = this._mapDataToForm(data);
+          this.persistedStatus = mappedData.applicationStatus || 'pending';
+
           if (mappedData.createdAt && mappedData.createdAt.toDate) {
             mappedData.createdAt = mappedData.createdAt.toDate().toLocaleString();
           }
@@ -84,6 +125,16 @@ export class LibraryRequestDetailPage implements OnInit {
             mappedData.updatedAt = mappedData.updatedAt.toDate().toLocaleString();
           }
           this.requestForm.patchValue(mappedData);
+
+          // Only auto-disable if not admin. Admins should be able to edit/save.
+          if (
+            ['approved', 'rejected'].includes(mappedData.applicationStatus) &&
+            this.currentUserRole !== 'admin' &&
+            !this.route.snapshot.queryParamMap.has('mode')
+          ) {
+            this.isViewOnly = true;
+            this.requestForm.disable();
+          }
         }
       });
     }
@@ -120,47 +171,134 @@ export class LibraryRequestDetailPage implements OnInit {
     this.router.navigate(['/admin/pending-requests']);
   }
 
+  async saveChanges() {
+    if (this.requestForm.dirty && this.requestId) {
+      if (this.requestForm.valid) {
+        await this._promptForComment('Confirm Changes', 'Please provide a reason for this update:', async (comment) => {
+          await this.libraryService.updateLibraryRegistration(this.requestId!, this.requestForm.value);
+          this.persistedStatus = this.requestForm.get('applicationStatus')?.value;
+          await this._addSystemComment(comment, 'Update');
+          await this.presentToast('Changes saved successfully.', 'success');
+          this.requestForm.markAsPristine();
+        });
+      } else {
+        this.requestForm.markAllAsTouched();
+        await this.presentToast('Please check the form for errors.', 'warning');
+      }
+    } else {
+      await this.presentToast('No changes detected.', 'medium');
+    }
+  }
+
   async approve() {
     if (!this.requestId) return;
-    this.isApproving = true;
-
-    const approveFn = httpsCallable(this.functions, 'registration-approveLibrary');
-    try {
-      const result: any = await approveFn({ registrationId: this.requestId });
-      await this.presentToast(result.message, 'success');
-      this.router.navigate(['/admin/pending-requests']);
-    } catch (error: any) {
-      console.error('Error approving library:', error);
-      await this.presentToast(error.message, 'danger');
-    } finally {
-      this.isApproving = false;
-    }
+    await this._promptForComment('Confirm Approval', 'Add an approval note (mandatory):', async (comment) => {
+      this.isProcessing = true;
+      const approveFn = httpsCallable(this.functions, 'registration-approveLibrary');
+      try {
+        await this._addSystemComment(comment, 'Approved');
+        const result: any = await approveFn({ registrationId: this.requestId });
+        await this.presentToast(result.message, 'success');
+        this.router.navigate(['/admin/pending-requests']);
+      } catch (error: any) {
+        console.error('Error approving library:', error);
+        await this.presentToast(error.message, 'danger');
+      } finally {
+        this.isProcessing = false;
+      }
+    });
   }
 
   async reject() {
-    if (this.requestForm.valid && this.requestId) {
-      const formValue = {
-        ...this.requestForm.value,
-        applicationStatus: 'rejected',
-      };
-      await this.libraryService.updateLibraryRegistration(this.requestId, formValue);
-      await this.presentToast('Application has been rejected.', 'warning');
-      this.router.navigate(['/admin/pending-requests']);
-    }
+    if (!this.requestId) return;
+    await this._promptForComment('Confirm Rejection', 'Reason for rejection (mandatory):', async (comment) => {
+      this.isProcessing = true;
+      const rejectFn = httpsCallable(this.functions, 'registration-rejectLibrary');
+      try {
+        await this._addSystemComment(comment, 'Rejected');
+        // Cloud function expects 'adminComments' but we also track it in subcollection above
+        const result: any = await rejectFn({
+          registrationRequestId: this.requestId,
+          adminComments: comment,
+        });
+        await this.presentToast(result.message, 'warning');
+        this.router.navigate(['/admin/pending-requests']);
+      } catch (error: any) {
+        console.error('Error rejecting library:', error);
+        await this.presentToast(error.message, 'danger');
+      } finally {
+        this.isProcessing = false;
+      }
+    });
   }
 
-  async saveChanges() {
-    if (this.requestForm.valid && this.requestId) {
-      const formValue = this.requestForm.value;
-      await this.libraryService.updateLibraryRegistration(this.requestId, formValue);
-      await this.presentToast('Changes have been saved.', 'success');
-    } else {
-      console.log('Form is invalid');
-      this.requestForm.markAllAsTouched();
-    }
+  async requestRevision() {
+    if (!this.requestId) return;
+    await this._promptForComment('Request Revision', 'Reason for revision request (mandatory):', async (comment) => {
+      this.isProcessing = true;
+      try {
+        await this.libraryService.updateLibraryRegistration(this.requestId!, {
+          applicationStatus: 'revision_requested',
+        });
+        this.persistedStatus = 'revision_requested';
+        await this._addSystemComment(comment, 'Revision Requested');
+        await this.presentToast('Revision requested successfully.', 'warning');
+        // Stay on page or navigate? Staying allows verifying status change.
+        // Manually update form value to reflect status change immediately
+        this.requestForm.patchValue({ applicationStatus: 'revision_requested' });
+        this.requestForm.markAsPristine();
+      } catch (error: any) {
+        console.error('Error requesting revision:', error);
+        await this.presentToast('Failed to request revision.', 'danger');
+      } finally {
+        this.isProcessing = false;
+      }
+    });
   }
 
-  private async presentToast(message: string, color: 'success' | 'danger' | 'warning') {
+  private async _promptForComment(header: string, placeholder: string, action: (comment: string) => Promise<void>) {
+    const alert = await this.alertController.create({
+      header,
+      inputs: [
+        {
+          name: 'comment',
+          type: 'textarea',
+          placeholder,
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Confirm',
+          role: 'destructive',
+          handler: async (data) => {
+            if (!data.comment || data.comment.trim().length < 5) {
+              await this.presentToast('Please provide a valid comment (min 5 chars).', 'warning');
+              return false;
+            }
+            await action(data.comment);
+            return true;
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  private async _addSystemComment(text: string, actionType: string) {
+    if (!this.requestId) return;
+    await this.libraryService.addComment(this.requestId, {
+      text: `[${actionType}] ${text}`,
+      authorId: this.currentUserId,
+      authorName: 'Admin', // In real app, fetch from profile
+      role: 'admin',
+    });
+  }
+
+  private async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium') {
     const toast = await this.toastController.create({
       message,
       duration: 3000,

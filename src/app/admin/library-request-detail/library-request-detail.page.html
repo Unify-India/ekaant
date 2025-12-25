@@ -3,7 +3,16 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/admin/pending-requests"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ isViewOnly ? 'View' : 'Edit' }} Library Request</ion-title>
+    <ion-title>
+      {{ isViewOnly ? 'View Library Details' : 'Review Library Request' }}
+    </ion-title>
+    <ion-badge
+      slot="end"
+      class="ion-margin-end"
+      [color]="currentStatus === 'approved' ? 'success' : currentStatus === 'rejected' ? 'danger' : 'warning'"
+    >
+      {{ currentStatus | uppercase }}
+    </ion-badge>
   </ion-toolbar>
 </ion-header>
 
@@ -43,17 +52,23 @@
             type="number"
             formControlName="totalSeats"
           ></ion-input>
-          <ion-select
-            label="Application Status"
-            labelPlacement="floating"
-            fill="outline"
-            formControlName="applicationStatus"
-          >
-            <ion-select-option value="pending">Pending</ion-select-option>
-            <ion-select-option value="revision_requested">Revision Requested</ion-select-option>
-            <ion-select-option value="approved">Approved</ion-select-option>
-            <ion-select-option value="rejected">Rejected</ion-select-option>
-          </ion-select>
+
+          <!-- Show dropdown only if editable, otherwise it's just info -->
+          @if (!isViewOnly) {
+            <ion-select
+              label="Application Status"
+              labelPlacement="floating"
+              fill="outline"
+              formControlName="applicationStatus"
+            >
+              <ion-select-option value="pending">Pending</ion-select-option>
+              <ion-select-option value="revision_requested">Revision Requested</ion-select-option>
+              <!-- Approved/Rejected should be set via actions, not manually here usually, but keeping for flexibility -->
+              <ion-select-option value="approved">Approved</ion-select-option>
+              <ion-select-option value="rejected">Rejected</ion-select-option>
+            </ion-select>
+          }
+
           <ion-input
             label="Contact Email"
             labelPlacement="floating"
@@ -69,44 +84,154 @@
           ></ion-input>
         </div>
 
-        <div class="timestamp-container">
-          <h3 class="ion-color-light">Created At : {{ requestForm.get('createdAt')?.value }}</h3>
-          <h3 class="ion-color-light">Last Updated : {{ requestForm.get('updatedAt')?.value }}</h3>
+        <div class="timestamp-container ion-margin-top">
+          <ion-note>Created: {{ requestForm.get('createdAt')?.value }}</ion-note>
+          <br />
+          <ion-note>Last Updated: {{ requestForm.get('updatedAt')?.value }}</ion-note>
         </div>
-
-        @if (!isViewOnly) {
-          <div class="form-actions">
-            <ion-button fill="outline" color="medium" (click)="cancel()">
-              <ion-icon slot="start" name="close-outline"></ion-icon>
-              Cancel
-            </ion-button>
-            <ion-button color="primary" (click)="saveChanges()">
-              <ion-icon slot="start" name="save-outline"></ion-icon>
-              Save Changes
-            </ion-button>
-          </div>
-          @if (currentUserRole === 'admin') {
-            <div class="admin-actions">
-              <ion-button color="danger" (click)="reject()">
-                <ion-icon slot="start" name="close-circle-outline"></ion-icon>
-                Reject
-              </ion-button>
-              <ion-button color="success" (click)="approve()" [disabled]="isApproving">
-                <ion-spinner *ngIf="isApproving" name="crescent"></ion-spinner>
-                <ion-icon *ngIf="!isApproving" slot="start" name="checkmark-circle-outline"></ion-icon>
-                {{ isApproving ? 'Approving...' : 'Approve & Create Library' }}
-              </ion-button>
-            </div>
-          }
-        }
       </ion-card-content>
     </ion-card>
 
-    <app-approval-comments
-      *ngIf="requestId"
-      [registrationId]="requestId"
-      [currentUserRole]="currentUserRole"
-      [currentUserId]="currentUserId"
-    ></app-approval-comments>
+    <!-- Additional Library Details (Accordion) -->
+    @if (fullLibraryData) {
+      <ion-accordion-group class="ion-margin-top" [multiple]="true">
+        <!-- Amenities -->
+        <ion-accordion value="amenities">
+          <ion-item slot="header" color="light">
+            <ion-label>Amenities</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <ion-chip *ngFor="let item of fullLibraryData.amenities | keyvalue" [disabled]="!item.value">
+              <ion-icon name="checkmark-circle" *ngIf="item.value" color="success"></ion-icon>
+              <ion-icon name="close-circle" *ngIf="!item.value" color="medium"></ion-icon>
+              <!-- <ion-label>{{ item.key | titlecase }}</ion-label> -->
+            </ion-chip>
+          </div>
+        </ion-accordion>
+
+        <!-- Pricing Plans -->
+        <ion-accordion value="pricing">
+          <ion-item slot="header" color="light">
+            <ion-label>Pricing Plans ({{ fullLibraryData.pricingPlans?.length || 0 }})</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <ion-list lines="none">
+              <ion-item *ngFor="let plan of fullLibraryData.pricingPlans" class="plan-item">
+                <ion-label>
+                  <h2>{{ plan.planType }}</h2>
+                  <p>{{ plan.timeSlot }} - {{ plan.rate | currency: 'INR' }}</p>
+                  <p *ngIf="plan.description">
+                    <small>{{ plan.description }}</small>
+                  </p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </div>
+        </ion-accordion>
+
+        <!-- Requirements / Documents -->
+        <ion-accordion value="requirements">
+          <ion-item slot="header" color="light">
+            <ion-label>Requirements & Documents ({{ fullLibraryData.requirements?.length || 0 }})</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <ion-list lines="none">
+              <ion-item
+                *ngFor="let req of fullLibraryData.requirements"
+                detail="true"
+                [href]="req.fileURL"
+                target="_blank"
+              >
+                <ion-icon slot="start" name="document-text-outline" color="primary"></ion-icon>
+                <ion-label>
+                  <h2>{{ req.description }}</h2>
+                  <p>Click to view document</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </div>
+        </ion-accordion>
+
+        <!-- Images -->
+        <ion-accordion value="images">
+          <ion-item slot="header" color="light">
+            <ion-label>Library Images ({{ fullLibraryData.libraryImages?.libraryPhotos?.length || 0 }})</ion-label>
+          </ion-item>
+          <div class="ion-padding image-grid" slot="content">
+            <div class="scrolling-wrapper">
+              <div class="card" *ngFor="let img of fullLibraryData.libraryImages?.libraryPhotos">
+                <img
+                  [src]="img.previewUrl"
+                  style="height: 150px; width: auto; border-radius: 8px; margin-right: 10px"
+                />
+                <p class="ion-text-center">
+                  <small>{{ img.caption || 'No Caption' }}</small>
+                </p>
+              </div>
+            </div>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
+    }
+
+    @if (requestId) {
+      <app-approval-comments
+        [registrationId]="requestId"
+        [currentUserRole]="currentUserRole"
+        [currentUserId]="currentUserId"
+      ></app-approval-comments>
+    }
   </div>
 </ion-content>
+
+@if (!isViewOnly || currentUserRole === 'admin') {
+  <ion-footer>
+    <ion-toolbar>
+      <ion-buttons slot="end">
+        <!-- Cancel/Back is always useful -->
+        <ion-button color="medium" (click)="cancel()">Close</ion-button>
+
+        <!-- Save only if dirty -->
+        @if (requestForm.dirty) {
+          <ion-button color="primary" fill="clear" (click)="saveChanges()">
+            <ion-icon slot="start" name="save-outline"></ion-icon>
+            Save Changes
+          </ion-button>
+        }
+
+        <!-- Review Actions: Only for Admin -->
+        @if (currentUserRole === 'admin') {
+          <ng-container>
+            <!-- Reject: Pending or Revision Requested -->
+            @if (persistedStatus === 'pending' || persistedStatus === 'revision_requested') {
+              <ion-button color="danger" fill="solid" (click)="reject()" [disabled]="isProcessing">
+                <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+                Reject
+              </ion-button>
+            }
+
+            <!-- Request Revision: Pending or Approved (to un-approve/flag) -->
+            @if (persistedStatus === 'pending' || persistedStatus === 'approved') {
+              <ion-button color="warning" fill="solid" (click)="requestRevision()" [disabled]="isProcessing">
+                <ion-icon slot="start" name="refresh-outline"></ion-icon>
+                Request Revision
+              </ion-button>
+            }
+
+            <!-- Approve: Anything NOT approved -->
+            @if (persistedStatus !== 'approved') {
+              <ion-button color="success" fill="solid" (click)="approve()" [disabled]="isProcessing">
+                @if (isProcessing) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+                }
+                Approve
+              </ion-button>
+            }
+          </ng-container>
+        }
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>
+}
