@@ -132,6 +132,10 @@
 .label-floating.input-fill-outline.sc-ion-input-md-h .label-text-wrapper.sc-ion-input-md {
   -webkit-transform: translateY(-50%) scale(0.9) !important;
   transform: translateY(-50%) scale(0.9) !important;
-  background-color: var(--ion-color-dark-contrast);
-  padding: 2px 4px 0 0;
+  background-color: inherit;
+  // padding: 2px 4px 0 0;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

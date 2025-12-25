@@ -6,7 +6,7 @@ import { initializeAppCheck, ReCaptchaEnterpriseProvider, provideAppCheck } from
 import { getAuth, provideAuth, connectAuthEmulator } from '@angular/fire/auth';
 import { getDatabase, provideDatabase, connectDatabaseEmulator } from '@angular/fire/database';
 import { connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore';
-import { getFunctions, provideFunctions } from '@angular/fire/functions';
+import { connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { provideStorage, getStorage, connectStorageEmulator } from '@angular/fire/storage';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -89,7 +89,21 @@ bootstrapApplication(AppComponent, {
       }
       return db;
     }),
-    provideFunctions(() => getFunctions()),
+    provideFunctions(() => {
+      const functions = getFunctions(undefined, 'asia-south1');
+      if (environment.useEmulators) {
+        try {
+          const host = environment.emulatorUrls?.functions || 'http://localhost:5001';
+          const url = new URL(host);
+          const hostname = url.hostname;
+          const port = Number(url.port) || environment.ports?.functions || 5001;
+          connectFunctionsEmulator(functions, hostname, port);
+        } catch (e) {
+          console.warn('Failed to connect Functions emulator:', e);
+        }
+      }
+      return functions;
+    }),
     provideMessaging(() => getMessaging()),
     provideStorage(() => {
       const storage = getStorage();
