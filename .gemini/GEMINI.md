@@ -5,6 +5,14 @@
 - Ask doubts in case the instructions are not clear
 - Never edit the environment files
 
+## Commit Strategy
+When asked to commit changes, follow this strategy:
+1.  **Granularity:** Commit one file or one logical component at a time. Do not group unrelated files.
+2.  **Limit:** Do not include more than 2 files in a single commit unless they are tightly coupled (e.g., `.ts`, `.html`, `.scss` for the same component).
+3.  **Message Format:** Use the conventional commit format: `<type>: <message in 100 chars>`.
+    -   Types: `feat` (new feature), `fix` (bug fix), `refactor` (code change that neither fixes a bug nor adds a feature), `style` (formatting, missing semi colons, etc; no production code change), `chore` (updating build tasks, package manager configs, etc).
+    -   Message: Concise, lowercase description of the change.
+
 # Project Context Saved (November 5, 2025)
 
 This document summarizes the current state of the Ekaant project and the ongoing development plan, as discussed with the Gemini CLI agent.

@@ -126,6 +126,20 @@ for **both** screens.
 2. We need to add the showRegistrationHeader flag in application status page for app-preview
 3. In the registration flow, in the last stage preview screen, the host image got some issue as the preview is not working as expected.
 
+## Security & Hardening (Pre-Prod)
+
+- [ ] **Storage Security Rules**
+  - [ ] Replace `allow write: if true;` with strict, role-based rules in `firebase/storage.rules`.
+  - [ ] Implement `isFileSizeValid()` (e.g., max 5MB) and `isImage()` helper functions in rules.
+  - [ ] Restrict `library-registrations/{id}` write access to authenticated owners.
+- [ ] **Backend Upload Validation**
+  - [ ] Update `getSignedUploadUrl` Cloud Function to accept dynamic paths (`entityId`, `folder`).
+  - [ ] Enforce `x-goog-content-length-range` header in signed URL generation.
+  - [ ] Validate `contentType` against an allowlist in the Cloud Function.
+- [ ] **Frontend Upload Integration**
+  - [ ] Update `FirebaseService.uploadFile` to pass the correct `contentType` to the signed URL function.
+  - [ ] Implement strict client-side file size checks before initiating uploads to provide immediate feedback.
+
 ## New Feature: Student Enrollment & Seat Allocation
 
 ### Phase 1: Student Application (Frontend & Backend)
