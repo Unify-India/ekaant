@@ -4,6 +4,12 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>{{ pageTitle }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="onCancel()" color="danger" fill="clear">
+        <ion-icon slot="start" name="close-outline"></ion-icon>
+        Cancel
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -119,7 +125,9 @@
           </ion-button>
         }
 
-        <ion-button (click)="onCancel()" fill="clear" color="dark">Cancel</ion-button>
+        @if (currentSectionId() === 'bookCollection') {
+          <ion-button (click)="nextSection()" fill="clear">Skip</ion-button>
+        }
 
         @if (currentSectionIndex() < sections.length - 1) {
           <ion-button (click)="nextSection()" [disabled]="!isCurrentSectionValid()" color="primary" slot="end">

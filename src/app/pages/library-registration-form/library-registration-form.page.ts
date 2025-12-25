@@ -25,6 +25,7 @@ import {
   documentOutline,
   chevronForward,
   chevronBack,
+  closeOutline,
 } from 'ionicons/icons';
 import { DraftService } from 'src/app/services/draft.service';
 import { ToasterService } from 'src/app/services/toaster/toaster.service';
@@ -79,11 +80,6 @@ export class LibraryRegistrationFormPage implements OnInit {
 
   ngOnInit() {
     // console.log('Library Registration Form initialized');
-    if (!this.lrfService.editMode) {
-      this.draftService.loadDraft(this.masterForm).catch((e) => {
-        console.error('Failed to load draft', e);
-      });
-    }
   }
   masterForm = this.lrfService.mainForm;
   currentSectionIndex = this.lrfService.currentSectionIndex;
@@ -111,6 +107,7 @@ export class LibraryRegistrationFormPage implements OnInit {
       documentLockOutline,
       imageOutline,
       documentOutline,
+      closeOutline,
     });
   }
 
@@ -149,6 +146,7 @@ export class LibraryRegistrationFormPage implements OnInit {
         this.router.navigate(['/manager/application-status']);
       } else {
         await this.lrfService.submitLibrary();
+        await this.draftService.clearDraft();
         this.router.navigate(['/registration-acknowledgement']);
       }
     } catch (err: any) {
@@ -161,15 +159,25 @@ export class LibraryRegistrationFormPage implements OnInit {
       this.router.navigate(['/manager/application-status']);
     } else {
       const alert = await this.alertController.create({
-        header: 'Cancel Registration?',
-        message: 'Are you sure you want to cancel the registration process? All entered data will be lost.',
+        header: 'Exit Registration?',
+        message: 'You can save your progress as a draft and resume later, or discard it completely.',
         buttons: [
-          { text: 'Stay', role: 'cancel' },
           {
-            text: 'Leave',
-            role: 'confirm',
+            text: 'Stay',
+            role: 'cancel',
+          },
+          {
+            text: 'Discard',
+            role: 'destructive',
             handler: () => {
               this.lrfService.reset();
+              this.router.navigate(['/home']);
+            },
+          },
+          {
+            text: 'Save & Exit',
+            handler: async () => {
+              await this.draftService.saveDraft(this.lrfService.mainForm.getRawValue());
               this.router.navigate(['/home']);
             },
           },
