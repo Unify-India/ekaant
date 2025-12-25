@@ -270,6 +270,10 @@
             </p>
             @if (req.sampleFile) {
               <ion-note>Sample document: {{ req.sampleFile.name }}</ion-note>
+            } @else if (req.fileURL) {
+              <ion-note>
+                <a [href]="req.fileURL" target="_blank" (click)="$event.stopPropagation()">View Document</a>
+              </ion-note>
             }
           </div>
         </div>
