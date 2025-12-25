@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, Optional } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   arrowForward,
@@ -27,7 +27,6 @@ export class LoginPage implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  @Optional() private modalCtrl = inject(ModalController, { optional: true });
 
   pageTitle = 'Welcome to Ekaant';
 
@@ -62,24 +61,29 @@ export class LoginPage implements OnInit {
     this.route.queryParams.subscribe((params) => {
       this.autoSelectManager = params['fromRegistration'] === 'true';
       this.redirectTo = params['redirectTo'] || null;
+      const autoRole = params['role'];
 
       if (this.autoSelectManager) {
         this.selectedRole = 'manager';
         // Automatically skip role selection and go directly to manager auth form
-        this.skipToManagerAuth();
+        this.skipToAuth(true);
+      } else if (autoRole) {
+        this.selectedRole = autoRole;
+        this.skipToAuth(false);
       }
     });
   }
-  private skipToManagerAuth() {
-    console.log('Skipping to manager auth form');
+
+  private skipToAuth(isRegister: boolean) {
+    console.log(`Skipping to auth form for role: ${this.selectedRole}, register: ${isRegister}`);
 
     // Set a small timeout to ensure the component is fully initialized
     setTimeout(() => {
       // Show the auth form right away
       this.showAuthForm = true;
       // Optionally switch to register mode for this flow
-      this.isRegisterMode = true; // keep registration enabled for manager flow
-      console.log('Auto-selected manager role and showing auth form');
+      this.isRegisterMode = isRegister;
+      console.log('Auto-selected role and showing auth form');
     }, 100);
   }
   get role(): string | null {
@@ -165,7 +169,9 @@ export class LoginPage implements OnInit {
   }
 
   private async handleSuccessfulAuth() {
-    if (this.selectedRole && !this.autoSelectManager) {
+    if (this.redirectTo) {
+      this.router.navigateByUrl(this.redirectTo);
+    } else if (this.selectedRole && !this.autoSelectManager) {
       this.router.navigate([`/${this.selectedRole}/dashboard`]);
     } else if (this.selectedRole && this.autoSelectManager) {
       this.router.navigate(['library-registration-form']);
@@ -180,11 +186,7 @@ export class LoginPage implements OnInit {
   }
 
   backToHome() {
-    if (this.modalCtrl) {
-      this.modalCtrl.dismiss();
-    } else {
-      this.router.navigate(['/home']);
-    }
+    this.router.navigate(['/home']);
   }
 
   resetRole() {
@@ -210,10 +212,5 @@ export class LoginPage implements OnInit {
     if (this.autoSelectManager) {
       this.isRegisterMode = true;
     }
-  }
-
-  // Helper method to check if we're in a modal
-  isModal(): boolean {
-    return !!this.modalCtrl;
   }
 }
