@@ -2,6 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { storage } from '../lib/firebaseAdmin';
 import { v4 as uuidv4 } from 'uuid';
+import { DEPLOYMENT_REGION } from '../config';
 
 const BUCKET_NAME = process.env.GCLOUD_STORAGE_BUCKET || '';
 const ALLOWED_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
@@ -22,6 +23,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
  */
 export const getSignedUploadUrl = onCall(
   {
+    region: DEPLOYMENT_REGION,
     maxInstances: 10,
   },
   async (request) => {
