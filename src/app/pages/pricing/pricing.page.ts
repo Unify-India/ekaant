@@ -15,7 +15,7 @@ export class PricingPage implements OnInit {
 
   pricingPlans = [
     {
-      title: '6-Month Free Trial',
+      title: '3-Month Free Trial',
       description: `Enjoy full access to all features of the Study Portal 
         with no charges for 6 months. Perfect for owners to experience 
         the benefits of a smarter digital system replacing traditional registers.`,
@@ -31,7 +31,7 @@ export class PricingPage implements OnInit {
       description: `Access to essential study room management features including 
         easy digital enrollment, real-time seat availability, and basic support ticketing. 
         Ideal for small to medium-sized libraries.`,
-      price: '₹5',
+      price: '₹10',
       duration: '/month/student',
       buttonText: 'Get Started',
       buttonColor: 'primary',
@@ -43,7 +43,7 @@ export class PricingPage implements OnInit {
       description: `Full-featured subscription including all Standard Plan benefits plus 
         streamlined record-keeping, automatic revenue tracking, priority support, and 
         enhanced student satisfaction tools. Best for larger institutions.`,
-      price: '₹15',
+      price: '₹20',
       duration: '/month/student',
       buttonText: 'Go Premium',
       buttonColor: 'warning',
