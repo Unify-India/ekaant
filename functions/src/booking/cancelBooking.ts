@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { IBooking, ICancelBookingData } from "../types/booking";
+import { DEPLOYMENT_REGION } from "../config";
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
@@ -19,7 +20,9 @@ const rtdb = admin.database();
  * @returns {Promise<{success: boolean, message: string}>} - A promise that resolves with a success message.
  * @throws {HttpsError} - Throws for auth errors, invalid arguments, or if the booking cannot be cancelled.
  */
-export const cancelBooking = onCall<ICancelBookingData, Promise<{success: boolean, message: string}>>(async (request) => {
+export const cancelBooking = onCall<ICancelBookingData, Promise<{success: boolean, message: string}>>(
+  { region: DEPLOYMENT_REGION },
+  async (request) => {
   // 1. Validate authentication and input
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");

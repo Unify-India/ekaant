@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { IBooking, ISeat, ICreateSubscriptionData } from "../types/booking";
+import { DEPLOYMENT_REGION } from "../config";
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
@@ -21,7 +22,9 @@ const rtdb = admin.database();
  * @returns {Promise<{success: boolean, bookingIds: string[]}>}
  * @throws {HttpsError} - Throws on validation, auth, or availability errors.
  */
-export const createSubscription = onCall<ICreateSubscriptionData, Promise<{success: boolean, bookingIds: string[]}>>(async (request) => {
+export const createSubscription = onCall<ICreateSubscriptionData, Promise<{success: boolean, bookingIds: string[]}>>(
+    { region: DEPLOYMENT_REGION },
+    async (request) => {
     // 1. Validation
     if (!request.auth) {
         throw new HttpsError("unauthenticated", "User must be authenticated.");

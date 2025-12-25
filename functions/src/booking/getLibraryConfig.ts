@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { ILibraryConfig, ISeat, ISlotType, IPricing, IGetLibraryConfigData } from "../types/booking";
+import { DEPLOYMENT_REGION } from "../config";
 
 // Initialize admin SDK if not already done
 if (admin.apps.length === 0) {
@@ -21,6 +22,7 @@ const db = admin.firestore();
  * or if the library or its configuration subcollections do not exist.
  */
 export const getLibraryConfig = onCall<IGetLibraryConfigData, Promise<ILibraryConfig>>(
+  { region: DEPLOYMENT_REGION },
   async (request) => {
     const { libraryId } = request.data;
 
