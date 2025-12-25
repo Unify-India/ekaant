@@ -17,7 +17,7 @@ import {
   deleteDoc,
   writeBatch,
 } from '@angular/fire/firestore';
-import { from, map, Observable, of, switchMap } from 'rxjs';
+import { from, map, Observable, of, switchMap, forkJoin } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
 import { IFirestoreLibrary, ILibraryState } from 'src/app/models/library.interface';
 
@@ -65,74 +65,68 @@ export class LibraryService {
     return null;
   }
 
-  public getLibraryRegistration(userId: string): Observable<any> {
-    // console.log('Fetching library registration for user:', userId);
+  getLibraryRegistration(userId: string): Observable<any> {
     const q = query(collection(this.firestore, 'library-registrations'), where('ownerId', '==', userId), limit(1));
     return from(getDocs(q)).pipe(
       switchMap((snapshot) => {
         if (snapshot.empty) {
           return of(null);
         }
-        const registrationDoc = snapshot.docs[0];
-        const registrationData = { id: registrationDoc.id, ...registrationDoc.data() };
-        const imagesColRef = collection(this.firestore, 'library-registrations', registrationDoc.id, 'libraryImages');
-        return from(getDocs(imagesColRef)).pipe(
-          map((imagesSnapshot) => {
-            const libraryPhotos = imagesSnapshot.docs.map((doc) => {
-              const data = doc.data();
-              return { previewUrl: data['imageURL'] };
-            });
-            const transformedData = {
-              ...registrationData,
-              libraryImages: {
-                libraryPhotos: libraryPhotos,
-              },
-            };
-            return transformedData;
-          }),
-        );
+        const docRef = snapshot.docs[0];
+        return this.getFullLibraryData(docRef, 'library-registrations');
       }),
     );
   }
 
-  public getApprovedLibrary(userId: string): Observable<any> {
-    // console.log('Fetching approved library for user:', userId);
+  getApprovedLibrary(userId: string): Observable<any> {
     const q = query(collection(this.firestore, 'libraries'), where('managerIds', 'array-contains', userId), limit(1));
     return from(getDocs(q)).pipe(
       switchMap((snapshot) => {
         if (snapshot.empty) {
           return of(null);
         }
-        const libraryDoc = snapshot.docs[0];
-        const libraryData = { id: libraryDoc.id, ...libraryDoc.data() };
-        const imagesColRef = collection(this.firestore, 'libraries', libraryDoc.id, 'libraryImages');
-        return from(getDocs(imagesColRef)).pipe(
-          map((imagesSnapshot) => {
-            const libraryPhotos = imagesSnapshot.docs.map((doc) => {
-              const data = doc.data();
-              return { previewUrl: data['imageURL'] };
-            });
-            const transformedData = {
-              ...libraryData,
-              libraryImages: {
-                libraryPhotos: libraryPhotos,
-              },
-            };
-            return transformedData;
-          }),
-        );
+        const docRef = snapshot.docs[0];
+        return this.getFullLibraryData(docRef, 'libraries');
       }),
+    );
+  }
+
+  private getFullLibraryData(docSnapshot: any, collectionName: string): Observable<any> {
+    const libraryData = { id: docSnapshot.id, ...docSnapshot.data() };
+    const libraryId = docSnapshot.id;
+
+    const imagesColRef = collection(this.firestore, collectionName, libraryId, 'libraryImages');
+    const plansColRef = collection(this.firestore, collectionName, libraryId, 'pricingPlans');
+    const reqsColRef = collection(this.firestore, collectionName, libraryId, 'requirements');
+
+    const images$ = from(getDocs(imagesColRef)).pipe(
+      map((sn) => sn.docs.map((d) => ({ previewUrl: d.data()['imageURL'], ...d.data() }))),
+    );
+    const plans$ = from(getDocs(plansColRef)).pipe(map((sn) => sn.docs.map((d) => d.data())));
+    const reqs$ = from(getDocs(reqsColRef)).pipe(map((sn) => sn.docs.map((d) => d.data())));
+
+    return forkJoin({
+      images: images$,
+      plans: plans$,
+      reqs: reqs$,
+    }).pipe(
+      map(({ images, plans, reqs }) => ({
+        ...libraryData,
+        libraryImages: { libraryPhotos: images },
+        pricingPlans: plans,
+        requirements: reqs,
+      })),
     );
   }
 
   public getLibraryRegistrationById(id: string): Observable<any> {
     const docRef = doc(this.firestore, 'library-registrations', id);
     return from(getDoc(docRef)).pipe(
-      map((snapshot) => {
+      switchMap((snapshot) => {
         if (snapshot.exists()) {
-          return { id: snapshot.id, ...snapshot.data() };
+           return this.getFullLibraryData(snapshot, 'library-registrations');
         } else {
-          return null;
+          return of(null);
         }
       }),
     );
@@ -294,6 +288,58 @@ export class LibraryService {
     });
   }
 
+  async syncLibraryImages(
+    libraryId: string,
+    currentImages: { file?: File; previewUrl: string; order?: number; caption?: string }[],
+    isApproved: boolean,
+    onProgress?: (idx: number, percent: number) => void,
+  ): Promise<void> {
+    const collectionName = isApproved ? 'libraries' : 'library-registrations';
+    const imagesColRef = collection(this.firestore, collectionName, libraryId, 'libraryImages');
+    const existingSnapshot = await getDocs(imagesColRef);
+    const existingDocs = existingSnapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    const batch = writeBatch(this.firestore);
+
+    // 1. Identify Deletions
+    // Delete any existing doc whose imageURL is NOT in the currentImages list
+    // (We match by URL because that's what we persist in the form)
+    const currentUrls = new Set(currentImages.map((img) => img.previewUrl));
+    existingDocs.forEach((exDoc: any) => {
+      if (!currentUrls.has(exDoc.imageURL)) {
+        batch.delete(doc(imagesColRef, exDoc.id));
+      }
+    });
+
+    // 2. Identify Updates (Order/Caption) for existing images
+    currentImages.forEach((img, idx) => {
+      // Find matching existing doc
+      const match = existingDocs.find((ex: any) => ex.imageURL === img.previewUrl);
+      if (match) {
+        // It's an existing image, update metadata if needed
+        const ref = doc(imagesColRef, match.id);
+        batch.update(ref, {
+          order: idx, // Update order based on array position
+          caption: img.caption || null,
+        });
+      }
+    });
+
+    // Commit deletions and metadata updates
+    await batch.commit();
+
+    // 3. Handle New Uploads (Sequential because they are async storage ops)
+    // New images have a 'file' property
+    for (let idx = 0; idx < currentImages.length; idx++) {
+      const img = currentImages[idx];
+      if (img.file) {
+        // pass a callback that knows which index it is
+        const progressCallback = onProgress ? (pct: number) => onProgress(idx, pct) : undefined;
+        await this.addLibraryImage(libraryId, img.file, isApproved, { order: idx, caption: img.caption }, progressCallback);
+      }
+    }
+  }
+
   async addLibraryImage(
     libraryId: string,
     file: File,
@@ -314,6 +360,56 @@ export class LibraryService {
       uploadedAt: serverTimestamp(),
     });
     return { id: imageDoc.id, url };
+  }
+
+  async syncRequirements(
+    libraryId: string,
+    currentReqs: any[],
+    isApproved: boolean,
+    onProgress?: (idx: number, percent: number) => void,
+  ): Promise<void> {
+    const collectionName = isApproved ? 'libraries' : 'library-registrations';
+    const reqsColRef = collection(this.firestore, collectionName, libraryId, 'requirements');
+    const existingSnapshot = await getDocs(reqsColRef);
+    const existingDocs = existingSnapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    const batch = writeBatch(this.firestore);
+
+    // 1. Identify Deletions
+    const currentUrls = new Set(currentReqs.map((r) => r.fileURL).filter(Boolean));
+    existingDocs.forEach((exDoc: any) => {
+      if (!currentUrls.has(exDoc.fileURL)) {
+        batch.delete(doc(reqsColRef, exDoc.id));
+      }
+    });
+
+    // 2. Identify Updates
+    currentReqs.forEach((req) => {
+      const match = existingDocs.find((ex: any) => ex.fileURL === req.fileURL);
+      if (match) {
+        const ref = doc(reqsColRef, match.id);
+        batch.update(ref, {
+          description: req.description || null,
+        });
+      }
+    });
+
+    await batch.commit();
+
+    // 3. Handle New Uploads
+    for (let idx = 0; idx < currentReqs.length; idx++) {
+      const req = currentReqs[idx];
+      if (req.sampleFile) {
+        const progressCallback = onProgress ? (pct: number) => onProgress(idx, pct) : undefined;
+        await this.addRequirementDocument(
+          libraryId,
+          req.sampleFile,
+          isApproved,
+          { description: req.description },
+          progressCallback,
+        );
+      }
+    }
   }
 
   async addRequirementDocument(
@@ -349,5 +445,23 @@ export class LibraryService {
       ...comment,
       timestamp: serverTimestamp(),
     });
+  }
+
+  async savePricingPlans(libraryId: string, plans: any[], isApproved: boolean): Promise<void> {
+    const collectionName = isApproved ? 'libraries' : 'library-registrations';
+    const subColRef = collection(this.firestore, collectionName, libraryId, 'pricingPlans');
+
+    // Delete existing plans (safe update strategy for overwrite)
+    const existingDocs = await getDocs(subColRef);
+    const batch = writeBatch(this.firestore);
+    existingDocs.forEach((doc) => batch.delete(doc.ref));
+
+    // Add new plans
+    plans.forEach((plan) => {
+      const newDocRef = doc(subColRef);
+      batch.set(newDocRef, plan);
+    });
+
+    await batch.commit();
   }
 }
