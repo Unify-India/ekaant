@@ -16,7 +16,7 @@ import {
   sparklesOutline,
 } from 'ionicons/icons';
 import { AdminRoutingModule } from 'src/app/admin/admin-routing.module';
-import { IFeatureCard, IRegistrationStep } from 'src/app/models/library-registration-request';
+import { IFeatureCard, IRegistrationStep } from 'src/app/models/library-registration.model';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
 
