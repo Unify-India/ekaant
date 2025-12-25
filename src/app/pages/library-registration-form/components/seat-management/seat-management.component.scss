@@ -123,6 +123,10 @@
   }
 }
 
+.select-facility {
+  max-width: 60%;
+}
+
 .range-row {
   display: flex;
   flex-wrap: wrap;
@@ -137,7 +141,8 @@
     flex: 1;
     min-width: fit-content;
 
-    ion-input, ion-select {
+    ion-input,
+    ion-select {
       flex: 1;
       margin-top: 0;
     }

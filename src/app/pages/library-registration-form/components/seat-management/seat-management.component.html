@@ -93,6 +93,7 @@
                 placeholder="Select"
                 formControlName="facility"
                 multiple
+                class="select-facility"
               >
                 @for (option of facilityOptions; track option.value) {
                   <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
@@ -101,7 +102,7 @@
 
               <ion-button (click)="addFacilityRange()" fill="solid" color="success" [disabled]="newRangeForm.invalid">
                 <ion-icon slot="start" name="save-outline"></ion-icon>
-                Save Facility
+                Save
               </ion-button>
             </div>
           </div>
