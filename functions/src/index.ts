@@ -1,5 +1,6 @@
 import * as logger from 'firebase-functions/logger';
 import * as functionsV1 from 'firebase-functions/v1'; // For V1 auth triggers
+import { DEPLOYMENT_REGION } from './config';
 
 // This file is the main entrypoint for all Firebase Functions.
 // We import functions from their individual files and export them here,
@@ -31,8 +32,8 @@ import { getSignedUploadUrl } from './uploads/getSignedUploadUrl';
 logger.info('Functions cold start');
 
 // Export V1 Auth Triggers (as V2 does not directly support them yet)
-export const authOnUserSignup = functionsV1.auth.user().onCreate(onUserSignupLogic);
-export const authOnUserDelete = functionsV1.auth.user().onDelete(onUserDeleteLogic);
+export const authOnUserSignup = functionsV1.region(DEPLOYMENT_REGION).auth.user().onCreate(onUserSignupLogic);
+export const authOnUserDelete = functionsV1.region(DEPLOYMENT_REGION).auth.user().onDelete(onUserDeleteLogic);
 
 // Export V1 Booking Triggers
 export const bookingOnSeatCheckout = transferSeatOnCheckout;
