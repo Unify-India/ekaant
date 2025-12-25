@@ -60,6 +60,21 @@ export class LibraryRequestDetailPage implements OnInit {
   persistedStatus: string = 'pending';
   fullLibraryData: any = null;
 
+  public readonly amenitiesLabels: { [key: string]: string } = {
+    highSpeedWifi: 'High-Speed Wi-Fi',
+    airConditioning: 'Air Conditioning',
+    powerOutlets: 'Power Outlets',
+    coffeeMachine: 'Coffee Machine',
+    waterCooler: 'Water Cooler',
+    parkingAvailable: 'Parking Available',
+    security247: '24/7 Security',
+    cctvSurveillance: 'CCTV Surveillance',
+    lockers: 'Lockers',
+    printingServices: 'Printing Services',
+    quietZones: 'Quiet Zones',
+    discussionRooms: 'Discussion Rooms',
+  };
+
   private functions = inject(Functions);
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
@@ -254,6 +269,28 @@ export class LibraryRequestDetailPage implements OnInit {
         this.isProcessing = false;
       }
     });
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'pending':
+        return 'status-pending';
+      case 'approved':
+        return 'status-approved';
+      case 'rejected':
+        return 'status-rejected';
+      case 'changes-required':
+        return 'status-changes-required';
+      default:
+        return '';
+    }
+  }
+
+  getNormalizedAmenities(): string[] {
+    if (!this.fullLibraryData || !this.fullLibraryData.amenities) return [];
+    const am = this.fullLibraryData.amenities;
+    if (Array.isArray(am)) return am;
+    return Object.keys(am).filter((k) => am[k] === true);
   }
 
   private async _promptForComment(header: string, placeholder: string, action: (comment: string) => Promise<void>) {

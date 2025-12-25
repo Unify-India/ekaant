@@ -97,24 +97,26 @@
       <ion-accordion-group class="ion-margin-top" [multiple]="true">
         <!-- Amenities -->
         <ion-accordion value="amenities">
-          <ion-item slot="header" color="light">
+          <ion-item slot="header" color="light" class="accordion-header">
             <ion-label>Amenities</ion-label>
           </ion-item>
           <div class="ion-padding" slot="content">
-            <ion-chip *ngFor="let item of fullLibraryData.amenities | keyvalue" [disabled]="!item.value">
-              <ion-icon name="checkmark-circle" *ngIf="item.value" color="success"></ion-icon>
-              <ion-icon name="close-circle" *ngIf="!item.value" color="medium"></ion-icon>
-              <!-- <ion-label>{{ item.key | titlecase }}</ion-label> -->
+            <ion-chip *ngFor="let key of getNormalizedAmenities()">
+              <ion-icon name="checkmark-circle" color="success"></ion-icon>
+              <ion-label>{{ amenitiesLabels[key] || (key | titlecase) }}</ion-label>
             </ion-chip>
+            <p *ngIf="getNormalizedAmenities().length === 0" class="ion-text-center">
+              <ion-note>No amenities specified.</ion-note>
+            </p>
           </div>
         </ion-accordion>
 
         <!-- Pricing Plans -->
         <ion-accordion value="pricing">
-          <ion-item slot="header" color="light">
+          <ion-item slot="header" color="light" class="accordion-header">
             <ion-label>Pricing Plans ({{ fullLibraryData.pricingPlans?.length || 0 }})</ion-label>
           </ion-item>
-          <div class="ion-padding" slot="content">
+          <div class="ion-padding" slot="content" class="accordion-content">
             <ion-list lines="none">
               <ion-item *ngFor="let plan of fullLibraryData.pricingPlans" class="plan-item">
                 <ion-label>
@@ -131,7 +133,7 @@
 
         <!-- Requirements / Documents -->
         <ion-accordion value="requirements">
-          <ion-item slot="header" color="light">
+          <ion-item slot="header" color="light" class="accordion-header">
             <ion-label>Requirements & Documents ({{ fullLibraryData.requirements?.length || 0 }})</ion-label>
           </ion-item>
           <div class="ion-padding" slot="content">
@@ -154,7 +156,7 @@
 
         <!-- Images -->
         <ion-accordion value="images">
-          <ion-item slot="header" color="light">
+          <ion-item slot="header" color="light" class="accordion-header">
             <ion-label>Library Images ({{ fullLibraryData.libraryImages?.libraryPhotos?.length || 0 }})</ion-label>
           </ion-item>
           <div class="ion-padding image-grid" slot="content">

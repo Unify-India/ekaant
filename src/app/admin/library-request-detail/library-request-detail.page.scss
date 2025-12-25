@@ -104,3 +104,13 @@ ion-item {
     margin-top: 0.5rem;
   }
 }
+
+.accordion-header {
+  box-sizing: border-box;
+  margin: 2px 0;
+  // padding: 0.5rem;
+  // background-color: lime;
+  ion-label {
+    margin-left: 1rem;
+  }
+}
