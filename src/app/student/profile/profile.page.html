@@ -34,6 +34,7 @@
               fill="outline"
               placeholder="Enter Full Name"
               formControlName="name"
+              errorText="Name is required"
             ></ion-input>
             <ion-input
               label="Email"
@@ -42,6 +43,7 @@
               placeholder="Enter Email"
               formControlName="email"
               [disabled]="true"
+              errorText="Valid email is required"
             ></ion-input>
             <ion-input
               label="Phone Number"
@@ -49,6 +51,7 @@
               fill="outline"
               placeholder="e.g., 9876543210"
               formControlName="phoneNumber"
+              helperText="Enter a 10-digit mobile number"
             ></ion-input>
 
             <ion-input
@@ -57,6 +60,7 @@
               fill="outline"
               placeholder="Enter text"
               formControlName="fullAddress"
+              helperText="Your current residential address"
             ></ion-input>
           </div>
         </ion-card-content>
@@ -74,6 +78,7 @@
             fill="outline"
             placeholder="Enter your ID number"
             formControlName="idNumber"
+            helperText="Provide a valid Government ID number"
           ></ion-input>
 
           <div class="upload-box" (click)="fileInput.click()">
@@ -102,6 +107,7 @@
               fill="outline"
               type="time"
               formControlName="preferredStartTime"
+              helperText="Preferred start time"
             ></ion-input>
             <ion-input
               label="End Time"
@@ -109,6 +115,7 @@
               fill="outline"
               type="time"
               formControlName="preferredEndTime"
+              helperText="Preferred end time"
             ></ion-input>
           </div>
         </ion-card-content>
