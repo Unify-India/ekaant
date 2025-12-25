@@ -32,7 +32,7 @@ import { PriceCardComponent } from 'src/app/components/price-card/price-card.com
 import { RequirementsListComponent } from 'src/app/components/requirements-list/requirements-list.component';
 import { ReviewCardComponent } from 'src/app/components/review-card/review-card.component';
 import { IAmenities, IPricingDetails, Review } from 'src/app/models/library';
-import { BookCategory } from 'src/app/models/library-registration-request';
+import { BookCategory } from 'src/app/models/library-registration.model';
 
 @Component({
   selector: 'app-library-details',
