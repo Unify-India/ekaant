@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { Auth, authState } from '@angular/fire/auth';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonInput, IonHeader, IonTitle, IonToolbar, IonIcon, IonButtons } from '@ionic/angular/standalone';
@@ -33,13 +34,19 @@ import { FooterPage } from '../footer/footer.page';
 export class BrowseLibrariesPage implements OnInit {
   private router = inject(Router);
   private libraryService = inject(LibraryService);
+  private auth = inject(Auth);
+
   libraries: any[] = [];
   query: string = '';
+  isAuthenticated = false;
 
   constructor() {}
 
   ngOnInit() {
     this.loadLibraries();
+    authState(this.auth).subscribe((user) => {
+      this.isAuthenticated = !!user;
+    });
   }
 
   loadLibraries() {
@@ -58,7 +65,17 @@ export class BrowseLibrariesPage implements OnInit {
       console.warn('No library data in action event');
       return;
     }
-    this.router.navigate(['student/application-form', library.id]);
+
+    if (this.isAuthenticated) {
+      this.router.navigate(['student/application-form', library.id]);
+    } else {
+      this.router.navigate(['/login'], {
+        queryParams: {
+          redirectTo: '/student/application-form/' + library.id,
+          role: 'student',
+        },
+      });
+    }
   }
 
   onSearch() {
