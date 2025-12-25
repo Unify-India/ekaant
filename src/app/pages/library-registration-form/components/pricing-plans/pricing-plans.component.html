@@ -24,34 +24,51 @@
           <div [formGroupName]="$index">
             @if (editingIndex() === $index) {
               <div class="plan-edit-form">
-                <ion-item fill="outline">
-                  <ion-label position="stacked">Plan Type</ion-label>
-                  <ion-select formControlName="planType" placeholder="Select Type">
-                    @for (type of planTypes; track type) {
-                      <ion-select-option [value]="type">{{ type }}</ion-select-option>
-                    }
-                  </ion-select>
-                </ion-item>
-                <ion-item fill="outline" class="ion-margin-top">
-                  <ion-label position="stacked">Time Slot</ion-label>
-                  <ion-select formControlName="timeSlot" placeholder="Select Slot">
-                    @for (slot of timeSlots; track slot) {
-                      <ion-select-option [value]="slot">{{ slot }}</ion-select-option>
-                    }
-                  </ion-select>
-                </ion-item>
-                <ion-item fill="outline" class="ion-margin-top">
-                  <ion-label position="stacked">Rate (₹)</ion-label>
-                  <ion-input formControlName="rate" type="number" placeholder="0"></ion-input>
-                </ion-item>
-                <ion-item fill="outline" class="ion-margin-top">
-                  <ion-label position="stacked">Description (Optional)</ion-label>
-                  <ion-textarea
-                    formControlName="description"
-                    [autoGrow]="true"
-                    placeholder="Add any additional details..."
-                  ></ion-textarea>
-                </ion-item>
+                <ion-select
+                  label="Plan Type"
+                  labelPlacement="floating"
+                  fill="outline"
+                  formControlName="planType"
+                  placeholder="Select Type"
+                >
+                  @for (type of planTypes; track type) {
+                    <ion-select-option [value]="type">{{ type }}</ion-select-option>
+                  }
+                </ion-select>
+
+                <ion-select
+                  class="ion-margin-top"
+                  label="Time Slot"
+                  labelPlacement="floating"
+                  fill="outline"
+                  formControlName="timeSlot"
+                  placeholder="Select Slot"
+                >
+                  @for (slot of timeSlots; track slot) {
+                    <ion-select-option [value]="slot">{{ slot }}</ion-select-option>
+                  }
+                </ion-select>
+
+                <ion-input
+                  class="ion-margin-top"
+                  label="Rate (₹)"
+                  labelPlacement="floating"
+                  fill="outline"
+                  formControlName="rate"
+                  type="number"
+                  placeholder="0"
+                ></ion-input>
+
+                <ion-textarea
+                  class="ion-margin-top"
+                  label="Description (Optional)"
+                  labelPlacement="floating"
+                  fill="outline"
+                  formControlName="description"
+                  [autoGrow]="true"
+                  placeholder="Add any additional details..."
+                ></ion-textarea>
+
                 <div class="form-actions">
                   <ion-button (click)="savePlan($index)" color="success">
                     <ion-icon slot="start" name="checkmark-outline"></ion-icon>
