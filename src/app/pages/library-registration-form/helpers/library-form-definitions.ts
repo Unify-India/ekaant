@@ -65,8 +65,7 @@ export function createBookCollectionForm(fb: FormBuilder): FormGroup {
       generalKnowledge: [false],
       fictionNovels: [false],
       referenceBooks: [false],
-    },
-    { validators: minOneCheckboxSelectedValidator() },
+    }
   );
 }
 
@@ -134,10 +133,8 @@ export function createPricingPlansForm(fb: FormBuilder): FormArray {
   return fb.array([], [Validators.required, Validators.minLength(1)]);
 }
 
-export function createRequirementsForm(fb: FormBuilder): FormGroup {
-  return fb.group({
-    selectedRequirements: fb.array([], [Validators.required, Validators.minLength(1)]),
-  });
+export function createRequirementsForm(fb: FormBuilder): FormArray {
+  return fb.array([], [Validators.required, Validators.minLength(1)]);
 }
 
 // helper to create individual requirement group (if used externally)
@@ -148,6 +145,7 @@ export function createRequirementGroup(fb: FormBuilder, req: any = {}) {
     attachSample: [req.attachSample || false],
     sampleFile: [null],
     sampleFileProgress: [0],
+    fileURL: [req.fileURL || ''],
   });
 }
 
