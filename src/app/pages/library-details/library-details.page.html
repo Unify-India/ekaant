@@ -19,7 +19,7 @@
         <h1>{{ libraryData.name }}</h1>
         <div class="secondary-header">
           <ion-chip color="secondary" slot="end">{{ libraryData.type }}</ion-chip>
-          <ion-button color="tertiary" routerLink="/student/apply-library">
+          <ion-button color="tertiary" (click)="enrollNow()">
             Enroll Now
             <ion-icon slot="end" name="arrow-forward"></ion-icon>
           </ion-button>
@@ -200,7 +200,7 @@
     <ion-card id="enroll-action" class="ion-padding enroll-action">
       <h2 class="section-heading">Ready to Start Your Journey?</h2>
       <p class="sub-section-heading">Join hundreds of students who have made this their study home.</p>
-      <ion-button color="success" size="large">
+      <ion-button color="success" size="large" (click)="enrollNow()">
         Enroll Now
         <ion-icon name="arrow-forward" slot="end"></ion-icon>
       </ion-button>

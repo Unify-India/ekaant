@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { Auth, authState } from '@angular/fire/auth';
+import { Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
@@ -25,6 +26,7 @@ import {
   cafeOutline,
   shieldOutline,
   closeCircleOutline,
+  arrowForward,
 } from 'ionicons/icons';
 import { AmenitiesCardComponent } from 'src/app/components/amenities-card/amenities-card.component';
 import { ListCodeOfConductComponent } from 'src/app/components/list-code-of-conduct/list-code-of-conduct.component';
@@ -50,10 +52,15 @@ import { BookCategory } from 'src/app/models/library-registration.model';
     ListCodeOfConductComponent,
   ],
 })
-export class LibraryDetailsPage {
+export class LibraryDetailsPage implements OnInit {
   pageTitle = 'Library details';
+  private router = inject(Router);
+  private auth = inject(Auth);
+  isAuthenticated = false;
+
   // Mock data for the entire page
   public libraryData = {
+    id: 'mock-library-1',
     name: 'Central City Library',
     type: 'Co-ed',
     address: '123 Lalpur Main Road, Ranchi, Jharkhand',
@@ -218,11 +225,32 @@ export class LibraryDetailsPage {
       cafeOutline,
       shieldOutline,
       closeCircleOutline,
+      arrowForward,
     });
 
     this.payPerUsePlans = this.allPricingPlans.filter((p) => p.pricingType === 'PayPerUse');
     this.monthlyPlans = this.allPricingPlans.filter((p) => p.pricingType === 'Monthly');
   }
+
+  ngOnInit() {
+    authState(this.auth).subscribe((user) => {
+      this.isAuthenticated = !!user;
+    });
+  }
+
+  enrollNow() {
+    if (this.isAuthenticated) {
+      this.router.navigate(['student/application-form', this.libraryData.id]);
+    } else {
+      this.router.navigate(['/login'], {
+        queryParams: {
+          redirectTo: '/student/application-form/' + this.libraryData.id,
+          role: 'student',
+        },
+      });
+    }
+  }
+
   bookCategoryList: BookCategory[] = [
     { name: 'Engineering & Technology', selected: true },
     { name: 'Medical Sciences', selected: false },
