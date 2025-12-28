@@ -12,7 +12,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeCircleOutline } from 'ionicons/icons';
-import { IPricingDetails } from 'src/app/models/library';
+import { IPricingDetails } from 'src/app/models/library.interface';
 
 @Component({
   selector: 'app-price-card',

@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { IonItem, IonChip, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { star, starOutline } from 'ionicons/icons';
-import { Review } from 'src/app/models/library';
+import { IReview } from 'src/app/models/library.interface';
 
 @Component({
   selector: 'app-review-card',
@@ -11,7 +11,7 @@ import { Review } from 'src/app/models/library';
   imports: [IonChip, IonIcon],
 })
 export class ReviewCardComponent {
-  @Input() reviews: Review[] = [];
+  @Input() reviews: IReview[] = [];
 
   public readonly starArray = [1, 2, 3, 4, 5];
 

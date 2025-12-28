@@ -5,7 +5,7 @@ import { IonButton, IonCardSubtitle, IonCardHeader, IonCard, IonCardTitle, IonBa
 import { addIcons } from 'ionicons';
 import { eyeOutline, pinOutline } from 'ionicons/icons';
 import { AdminRoutingModule } from 'src/app/admin/admin-routing.module';
-import { Library } from 'src/app/models/library';
+import { Library } from 'src/app/models/library.interface';
 import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
 
 @Component({
