@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonInput, IonHeader, IonTitle, IonToolbar, IonIcon, IonButtons } from '@ionic/angular/standalone';
 import { LibraryCardComponent } from 'src/app/components/library-card/library-card.component';
-import { Library } from 'src/app/models/library';
+import { Library } from 'src/app/models/library.interface';
 import { LibraryService } from 'src/app/services/library/library.service';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 
@@ -36,7 +36,7 @@ export class BrowseLibrariesPage implements OnInit {
   private libraryService = inject(LibraryService);
   private auth = inject(Auth);
 
-  libraries: any[] = [];
+  libraries: Library[] = [];
   query: string = '';
   isAuthenticated = false;
 
@@ -51,7 +51,7 @@ export class BrowseLibrariesPage implements OnInit {
 
   loadLibraries() {
     this.libraryService.getLibrariesForCardView().subscribe({
-      next: (data) => {
+      next: (data: Library[]) => {
         this.libraries = data;
         console.log('Loaded libraries:', this.libraries);
       },
