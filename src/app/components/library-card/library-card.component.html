@@ -27,7 +27,7 @@
   </ion-card-content>
 
   <div class="card-footer">
-    <ion-button color="medium" routerLink="/library-details">
+    <ion-button color="medium" [routerLink]="['/library-details', library.id]">
       <span>View</span>
       <ion-icon slot="start" name="eye-outline"></ion-icon>
     </ion-button>

@@ -86,7 +86,7 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'library-details',
+    path: 'library-details/:id',
     loadComponent: () => import('./pages/library-details/library-details.page').then((m) => m.LibraryDetailsPage),
   },
   {
