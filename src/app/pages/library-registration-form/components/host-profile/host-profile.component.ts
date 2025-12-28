@@ -7,6 +7,7 @@ import { IonProgressBar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { warningOutline, personCircleOutline, shieldCheckmarkOutline } from 'ionicons/icons';
 
+import { AuthService } from 'src/app/auth/service/auth.service';
 import { LibraryRegistrationFormService } from '../../service/library-registration-form.service';
 
 @Component({
@@ -18,6 +19,7 @@ import { LibraryRegistrationFormService } from '../../service/library-registrati
 })
 export class HostProfileComponent implements OnInit {
   private lrfService = inject(LibraryRegistrationFormService);
+  private authService = inject(AuthService);
   public hostProfileForm!: FormGroup;
 
   // --- UI String Variables ---
@@ -36,6 +38,16 @@ export class HostProfileComponent implements OnInit {
   constructor() {
     addIcons({ warningOutline, personCircleOutline, shieldCheckmarkOutline });
     this.hostProfileForm = this.lrfService.getFormGroup('hostProfile');
+
+    // Pre-fill email from logged-in user and disable editing
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser?.email) {
+      const emailControl = this.hostProfileForm.get('email');
+      if (emailControl) {
+        emailControl.setValue(currentUser.email);
+        emailControl.disable();
+      }
+    }
 
     const phoneSignal = toSignal(this.hostProfileForm.get('phoneNumber')!.valueChanges, {
       initialValue: this.hostProfileForm.get('phoneNumber')!.value,

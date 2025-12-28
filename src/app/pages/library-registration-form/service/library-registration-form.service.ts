@@ -245,7 +245,7 @@ export class LibraryRegistrationFormService {
     if (!this.registrationDocId) {
       throw new Error('No registration document ID found for updating.');
     }
-    const payload = this.mainForm.value;
+    const payload = this.mainForm.getRawValue();
     const { initialPayload, imagesArray, hostProfileFile, requirementsArray, pricingPlansArray } =
       this.prepareInitialPayload(payload);
 
@@ -268,7 +268,7 @@ export class LibraryRegistrationFormService {
       throw new Error('User not authenticated. Cannot submit form.');
     }
 
-    const payload = this.mainForm.value;
+    const payload = this.mainForm.getRawValue();
     const { initialPayload, imagesArray, hostProfileFile, requirementsArray, pricingPlansArray } =
       this.prepareInitialPayload(payload);
 
