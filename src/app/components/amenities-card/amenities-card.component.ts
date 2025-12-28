@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
-import { IAmenities } from 'src/app/models/library';
+import { IAmenities } from 'src/app/models/library.interface';
 
 @Component({
   selector: 'app-amenities-card',
