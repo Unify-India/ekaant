@@ -42,33 +42,52 @@ export const approveLibrary = onCall({ region: DEPLOYMENT_REGION }, async (reque
       throw new HttpsError('failed-precondition', 'This library has already been approved.');
     }
 
-    // 2. Create Library Manager Auth User
+    // 2. Identify/Create Library Manager User
+    const ownerId = registrationData.ownerId;
     // The UI schema uses hostProfile for manager details
     const hostProfile = registrationData.hostProfile || {};
     const managerEmail = hostProfile.email;
     const managerName = hostProfile.fullName;
 
-    if (!managerEmail) {
-      throw new HttpsError('failed-precondition', 'Manager email is missing in the registration request.');
+    let managerUserRecord;
+    let tempPassword = null;
+
+    // A. Try to find user by ownerId (Preferred)
+    if (ownerId) {
+      try {
+        managerUserRecord = await auth.getUser(ownerId);
+        logger.info(`Found existing user by ownerId: ${ownerId}`);
+      } catch (e: any) {
+        if (e.code !== 'auth/user-not-found') {
+          throw e;
+        }
+        logger.warn(`User with ownerId ${ownerId} not found. Proceeding to email lookup.`);
+      }
     }
 
-    const managerPassword = Math.random().toString(36).slice(-8); // Generate a random temporary password
+    // B. Fallback: Find by email or Create new user
+    if (!managerUserRecord) {
+      if (!managerEmail) {
+        throw new HttpsError('failed-precondition', 'Manager email is missing and no valid ownerId found.');
+      }
 
-    let managerUserRecord;
-    try {
-      // Try to find if user already exists
-      managerUserRecord = await auth.getUserByEmail(managerEmail);
-      logger.info(`User already exists for email ${managerEmail}. Updating claims.`);
-    } catch (e: any) {
-      if (e.code === 'auth/user-not-found') {
-        // Create new user
-        managerUserRecord = await auth.createUser({
-          email: managerEmail,
-          password: managerPassword,
-          displayName: managerName,
-        });
-      } else {
-        throw e;
+      try {
+        // Try to find if user already exists by email
+        managerUserRecord = await auth.getUserByEmail(managerEmail);
+        logger.info(`Found existing user by email: ${managerEmail}`);
+      } catch (e: any) {
+        if (e.code === 'auth/user-not-found') {
+          // Create new user
+          tempPassword = Math.random().toString(36).slice(-8); // Generate a random temporary password
+          managerUserRecord = await auth.createUser({
+            email: managerEmail,
+            password: tempPassword,
+            displayName: managerName,
+          });
+          logger.info(`Created new user for ${managerEmail}`);
+        } else {
+          throw e;
+        }
       }
     }
 
@@ -113,13 +132,13 @@ export const approveLibrary = onCall({ region: DEPLOYMENT_REGION }, async (reque
 
     // TODO: 6. Send Welcome Email
     logger.info(
-      `Successfully approved library ${libraryId}. Manager: ${managerEmail}, Temp Password: ${managerPassword}`,
+      `Successfully approved library ${libraryId}. Manager: ${managerUserRecord.email}, Temp Password: ${tempPassword || 'N/A'}`,
     );
 
     return {
       status: 'success',
       message: `Library ${basicInfo.libraryName || ''} approved successfully.`,
-      tempPassword: managerPassword, // Sending back for admin's info
+      tempPassword: tempPassword, // Sending back for admin's info
     };
   } catch (error) {
     logger.error('Error approving library:', error);
