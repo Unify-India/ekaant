@@ -13,197 +13,212 @@
       <ion-title size="large">{{ pageTitle }}</ion-title>
     </ion-toolbar>
   </ion-header>
-  <div class="details-container">
-    <ion-card class="overview-card ion-padding">
-      <div class="header">
-        <h1>{{ libraryData.name }}</h1>
-        <div class="secondary-header">
-          <ion-chip color="secondary" slot="end">{{ libraryData.type }}</ion-chip>
-          <ion-button color="tertiary" (click)="enrollNow()">
-            Enroll Now
-            <ion-icon slot="end" name="arrow-forward"></ion-icon>
-          </ion-button>
-        </div>
-      </div>
 
-      <div class="info-items">
-        <div class="info-item">
-          <ion-icon name="time-outline"></ion-icon>
-          <div>
-            <ion-label>Operating Hours</ion-label>
-            <p>
-              <strong>{{ libraryData.operatingHours }}</strong>
-            </p>
+  @if (isLoading) {
+    <div class="ion-text-center ion-padding top-50">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading library details...</p>
+    </div>
+  } @else {
+    <div class="details-container">
+      <ion-card class="overview-card ion-padding">
+        <div class="header">
+          <h1>{{ libraryData.basicInformation.libraryName }}</h1>
+          <div class="secondary-header">
+            <ion-chip color="secondary" slot="end">{{ libraryData.basicInformation.genderCategory }}</ion-chip>
+            <ion-button color="tertiary" (click)="enrollNow()">
+              Enroll Now
+              <ion-icon slot="end" name="arrow-forward"></ion-icon>
+            </ion-button>
           </div>
         </div>
-        <div class="info-item">
-          <ion-icon name="people-outline"></ion-icon>
-          <div>
-            <ion-label>Seat Availability</ion-label>
-            <p>
-              <strong>{{ libraryData.seats.available }} / {{ libraryData.seats.total }} Available</strong>
-            </p>
-          </div>
-        </div>
-        <div class="info-item">
-          <ion-icon name="star"></ion-icon>
-          <div>
-            <ion-label>Rating</ion-label>
-            <p>
-              <strong>{{ libraryData.rating.average }} ({{ libraryData.rating.totalReviews }} reviews)</strong>
-            </p>
-          </div>
-        </div>
-      </div>
-    </ion-card>
 
-    <ion-card class="ratings-card ion-padding">
-      <div class="header">
-        <h2>Ratings & Reviews</h2>
-        <!-- NOTE: To be added after MVP -->
-        <!-- <ion-button color="tertiary">
-          <ion-icon slot="start" name="add"></ion-icon>
-          Add Review
-        </ion-button> -->
-      </div>
-
-      <ion-grid>
-        <ion-row>
-          <ion-col size="12" size-lg="6">
-            <div class="rating-summary">
-              <span class="average">{{ libraryData.rating.average }}</span>
-              <div class="stars">
-                @for (i of starSummaryArray; track i) {
-                  <ion-icon [name]="i <= libraryData.rating.average ? 'star' : 'star-outline'"></ion-icon>
-                }
-              </div>
+        <div class="info-items">
+          <div class="info-item">
+            <ion-icon name="time-outline"></ion-icon>
+            <div>
+              <ion-label>Operating Hours</ion-label>
               <p>
-                <small>{{ libraryData.rating.totalReviews }} total reviews</small>
+                <strong>{{ operatingHours }}</strong>
               </p>
             </div>
-            <div class="rating-breakdown">
-              @for (item of libraryData.ratingsBreakdown; track item.stars) {
-                <div class="breakdown-row">
-                  <span>
-                    {{ item.stars }}
-                    <ion-icon name="star" color="warning"></ion-icon>
-                  </span>
-                  <ion-progress-bar [value]="getRatingPercentage(item.count)" color="warning"></ion-progress-bar>
-                  <span>{{ item.count }}</span>
+          </div>
+          <div class="info-item">
+            <ion-icon name="people-outline"></ion-icon>
+            <div>
+              <ion-label>Seat Availability</ion-label>
+              <p>
+                <strong>{{ availableSeats }} / {{ libraryData.seatManagement.totalSeats }} Available</strong>
+              </p>
+            </div>
+          </div>
+          <div class="info-item">
+            <ion-icon name="star"></ion-icon>
+            <div>
+              <ion-label>Rating</ion-label>
+              <p>
+                <strong>
+                  {{ libraryData.rating?.averageRating }} ({{ libraryData.rating?.totalReviews }} reviews)
+                </strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      </ion-card>
+
+      <ion-card class="ratings-card ion-padding">
+        <div class="header">
+          <h2>Ratings & Reviews</h2>
+        </div>
+
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-lg="6">
+              <div class="rating-summary">
+                <span class="average">{{ libraryData.rating?.averageRating }}</span>
+                <div class="stars">
+                  @for (i of starSummaryArray; track i) {
+                    <ion-icon
+                      [name]="(libraryData.rating?.averageRating || 0) >= i ? 'star' : 'star-outline'"
+                    ></ion-icon>
+                  }
                 </div>
-              }
-            </div>
-          </ion-col>
+                <p>
+                  <small>{{ libraryData.rating?.totalReviews }} total reviews</small>
+                </p>
+              </div>
+              <div class="rating-breakdown">
+                @if (libraryData.rating?.breakdown) {
+                  @for (item of libraryData.rating!.breakdown; track item.stars) {
+                    <div class="breakdown-row">
+                      <span>
+                        {{ item.stars }}
+                        <ion-icon name="star" color="warning"></ion-icon>
+                      </span>
+                      <ion-progress-bar [value]="getRatingPercentage(item.count)" color="warning"></ion-progress-bar>
+                      <span>{{ item.count }}</span>
+                    </div>
+                  }
+                }
+              </div>
+            </ion-col>
 
-          <ion-col size="12" size-lg="6" class="most-mentioned">
-            <h4 class="text-success text-normal">Positive Aspects</h4>
-            <div class="aspect-tags">
-              @for (aspect of libraryData.positiveAspects; track aspect) {
-                <ion-chip color="success">{{ aspect }}</ion-chip>
-              }
-            </div>
-            <h4 class="text-danger text-normal">Areas for Improvement</h4>
-            <div class="aspect-tags">
-              @for (aspect of libraryData.areasForImprovement; track aspect) {
-                <ion-chip color="danger">{{ aspect }}</ion-chip>
-              }
-            </div>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+            <!-- <ion-col size="12" size-lg="6" class="most-mentioned">
+               TODO: Add positive/negative aspects to ILibrary or ILibraryRating
+               Currently not in the new interface, so commenting out to avoid errors
+              <h4 class="text-success text-normal">Positive Aspects</h4>
+              <div class="aspect-tags">
+                @for (aspect of libraryData.positiveAspects; track aspect) {
+                  <ion-chip color="success">{{ aspect }}</ion-chip>
+                }
+              </div>
+              <h4 class="text-danger text-normal">Areas for Improvement</h4>
+              <div class="aspect-tags">
+                @for (aspect of libraryData.areasForImprovement; track aspect) {
+                  <ion-chip color="danger">{{ aspect }}</ion-chip>
+                }
+              </div>
+            </ion-col> -->
+          </ion-row>
+        </ion-grid>
 
-      <h3 class="ion-padding-top">Recent Reviews</h3>
-      <app-review-card [reviews]="libraryData.recentReviews"></app-review-card>
-    </ion-card>
+        <h3 class="ion-padding-top">Recent Reviews</h3>
+        <app-review-card [reviews]="libraryData.reviews || []"></app-review-card>
+      </ion-card>
 
-    <ion-card id="amenities-list" class="ion-padding">
-      <h2>Facilities and Amenities</h2>
-      <div class="amenities-container">
-        @for (amenity of libraryData.amenities; track $index) {
-          <div class="amenity-blocks">
-            <app-amenities-card [amenity]="amenity"></app-amenities-card>
+      <ion-card id="amenities-list" class="ion-padding">
+        <h2>Facilities and Amenities</h2>
+        <div class="amenities-container">
+          @for (amenity of displayAmenities; track $index) {
+            <div class="amenity-blocks">
+              <app-amenities-card [amenity]="amenity"></app-amenities-card>
+            </div>
+          }
+        </div>
+      </ion-card>
+
+      <ion-card id="pricing-plans" class="ion-padding">
+        <h2>Pricing Plans</h2>
+        <div class="pricing-container">
+          @if (payPerUsePlans.length > 0) {
+            <div class="pricing-section">
+              <h2 class="sub-section-heading">Pay Per Use</h2>
+              <div *ngFor="let plan of payPerUsePlans">
+                <app-price-card [pricing]="plan"></app-price-card>
+              </div>
+            </div>
+          }
+
+          @if (monthlyPlans.length > 0) {
+            <div class="pricing-section">
+              <h2 class="sub-section-heading">Monthly Memberships</h2>
+              <div *ngFor="let plan of monthlyPlans">
+                <app-price-card [pricing]="plan"></app-price-card>
+              </div>
+            </div>
+          }
+        </div>
+      </ion-card>
+
+      <ion-card id="location-info" class="ion-padding location-info">
+        <h2>
+          <ion-icon name="navigate-circle-outline" color="danger"></ion-icon>
+          Location
+        </h2>
+        <p>{{ fullAddress }}</p>
+        <ion-button color="danger" expand="full">
+          <ion-icon name="arrow-forward" slot="end"></ion-icon>
+          Get Directions on Map
+        </ion-button>
+      </ion-card>
+
+      <ion-card id="requirements-list" class="ion-padding requirements-list">
+        <h2>Requirements</h2>
+        <app-requirements-list [requirements]="displayRequirements"></app-requirements-list>
+      </ion-card>
+
+      <div class="code-of-conduct">
+        <app-list-code-of-conduct [codeOfConduct]="codeOfConduct"></app-list-code-of-conduct>
+      </div>
+
+      <ion-card id="host-info" class="ion-padding">
+        <h2>Meet the Host</h2>
+        <div class="host-details-container">
+          <div class="img-container">
+            <ion-avatar>
+              <img
+                [src]="libraryData.hostProfile.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'"
+                alt="Host Avatar"
+              />
+            </ion-avatar>
           </div>
-        }
-      </div>
-    </ion-card>
-    <ion-card id="books-collection" class="ion-padding">
-      <h2>Book Collection</h2>
-      <div class="book-category-grid">
-        @for (category of bookCategoryList; track category.name) {
-          <ion-card class="book-category" [color]="category.selected ? 'primary' : 'light'">
-            <ion-card-content class="ion-text-center text-bold">
-              {{ category.name }}
-            </ion-card-content>
-          </ion-card>
-        }
-      </div>
-    </ion-card>
-    <ion-card id="pricing-plans" class="ion-padding">
-      <h2>Pricing Plans</h2>
-      <div class="pricing-container">
-        <div class="pricing-section">
-          <h2 class="sub-section-heading">Pay Per Use</h2>
-          <div *ngFor="let plan of payPerUsePlans">
-            <app-price-card [pricing]="plan"></app-price-card>
+          <div class="host-details">
+            <h3>{{ libraryData.hostProfile.fullName || 'Host' }}</h3>
+            <p>{{ libraryData.hostProfile.visionStatement }}</p>
+            @if (!libraryData.hostProfile.maskPhoneNumber) {
+              <p>
+                <ion-icon name="call-outline"></ion-icon>
+                <span>{{ libraryData.hostProfile.phoneNumber }}</span>
+              </p>
+            }
+            @if (!libraryData.hostProfile.maskEmail) {
+              <p>
+                <ion-icon name="mail-outline"></ion-icon>
+                <span>{{ libraryData.hostProfile.email }}</span>
+              </p>
+            }
           </div>
         </div>
+      </ion-card>
 
-        <div class="pricing-section">
-          <h2 class="sub-section-heading">Monthly Memberships</h2>
-          <div *ngFor="let plan of monthlyPlans">
-            <app-price-card [pricing]="plan"></app-price-card>
-          </div>
-        </div>
-      </div>
-    </ion-card>
-
-    <ion-card id="location-info" class="ion-padding location-info">
-      <h2>
-        <ion-icon name="navigate-circle-outline" color="danger"></ion-icon>
-        Location
-      </h2>
-      <p>{{ libraryData.address }}</p>
-      <ion-button color="danger" expand="full">
-        <ion-icon name="arrow-forward" slot="end"></ion-icon>
-        Get Directions on Map
-      </ion-button>
-    </ion-card>
-    <ion-card id="requirements-list" class="ion-padding requirements-list">
-      <h2>Requirements</h2>
-      <app-requirements-list [requirements]="libraryData.requirements"></app-requirements-list>
-    </ion-card>
-    <div class="code-of-conduct">
-      <app-list-code-of-conduct [codeOfConduct]="codeOfConduct"></app-list-code-of-conduct>
+      <ion-card id="enroll-action" class="ion-padding enroll-action">
+        <h2 class="section-heading">Ready to Start Your Journey?</h2>
+        <p class="sub-section-heading">Join hundreds of students who have made this their study home.</p>
+        <ion-button color="success" size="large" (click)="enrollNow()">
+          Enroll Now
+          <ion-icon name="arrow-forward" slot="end"></ion-icon>
+        </ion-button>
+      </ion-card>
     </div>
-    <ion-card id="host-info" class="ion-padding">
-      <h2>Meet the Host</h2>
-      <div class="host-details-container">
-        <div class="img-container">
-          <ion-avatar>
-            <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
-          </ion-avatar>
-        </div>
-        <div class="host-details">
-          <h3>Dr. Rajesh Kumar</h3>
-          <p>Creating a peaceful and productive learning environment for all students</p>
-          <p>
-            <ion-icon name="call-outline"></ion-icon>
-            <span>+91-98xxx-xxxxx</span>
-          </p>
-          <p>
-            <ion-icon name="mail-outline"></ion-icon>
-            <span>owner centrallibrary.com</span>
-          </p>
-        </div>
-      </div>
-    </ion-card>
-    <ion-card id="enroll-action" class="ion-padding enroll-action">
-      <h2 class="section-heading">Ready to Start Your Journey?</h2>
-      <p class="sub-section-heading">Join hundreds of students who have made this their study home.</p>
-      <ion-button color="success" size="large" (click)="enrollNow()">
-        Enroll Now
-        <ion-icon name="arrow-forward" slot="end"></ion-icon>
-      </ion-button>
-    </ion-card>
-  </div>
+  }
 </ion-content>
