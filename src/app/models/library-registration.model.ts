@@ -1,6 +1,13 @@
 import { Timestamp } from '@angular/fire/firestore';
 
-import { IBasicInformation, ILibraryImage, IPricingPlan } from './library.interface';
+import {
+  IBasicInformation,
+  ILibraryImage,
+  IManagerProfile,
+  IPricingPlan,
+  IRequirement,
+  ISeatManagement,
+} from './library.interface';
 
 export interface BookCategory {
   name: string;
@@ -22,48 +29,20 @@ export interface IFeatureCard {
   id: number;
   title: string;
 }
-export interface ILibraryManager {
-  address: string;
-  email: string;
-  experience: string;
-  fullName: string;
-  maskEmail: boolean;
-  photoURL: string;
-  visionStatement: string;
-}
-export interface IRequirement {
-  description: string;
-  fileURL: string;
-  name: string;
-  uploadedAt?: Timestamp;
-}
-export interface ISeat {
-  hasPower: boolean;
-  id: string;
-  isAC?: boolean;
-  seatNumber: string;
-  status: 'active' | 'maintenance' | 'disabled';
-}
-
-export interface IRequirement {
-  description: string;
-  fileURL: string;
-  name: string;
-  uploadedAt?: Timestamp;
-}
 
 export interface ILibraryRegistrationRequest {
   amenities: string[];
   basicInformation: IBasicInformation;
-  bookCollection?: string[];
-  createdAt: Timestamp;
-  hostProfile: ILibraryManager;
+  bookCollection?: string[] | { [key: string]: boolean };
+  codeOfConduct?: string;
+  createdAt: string;
+  hostProfile: IManagerProfile;
   libraryImages: ILibraryImage[];
   managerIds: string[];
   occupiedSeats: number;
   pricingPlans: IPricingPlan[];
   requirements: IRequirement[];
-  seatManagement: ISeat[];
+  seatManagement: ISeatManagement;
   status: string;
   totalSeats: number;
 }
