@@ -19,7 +19,7 @@ import {
 } from '@angular/fire/firestore';
 import { from, map, Observable, of, switchMap, forkJoin } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
-import { IFirestoreLibrary, ILibraryState } from 'src/app/models/library.interface';
+import { ILibrary, ILibraryState, Library } from 'src/app/models/library.interface';
 
 import { FirebaseService } from '../firebase/firebase-service';
 
@@ -100,10 +100,10 @@ export class LibraryService {
     // const reqsColRef = collection(this.firestore, collectionName, libraryId, 'requirements');
 
     const images$ = from(getDocs(imagesColRef)).pipe(
-      map((sn) => sn.docs.map((d) => ({ previewUrl: d.data()['imageURL'], ...d.data() }))),
+      map((sn) => sn.docs.map((d) => ({ id: d.id, previewUrl: d.data()['imageURL'], ...d.data() }))),
     );
-    const plans$ = from(getDocs(plansColRef)).pipe(map((sn) => sn.docs.map((d) => d.data())));
-    // const reqs$ = from(getDocs(reqsColRef)).pipe(map((sn) => sn.docs.map((d) => d.data())));
+    const plans$ = from(getDocs(plansColRef)).pipe(map((sn) => sn.docs.map((d) => ({ id: d.id, ...d.data() }))));
+    // const reqs$ = from(getDocs(reqsColRef)).pipe(map((sn) => sn.docs.map((d) => ({ id: d.id, ...d.data() }))));
 
     return forkJoin({
       images: images$,
@@ -143,7 +143,7 @@ export class LibraryService {
           return [];
         }
         return snapshot.docs.map((doc) => {
-          const data = doc.data() as IFirestoreLibrary;
+          const data = doc.data() as ILibrary;
           const addressParts = [
             data.basicInformation?.addressLine1,
             data.basicInformation?.addressLine2,
@@ -175,7 +175,7 @@ export class LibraryService {
           return [];
         }
         return snapshot.docs.map((doc) => {
-          const data = doc.data() as IFirestoreLibrary;
+          const data = doc.data() as ILibrary;
           const addressParts = [
             data.basicInformation?.addressLine1,
             data.basicInformation?.addressLine2,
@@ -201,20 +201,16 @@ export class LibraryService {
     const libraryDocRef = doc(this.firestore, `libraries/${libraryId}`);
 
     return from(getDoc(libraryDocRef)).pipe(
-      map((librarySnapshot) => {
+      switchMap((librarySnapshot) => {
         if (!librarySnapshot.exists()) {
-          return null;
+          return of(null);
         }
-        const data = librarySnapshot.data();
-        return {
-          id: librarySnapshot.id,
-          ...data,
-        };
+        return this.getFullLibraryData(librarySnapshot, 'libraries');
       }),
     );
   }
 
-  public getLibrariesForCardView(): Observable<any[]> {
+  public getLibrariesForCardView(): Observable<Library[]> {
     const q = query(collection(this.firestore, 'libraries'), where('status', '==', 'approved'));
     return from(getDocs(q)).pipe(
       map((snapshot) => {
@@ -222,7 +218,7 @@ export class LibraryService {
           return [];
         }
         return snapshot.docs.map((doc) => {
-          const data = doc.data() as IFirestoreLibrary;
+          const data = doc.data() as ILibrary;
           const address = [
             data.basicInformation?.addressLine1,
             data.basicInformation?.city,
@@ -242,8 +238,8 @@ export class LibraryService {
             totalSeats: totalSeats,
             type: data.basicInformation?.genderCategory,
             // TODO: Add a proper placeholder image
-            photoURL: data.libraryImages?.libraryPhotos?.[0]?.previewUrl || null,
-          };
+            photoURL: data.libraryImages?.[0]?.imageURL || null,
+          } as Library;
         });
       }),
     );
