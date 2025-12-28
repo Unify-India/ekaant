@@ -121,9 +121,10 @@
             </ion-col> -->
           </ion-row>
         </ion-grid>
-
-        <h3 class="ion-padding-top">Recent Reviews</h3>
-        <app-review-card [reviews]="libraryData.reviews || []"></app-review-card>
+        @if (libraryData.reviews && libraryData.reviews.length > 0) {
+          <h3 class="ion-padding-top">Recent Reviews</h3>
+          <app-review-card [reviews]="libraryData.reviews"></app-review-card>
+        }
       </ion-card>
 
       <ion-card id="amenities-list" class="ion-padding">
