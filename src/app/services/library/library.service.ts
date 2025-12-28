@@ -97,24 +97,25 @@ export class LibraryService {
 
     const imagesColRef = collection(this.firestore, collectionName, libraryId, 'libraryImages');
     const plansColRef = collection(this.firestore, collectionName, libraryId, 'pricingPlans');
-    // const reqsColRef = collection(this.firestore, collectionName, libraryId, 'requirements');
+    const reqsColRef = collection(this.firestore, collectionName, libraryId, 'requirements');
 
     const images$ = from(getDocs(imagesColRef)).pipe(
       map((sn) => sn.docs.map((d) => ({ id: d.id, previewUrl: d.data()['imageURL'], ...d.data() }))),
     );
     const plans$ = from(getDocs(plansColRef)).pipe(map((sn) => sn.docs.map((d) => ({ id: d.id, ...d.data() }))));
-    // const reqs$ = from(getDocs(reqsColRef)).pipe(map((sn) => sn.docs.map((d) => ({ id: d.id, ...d.data() }))));
+    const reqs$ = from(getDocs(reqsColRef)).pipe(map((sn) => sn.docs.map((d) => ({ id: d.id, ...d.data() }))));
 
     return forkJoin({
       images: images$,
       plans: plans$,
-      // reqs: reqs$,
+      reqs: reqs$,
     }).pipe(
-      map(({ images, plans }) => {
+      map(({ images, plans, reqs }) => {
         const fullData = {
           ...libraryData,
           libraryImages: { libraryPhotos: images },
           pricingPlans: plans,
+          requirements: reqs,
         };
         console.log('[LibraryService] Merged full library data:', fullData);
         return fullData;
