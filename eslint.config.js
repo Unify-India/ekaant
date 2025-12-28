@@ -34,6 +34,7 @@ export default [
     },
     rules: {
       ...tseslint.configs.recommendedTypeChecked.rules,
+      '@typescript-eslint/no-explicit-any': 'warn',
       'perfectionist/sort-interfaces': ['error', { type: 'alphabetical', order: 'asc', ignoreCase: true }],
       'perfectionist/sort-imports': [
         'error',

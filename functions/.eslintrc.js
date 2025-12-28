@@ -16,6 +16,7 @@ module.exports = {
   ],
   plugins: ['@typescript-eslint', 'import'],
   rules: {
+    '@typescript-eslint/no-explicit-any': 'error',
     quotes: ['error', 'single'],
     'import/no-unresolved': 0,
     indent: ['error', 2],
