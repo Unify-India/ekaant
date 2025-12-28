@@ -1,4 +1,5 @@
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { AMENITIES_DATA } from 'src/app/models/constants/amenities.constants';
 import { IPricingPlan } from 'src/app/models/library.interface';
 
 export function createBasicInformationForm(fb: FormBuilder): FormGroup {
@@ -52,42 +53,28 @@ export function createLibraryImagesForm(fb: FormBuilder): FormGroup {
 }
 
 export function createBookCollectionForm(fb: FormBuilder): FormGroup {
-  return fb.group(
-    {
-      engineeringTechnology: [false],
-      medicalSciences: [false],
-      managementBusiness: [false],
-      artsLiterature: [false],
-      scienceMathematics: [false],
-      competitiveExams: [false],
-      governmentJobExams: [false],
-      languageCommunication: [false],
-      computerScienceIT: [false],
-      generalKnowledge: [false],
-      fictionNovels: [false],
-      referenceBooks: [false],
-    }
-  );
+  return fb.group({
+    engineeringTechnology: [false],
+    medicalSciences: [false],
+    managementBusiness: [false],
+    artsLiterature: [false],
+    scienceMathematics: [false],
+    competitiveExams: [false],
+    governmentJobExams: [false],
+    languageCommunication: [false],
+    computerScienceIT: [false],
+    generalKnowledge: [false],
+    fictionNovels: [false],
+    referenceBooks: [false],
+  });
 }
 
 export function createAmenitiesForm(fb: FormBuilder): FormGroup {
-  return fb.group(
-    {
-      highSpeedWifi: [false],
-      airConditioning: [false],
-      powerOutlets: [false],
-      coffeeMachine: [false],
-      waterCooler: [false],
-      parkingAvailable: [false],
-      security247: [false],
-      cctvSurveillance: [false],
-      lockers: [false],
-      printingServices: [false],
-      quietZones: [false],
-      discussionRooms: [false],
-    },
-    { validators: minOneCheckboxSelectedValidator() },
-  );
+  const controlsConfig: { [key: string]: any } = {};
+  Object.keys(AMENITIES_DATA).forEach((key) => {
+    controlsConfig[key] = [false];
+  });
+  return fb.group(controlsConfig, { validators: minOneCheckboxSelectedValidator() });
 }
 
 export function createSeatManagementForm(fb: FormBuilder): FormGroup {
