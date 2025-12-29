@@ -53,10 +53,9 @@ export class RequirementsComponent implements OnInit {
   ];
 
   // Signal to track form array value changes
-  private selectedReqsSignal = toSignal(
-    (this.lrfService.mainForm.get('requirements') as FormArray).valueChanges,
-    { initialValue: (this.lrfService.mainForm.get('requirements') as FormArray).value }
-  );
+  private selectedReqsSignal = toSignal((this.lrfService.mainForm.get('requirements') as FormArray).valueChanges, {
+    initialValue: (this.lrfService.mainForm.get('requirements') as FormArray).value,
+  });
 
   // A computed signal that reactively calculates which common requirements are available
   public availableRequirements = computed(() => {

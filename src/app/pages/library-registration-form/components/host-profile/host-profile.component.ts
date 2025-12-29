@@ -6,8 +6,8 @@ import { IonicModule } from '@ionic/angular';
 import { IonProgressBar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { warningOutline, personCircleOutline, shieldCheckmarkOutline } from 'ionicons/icons';
-
 import { AuthService } from 'src/app/auth/service/auth.service';
+
 import { LibraryRegistrationFormService } from '../../service/library-registration-form.service';
 
 @Component({

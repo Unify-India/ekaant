@@ -39,7 +39,7 @@ export class LibraryProfilePage implements OnInit {
     const user = this.authService.getCurrentUser();
     if (user) {
       this.libraryService.getApprovedLibrary(user.uid).subscribe((data) => {
-        if (data) {
+        if (data && data.id) {
           this.lrfService.loadRegistrationData(data);
           this.lrfService.setEditMode(true, data.id);
         }

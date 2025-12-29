@@ -4,8 +4,8 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { warningOutline, wifiOutline } from 'ionicons/icons';
-
 import { AMENITIES_DATA } from 'src/app/models/constants/amenities.constants';
+
 import { LibraryRegistrationFormService } from '../../service/library-registration-form.service';
 
 @Component({
@@ -38,12 +38,12 @@ export class AmenitiesComponent implements OnInit {
     const icons = this.amenities.reduce((acc: any, curr) => {
       // We can't easily import icons dynamically by string name in 'addIcons' here without a map
       // but for now we can just rely on the template using them if they are registered globally or we import specific ones.
-      // However, addIcons needs the object { name: iconSvg }. 
+      // However, addIcons needs the object { name: iconSvg }.
       // Since we are moving to a constant, we might need to update how icons are added.
       // For this component, let's keep the manual addIcons for now or update it to be comprehensive.
       return acc;
     }, {});
-    
+
     addIcons({ warningOutline, wifiOutline }); // Keep existing + others will need to be added or imported if we want to show icons in the form
   }
 

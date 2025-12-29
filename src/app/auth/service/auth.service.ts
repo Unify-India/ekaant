@@ -248,7 +248,7 @@ export class AuthService {
       }
 
       this.toaster.showToast('Login successful!', 'success');
-      this.redirectToDashboard(selectedRole);
+      // this.redirectToDashboard(selectedRole);
     } catch (error: any) {
       console.error('Firebase login error:', error);
       this.handleAuthError(error, 'login');

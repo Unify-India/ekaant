@@ -15,6 +15,7 @@ import {
 } from 'ionicons/icons';
 
 import { AuthService } from '../../auth/service/auth.service';
+import { LibraryService } from '../../services/library/library.service';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +26,7 @@ import { AuthService } from '../../auth/service/auth.service';
 })
 export class LoginPage implements OnInit {
   private authService = inject(AuthService);
+  private libraryService = inject(LibraryService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -171,7 +173,30 @@ export class LoginPage implements OnInit {
   private async handleSuccessfulAuth() {
     if (this.redirectTo) {
       this.router.navigateByUrl(this.redirectTo);
-    } else if (this.selectedRole && !this.autoSelectManager) {
+      return;
+    }
+
+    if (this.selectedRole === 'manager') {
+      const user = this.authService.getCurrentUser();
+      if (user) {
+        try {
+          const state = await this.libraryService.getManagerLibraryState(user);
+          if (state?.applicationStatus === 'approved') {
+            this.router.navigate(['/manager/dashboard']);
+          } else if (state) {
+            this.router.navigate(['/manager/application-status']);
+          } else {
+            this.router.navigate(['library-registration-form']);
+          }
+        } catch (e) {
+          console.error('Error checking library state', e);
+          this.router.navigate(['/manager/dashboard']);
+        }
+      }
+      return;
+    }
+
+    if (this.selectedRole && !this.autoSelectManager) {
       this.router.navigate([`/${this.selectedRole}/dashboard`]);
     } else if (this.selectedRole && this.autoSelectManager) {
       this.router.navigate(['library-registration-form']);
