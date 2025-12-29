@@ -5,6 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { AuthService } from 'src/app/auth/service/auth.service';
 import { ApprovalCommentsComponent } from 'src/app/components/approval-comments/approval-comments.component';
 import { IUser } from 'src/app/models/global.interface';
+import { ILibrary } from 'src/app/models/library.interface';
 import { PreviewComponent } from 'src/app/pages/library-registration-form/components/preview/preview.component';
 import { LibraryRegistrationFormService } from 'src/app/pages/library-registration-form/service/library-registration-form.service';
 import { LibraryService } from 'src/app/services/library/library.service';
@@ -22,7 +23,7 @@ export class ApplicationStatusPage implements OnInit {
   private lrfService = inject(LibraryRegistrationFormService);
 
   isLoading = true;
-  application: any;
+  application!: ILibrary;
   currentUserRole: 'admin' | 'manager' = 'manager';
   currentUserId!: string;
 
@@ -40,12 +41,14 @@ export class ApplicationStatusPage implements OnInit {
   loadApplicationStatus(userId: string) {
     this.isLoading = true;
     this.libraryService.getLibraryRegistration(userId).subscribe({
-      next: (data) => {
-        this.application = data;
+      next: (data: ILibrary | null) => {
         if (data) {
+          this.application = data;
           this.lrfService.loadRegistrationData(data);
           console.info('Library application data', data);
-          this.lrfService.setEditMode(true, data.id);
+          if (data.id) {
+            this.lrfService.setEditMode(true, data.id);
+          }
         }
         this.isLoading = false;
       },
@@ -69,5 +72,13 @@ export class ApplicationStatusPage implements OnInit {
       default:
         return '';
     }
+  }
+
+  getFormattedDate(date: any): Date | null {
+    if (!date) return null;
+    if (date.toDate) {
+      return date.toDate();
+    }
+    return new Date(date);
   }
 }

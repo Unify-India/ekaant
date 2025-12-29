@@ -17,8 +17,10 @@
     <!-- Status Display -->
     <ion-card class="status-card">
       <ion-card-header>
-        <ion-card-title>{{ application.basicInformation?.libraryName || 'Your Application' }}</ion-card-title>
-        <ion-card-subtitle>Submitted on: {{ application.createdAt?.toDate() | date: 'medium' }}</ion-card-subtitle>
+        <ion-card-title>{{ application.basicInformation.libraryName || 'Your Application' }}</ion-card-title>
+        <ion-card-subtitle>
+          Submitted on: {{ getFormattedDate(application.createdAt) | date: 'medium' }}
+        </ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
         <h2>
