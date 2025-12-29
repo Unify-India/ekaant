@@ -1,3 +1,4 @@
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, inject, input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import {
@@ -12,10 +13,9 @@ import {
   IonFabButton,
   IonProgressBar,
   IonInput,
-  IonButton,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { imageOutline, warningOutline, closeCircle, arrowUpOutline, arrowDownOutline } from 'ionicons/icons';
+import { imageOutline, warningOutline, closeCircle, menuOutline, close } from 'ionicons/icons';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { FormEssentials } from 'src/app/shared/core/micro-components/form-essentials.module';
 
@@ -40,13 +40,13 @@ import { LibraryRegistrationFormService } from '../../service/library-registrati
     IonProgressBar,
     FormEssentials,
     IonInput,
-    IonButton,
+    DragDropModule,
   ],
 })
 export class LibraryImagesComponent implements OnInit {
   private fb = inject(FormBuilder);
   private lrfService = inject(LibraryRegistrationFormService);
-  public imagesForm!: FormGroup;
+  public imagesArray!: FormArray;
 
   // --- String Variables ---
   public readonly pageTitle = 'Library Images';
@@ -71,15 +71,15 @@ export class LibraryImagesComponent implements OnInit {
   ];
 
   constructor() {
-    addIcons({ imageOutline, warningOutline, closeCircle, arrowUpOutline, arrowDownOutline });
+    addIcons({ imageOutline, warningOutline, closeCircle, menuOutline, close });
   }
 
   ngOnInit() {
-    this.imagesForm = this.lrfService.getFormGroup('libraryImages');
+    this.imagesArray = this.lrfService.getFormGroup('libraryImages') as any as FormArray;
   }
 
   get libraryPhotosArray(): FormArray {
-    return this.imagesForm.get('libraryPhotos') as FormArray;
+    return this.imagesArray;
   }
 
   asFormGroup(control: AbstractControl): FormGroup {
@@ -92,6 +92,8 @@ export class LibraryImagesComponent implements OnInit {
     if (!input.files) return;
 
     for (let i = 0; i < input.files.length; i++) {
+      if (this.libraryPhotosArray.length >= this.maxImages) break;
+
       const file = input.files[i];
       const previewUrl = await this.readFileAsDataURL(file);
 
@@ -117,13 +119,15 @@ export class LibraryImagesComponent implements OnInit {
     this.libraryPhotosArray.removeAt(index);
   }
 
-  movePhoto(index: number, direction: number): void {
-    const newIndex = index + direction;
-    if (newIndex >= 0 && newIndex < this.libraryPhotosArray.length) {
-      const control = this.libraryPhotosArray.at(index);
-      this.libraryPhotosArray.removeAt(index);
-      this.libraryPhotosArray.insert(newIndex, control);
-    }
+  drop(event: CdkDragDrop<any[]>) {
+    const previousIndex = event.previousIndex;
+    const currentIndex = event.currentIndex;
+
+    if (previousIndex === currentIndex) return;
+
+    const control = this.libraryPhotosArray.at(previousIndex);
+    this.libraryPhotosArray.removeAt(previousIndex);
+    this.libraryPhotosArray.insert(currentIndex, control);
   }
 
   triggerFileUpload(fileInput: HTMLInputElement): void {

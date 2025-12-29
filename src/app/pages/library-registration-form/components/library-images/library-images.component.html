@@ -1,9 +1,11 @@
 <ion-card class="registration-section-card">
-  <h2>{{ photosSectionTitle }}</h2>
+  <div class="section-header">
+    <h4>{{ uploadAreaTitle }}</h4>
+    <ion-note color="medium">{{ libraryPhotosArray.length }} / {{ maxImages }} Images</ion-note>
+  </div>
   <p>{{ photosSectionDescription }}</p>
-
   <!-- Warning Glass Box -->
-  @if (imagesForm.invalid) {
+  @if (imagesArray.invalid) {
     <div class="ion-padding-start ion-padding-end glass-box warning-glass-box ion-margin-bottom">
       <ion-icon name="warning-outline" color="warning"></ion-icon>
       <ion-note color="warning">
@@ -13,13 +15,8 @@
   }
 
   <!-- Main Content Form -->
-  <form [formGroup]="imagesForm">
-
+  <form>
     <!-- File Upload Area -->
-    <div class="section-header">
-      <h4>{{ uploadAreaTitle }}</h4>
-      <ion-note color="medium">{{ libraryPhotosArray.length }} / {{ maxImages }} Images</ion-note>
-    </div>
 
     <input
       type="file"
@@ -40,13 +37,15 @@
 
     @if (libraryPhotosArray.controls.length > 0) {
       <ion-grid class="preview-grid ion-margin-top">
-        <ion-row>
+        <ion-row cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="drop($event)">
           @for (photoControl of libraryPhotosArray.controls; track photoControl) {
-            <ion-col size="12" size-md="6" size-lg="4">
+            <ion-col size="12" size-md="6" size-lg="4" cdkDrag>
               <div class="image-card" [formGroup]="asFormGroup(photoControl)">
                 <div class="image-preview-wrapper">
                   <ion-img [src]="photoControl.get('previewUrl')?.value"></ion-img>
-                  @if (photoControl.get('uploadProgress')?.value > 0 && photoControl.get('uploadProgress')?.value < 100) {
+                  @if (
+                    photoControl.get('uploadProgress')?.value > 0 && photoControl.get('uploadProgress')?.value < 100
+                  ) {
                     <div class="progress-overlay">
                       <ion-progress-bar
                         [value]="(photoControl.get('uploadProgress')?.value || 0) / 100"
@@ -56,13 +55,17 @@
                   }
                   <ion-fab vertical="top" horizontal="end" slot="fixed">
                     <ion-fab-button (click)="removePhoto($index)" color="danger" size="small">
-                      <ion-icon name="close-circle"></ion-icon>
+                      <ion-icon name="close" color="light"></ion-icon>
                     </ion-fab-button>
                   </ion-fab>
                 </div>
-                
+
                 <div class="card-content">
+                  <div class="drag-handle" cdkDragHandle>
+                    <ion-icon name="menu-outline" size="large"></ion-icon>
+                  </div>
                   <ion-input
+                    class="input-caption"
                     label="Caption"
                     labelPlacement="floating"
                     fill="outline"
@@ -70,23 +73,6 @@
                     formControlName="caption"
                     maxlength="50"
                   ></ion-input>
-                  
-                  <div class="reorder-actions">
-                    <ion-button 
-                      fill="clear" 
-                      size="small" 
-                      (click)="movePhoto($index, -1)" 
-                      [disabled]="$index === 0">
-                      <ion-icon slot="icon-only" name="arrow-up-outline"></ion-icon>
-                    </ion-button>
-                    <ion-button 
-                      fill="clear" 
-                      size="small" 
-                      (click)="movePhoto($index, 1)" 
-                      [disabled]="$index === libraryPhotosArray.controls.length - 1">
-                      <ion-icon slot="icon-only" name="arrow-down-outline"></ion-icon>
-                    </ion-button>
-                  </div>
                 </div>
               </div>
             </ion-col>
