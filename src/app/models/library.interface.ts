@@ -1,10 +1,6 @@
 import { Timestamp } from '@angular/fire/firestore';
 
-import { ILibraryRegistrationRequest } from './library-registration.model';
-
 export interface ILibraryState {
-  // Allow other properties from the library/registration documents
-  [key: string]: any;
   applicationStatus: 'approved' | 'pending' | 'rejected' | 'changes-required' | 'none';
 }
 
@@ -97,16 +93,15 @@ export interface ISeat {
 
 export interface ISeatManagement {
   facilityRanges?: { from: number; to: number; facility: string }[];
-  occupiedSeats: number;
   seats: ISeat[];
-  totalSeats: number;
 }
 
 export interface ILibraryImage {
   caption?: string;
   imageURL: string;
   order: number;
-  uploadedAt: Timestamp;
+  uploadedAt: string;
+  uploadedBy: string;
 }
 
 export interface IRequirement {
@@ -139,6 +134,44 @@ export interface IApprovalComment {
   role: string;
   text: string;
   timestamp: Timestamp;
+}
+export interface IBookCategory {
+  name: string;
+  selected: boolean;
+}
+
+export interface IRegistrationStep {
+  color: string;
+  description: string;
+  icon: string;
+  id: number;
+  title: string;
+}
+
+export interface IFeatureCard {
+  color: string;
+  description: string;
+  icon: string;
+  id: number;
+  title: string;
+}
+
+export interface ILibraryRegistrationRequest {
+  amenities: string[];
+  applicationStatus: string;
+  basicInformation: IBasicInformation;
+  bookCollection?: string[] | { [key: string]: boolean };
+  codeOfConduct?: string;
+  createdAt: Timestamp | string;
+  hostProfile: IManagerProfile;
+  libraryImages: ILibraryImage[];
+  managerIds: string[];
+  occupiedSeats: number;
+  pricingPlans: IPricingPlan[];
+  requirements: IRequirement[];
+  seatManagement: ISeatManagement;
+  status: string;
+  totalSeats: number;
 }
 
 export interface ILibrary extends ILibraryRegistrationRequest {
