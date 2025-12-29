@@ -46,10 +46,8 @@ export function createPhotoGroup(fb: FormBuilder, photoUrl: string = '', caption
   });
 }
 
-export function createLibraryImagesForm(fb: FormBuilder): FormGroup {
-  return fb.group({
-    libraryPhotos: fb.array([], [Validators.required, Validators.minLength(1), Validators.maxLength(10)]),
-  });
+export function createLibraryImagesArray(fb: FormBuilder): FormArray {
+  return fb.array([], [Validators.required, Validators.minLength(1), Validators.maxLength(10)]);
 }
 
 export function createBookCollectionForm(fb: FormBuilder): FormGroup {
@@ -110,6 +108,7 @@ export function createFacilityRangeGroup(fb: FormBuilder, from = 0, to = 0, faci
 
 export function createPricingPlanGroup(fb: FormBuilder, plan: Partial<IPricingPlan> = {}): FormGroup {
   return fb.group({
+    planName: [plan.planName || '', Validators.required],
     planType: [plan.planType || '', Validators.required],
     timeSlot: [plan.timeSlot || '', Validators.required],
     rate: [plan.rate || null, [Validators.required, Validators.min(0)]],

@@ -13,7 +13,7 @@ import {
   createCodeOfConductForm,
   createFacilityRangeGroup,
   createHostProfileForm,
-  createLibraryImagesForm,
+  createLibraryImagesArray,
   createPhotoGroup,
   createPricingPlanGroup,
   createPricingPlansForm,
@@ -64,7 +64,7 @@ export class LibraryRegistrationFormService {
     this.mainForm = this.fb.group({
       basicInformation: createBasicInformationForm(this.fb),
       hostProfile: createHostProfileForm(this.fb),
-      libraryImages: createLibraryImagesForm(this.fb),
+      libraryImages: createLibraryImagesArray(this.fb),
       bookCollection: createBookCollectionForm(this.fb),
       amenities: createAmenitiesForm(this.fb),
       seatManagement: createSeatManagementForm(this.fb),
@@ -115,7 +115,7 @@ export class LibraryRegistrationFormService {
       )
       .subscribe((result) => {
         if (result && result.data) {
-          this.registrationDocId = result.data.id;
+          this.registrationDocId = result.data.id || null;
           this.editMode = true;
 
           if (!this.hasLocalDraft) {
@@ -148,7 +148,7 @@ export class LibraryRegistrationFormService {
     }
 
     this.mainForm.get('bookCollection')?.patchValue(data.bookCollection || {});
-    
+
     if (Array.isArray(data.amenities)) {
       const amObj: any = {};
       data.amenities.forEach((k: string) => (amObj[k] = true));
@@ -181,11 +181,16 @@ export class LibraryRegistrationFormService {
       }
     }
 
-    if (data.libraryImages && data.libraryImages.libraryPhotos) {
-      const photosArray = this.mainForm.get('libraryImages.libraryPhotos') as FormArray;
+    if (data.libraryImages) {
+      const photosArray = this.mainForm.get('libraryImages') as FormArray;
       photosArray.clear();
-      data.libraryImages.libraryPhotos.forEach((photo: any) => {
-        const group = createPhotoGroup(this.fb, photo.previewUrl);
+      // Handle both array (new structure) and object wrapper (old structure)
+      const imagesList = Array.isArray(data.libraryImages)
+        ? data.libraryImages
+        : data.libraryImages.libraryPhotos || [];
+
+      imagesList.forEach((photo: any) => {
+        const group = createPhotoGroup(this.fb, photo.previewUrl || photo.imageURL, photo.caption);
         if (photo.file) {
           group.patchValue({ file: photo.file });
         }
@@ -250,10 +255,12 @@ export class LibraryRegistrationFormService {
       this.prepareInitialPayload(payload);
 
     await this.uploadImages(this.registrationDocId, imagesArray, this.isApproved);
-    await this.uploadHostProfile(this.registrationDocId, hostProfileFile, this.isApproved);
+    const hostPhotoUrl = await this.uploadHostProfile(this.registrationDocId, hostProfileFile, this.isApproved);
     await this.uploadRequirements(this.registrationDocId, requirementsArray, this.isApproved);
 
-    await this.libraryService.savePricingPlans(this.registrationDocId, pricingPlansArray, this.isApproved);
+    if (hostPhotoUrl) {
+      initialPayload.hostProfile.photoURL = hostPhotoUrl;
+    }
 
     if (this.isApproved) {
       await this.libraryService.updateApprovedLibrary(this.registrationDocId, initialPayload);
@@ -284,21 +291,26 @@ export class LibraryRegistrationFormService {
     });
 
     await this.uploadImages(libraryId, imagesArray, false);
-    await this.uploadHostProfile(libraryId, hostProfileFile, false);
+    const hostPhotoUrl = await this.uploadHostProfile(libraryId, hostProfileFile, false);
     await this.uploadRequirements(libraryId, requirementsArray, false);
-    await this.libraryService.savePricingPlans(libraryId, pricingPlansArray, false);
+
+    if (hostPhotoUrl) {
+      await this.libraryService.updateLibraryRegistration(libraryId, {
+        'hostProfile.photoURL': hostPhotoUrl,
+      });
+    }
 
     return libraryId;
   }
 
   private prepareInitialPayload(payload: any) {
-    const imagesArray = payload.libraryImages?.libraryPhotos ?? [];
+    const imagesArray = payload.libraryImages ?? [];
     const hostProfileFile: File | null = payload.hostProfile?.profilePhoto ?? null;
     const pricingPlansArray = payload.pricingPlans?.pricingPlans ?? payload.pricingPlans ?? [];
 
     const requirementsArray = Array.isArray(payload.requirements)
       ? payload.requirements
-      : payload.requirements?.selectedRequirements ?? [];
+      : (payload.requirements?.selectedRequirements ?? []);
 
     const initialPayload = { ...payload };
 
@@ -328,7 +340,7 @@ export class LibraryRegistrationFormService {
       initialPayload.hostProfile = hp;
     }
 
-    delete initialPayload.pricingPlans;
+    initialPayload.pricingPlans = pricingPlansArray;
 
     if (initialPayload.requirements) {
       initialPayload.requirements = initialPayload.requirements.map((req: any) => {
@@ -403,8 +415,7 @@ export class LibraryRegistrationFormService {
     if (!Array.isArray(imagesArray)) return;
 
     try {
-      const imagesFormGroup = this.mainForm.get('libraryImages');
-      const photosArray = imagesFormGroup?.get('libraryPhotos');
+      const photosArray = this.mainForm.get('libraryImages') as FormArray;
 
       const imagesToSync = imagesArray.map((photo, idx) => ({
         file: photo.file,
@@ -415,7 +426,7 @@ export class LibraryRegistrationFormService {
 
       await this.libraryService.syncLibraryImages(libraryId, imagesToSync, isApproved, (idx, percent) => {
         try {
-          const photoControl = (photosArray as any)?.at ? (photosArray as any).at(idx) : null;
+          const photoControl = photosArray.at(idx);
           if (photoControl) {
             photoControl.patchValue({ uploadProgress: percent });
           }
@@ -428,8 +439,12 @@ export class LibraryRegistrationFormService {
     }
   }
 
-  private async uploadHostProfile(libraryId: string, hostProfileFile: File | null, isApproved: boolean): Promise<void> {
-    if (!hostProfileFile) return;
+  private async uploadHostProfile(
+    libraryId: string,
+    hostProfileFile: File | null,
+    isApproved: boolean,
+  ): Promise<string | null> {
+    if (!hostProfileFile) return null;
     try {
       const hostForm = this.mainForm.get('hostProfile');
       const onProgress = (percent: number) => {
@@ -445,20 +460,17 @@ export class LibraryRegistrationFormService {
 
       const url = await this.firebase.uploadFile(path, hostProfileFile, onProgress);
 
-      const updatePayload = { 'hostProfile.photoURL': url };
-      if (isApproved) {
-        await this.libraryService.updateApprovedLibrary(libraryId, updatePayload);
-      } else {
-        await this.libraryService.updateLibraryRegistration(libraryId, updatePayload);
-      }
-
       try {
-        hostForm?.patchValue({ profilePhotoProgress: 100 });
+        hostForm?.patchValue({
+          profilePhotoProgress: 100,
+          photoURL: url,
+        });
       } catch (e) {
         // ignore
       }
+      return url;
     } catch (e) {
-      // ignore
+      return null;
     }
   }
 
