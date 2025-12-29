@@ -48,18 +48,18 @@
           "description": "Fully air-conditioned space"
         }
       },
-      "pricingPlans": {
-        "plan_daily": {
+      "pricingPlans": [
+        {
           "name": "Daily Pass",
           "price": 250,
           "duration": "day"
         },
-        "plan_monthly": {
+        {
           "name": "Monthly Subscription",
           "price": 3000,
           "duration": "month"
         }
-      },
+      ],
       "bookCategories": {
         "cat_fiction": {
           "name": "Fiction"
@@ -88,18 +88,18 @@
           "description": "Access to microwave and coffee machine"
         }
       },
-      "pricingPlans": {
-        "plan_hourly": {
+      "pricingPlans": [
+        {
           "name": "Hourly Pass",
           "price": 50,
           "duration": "hour"
         },
-        "plan_monthly": {
+        {
           "name": "Monthly Subscription",
           "price": 3500,
           "duration": "month"
         }
-      },
+      ],
       "bookCategories": {
         "cat_engg": {
           "name": "Engineering"

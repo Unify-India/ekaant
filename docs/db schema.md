@@ -80,16 +80,14 @@ This document outlines the Firestore database structure. The schema is designed 
       "engineeringTechnology": true,
       "fictionNovels": false
     },
-    "pricingPlans": {
-      "pricingPlans": [
-        {
-          "planType": "Monthly Membership",
-          "timeSlot": "6 AM - 12 PM (Morning)",
-          "rate": 1500,
-          "description": "Ideal for early birds."
-        }
-      ]
-    },
+    "pricingPlans": [
+      {
+        "planType": "Monthly Membership",
+        "timeSlot": "6 AM - 12 PM (Morning)",
+        "rate": 1500,
+        "description": "Ideal for early birds."
+      }
+    ],
     "requirements": {
       "selectedRequirements": [
         {
@@ -143,7 +141,7 @@ This document outlines the Firestore database structure. The schema is designed 
     "seatManagement": { "...": "..." },
     "amenities": { "...": "..." },
     "bookCollection": { "...": "..." },
-    "pricingPlans": { "...": "..." },
+    "pricingPlans": [ "..." ],
     "codeOfConduct": { "...": "..." }
   }
   ```
@@ -236,3 +234,29 @@ This document outlines the Firestore database structure. The schema is designed 
     "comments": [{ "comment": "We are looking into it.", "author": "{managerId}", "timestamp": "Timestamp" }]
   }
   ```
+
+
+Option B (Better): Store facility ranges ONCE and infer facilities per seat
+
+This means:
+
+You define facility ranges like this:
+
+facilityRanges: [
+  { from: 1, to: 40, facilities: ['AC', 'Power', 'WiFi'] },
+  { from: 41, to: 50, facilities: ['Power'] }
+]
+
+
+Seat documents DO NOT store facility details.
+A seat document only stores dynamic properties:
+
+{
+  seatNumber: '1',
+  status: 'active' | 'maintenance' | 'disabled'
+}
+
+
+The client (Angular) or backend interprets facility ranges to produce the effective seat capability.
+
+This is normalized data modeling, and it matches your usage patterns.
