@@ -30,8 +30,7 @@ import { PriceCardComponent } from 'src/app/components/price-card/price-card.com
 import { RequirementsListComponent } from 'src/app/components/requirements-list/requirements-list.component';
 import { ReviewCardComponent } from 'src/app/components/review-card/review-card.component';
 import { AMENITIES_DATA } from 'src/app/models/constants/amenities.constants';
-import { BookCategory } from 'src/app/models/library-registration.model';
-import { IAmenities, ILibrary, IPricingDetails } from 'src/app/models/library.interface';
+import { IAmenities, IBookCategory, ILibrary, IPricingDetails } from 'src/app/models/library.interface';
 import { LibraryService } from 'src/app/services/library/library.service';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
@@ -68,6 +67,10 @@ export class LibraryDetailsPage implements OnInit {
   libraryData: ILibrary = {
     id: '',
     amenities: [],
+    applicationStatus: 'pending',
+    bookCollection: [],
+    codeOfConduct: '',
+    comments: [],
     basicInformation: {
       libraryName: '',
       addressLine1: '',
@@ -79,9 +82,7 @@ export class LibraryDetailsPage implements OnInit {
       genderCategory: '',
     },
     seatManagement: {
-      occupiedSeats: 0,
       seats: [],
-      totalSeats: 0,
     },
 
     pricingPlans: [],
@@ -119,7 +120,7 @@ export class LibraryDetailsPage implements OnInit {
   displayAmenities: IAmenities[] = [];
 
   // TODO: Fetch these from DB or Constants
-  bookCategoryList: BookCategory[] = [
+  bookCategoryList: IBookCategory[] = [
     { name: 'Engineering & Technology', selected: true },
     { name: 'Medical Sciences', selected: false },
     { name: 'Management & Business', selected: false },
@@ -274,22 +275,32 @@ export class LibraryDetailsPage implements OnInit {
 
   mapPricingPlans(plans: any[]) {
     this.payPerUsePlans = plans
-      .filter((p) => p.planType === 'Hourly' || p.planType === 'Daily' || p.pricingType === 'PayPerUse')
+      .filter(
+        (p) =>
+          p.planType?.toLowerCase().includes('pay per use') ||
+          p.planType?.toLowerCase().includes('daily pass') ||
+          p.pricingType === 'PayPerUse',
+      )
       .map((p) => ({
         pricingType: 'PayPerUse',
         price: p.rate || p.price,
-        pricingName: p.planName,
-        unit: p.planType === 'Hourly' ? 'hour' : 'day',
+        pricingName: p.planName || p.planType,
+        unit: p.planType?.toLowerCase().includes('pay per use') ? 'hour' : 'day',
         amenities: [],
       }));
 
     this.monthlyPlans = plans
-      .filter((p) => p.planType === 'Monthly' || p.pricingType === 'Monthly')
+      .filter(
+        (p) =>
+          p.planType?.toLowerCase().includes('monthly') ||
+          p.planType?.toLowerCase().includes('weekly') ||
+          p.pricingType === 'Monthly',
+      )
       .map((p) => ({
         pricingType: 'Monthly',
         price: p.rate || p.price,
-        pricingName: p.planName,
-        unit: 'month',
+        pricingName: p.planName || p.planType,
+        unit: p.planType?.toLowerCase().includes('weekly') ? 'week' : 'month',
         timeRange: p.timeSlot,
         amenities: [{ amenityName: 'Reserved Seat', isAvailable: true }],
       }));
