@@ -113,9 +113,10 @@ export const approveLibrary = onCall({ region: DEPLOYMENT_REGION }, async (reque
       basicInformation: basicInfo,
       hostProfile: hostProfile,
       seatManagement: seatManagement,
-      amenities: registrationData.amenities || {},
+      amenities: registrationData.amenities || [],
       bookCollection: registrationData.bookCollection || {},
-      pricingPlans: registrationData.pricingPlans || {},
+      pricingPlans: registrationData.pricingPlans || [],
+      libraryImages: registrationData.libraryImages || [],
       status: 'approved',
       createdAt: new Date(),
       // Initialize ratings
