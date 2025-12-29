@@ -40,6 +40,25 @@
     flex-direction: column;
     gap: 8px;
 
+    .plan-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+
+      .plan-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--ion-color-dark);
+      }
+
+      .plan-type-chip {
+        height: 24px;
+        font-size: 0.75rem;
+        margin: 0;
+      }
+    }
+
     .detail-row {
       display: flex;
       align-items: center;

@@ -24,7 +24,16 @@
           <div [formGroupName]="$index">
             @if (editingIndex() === $index) {
               <div class="plan-edit-form">
+                <ion-input
+                  label="Plan Name"
+                  labelPlacement="floating"
+                  fill="outline"
+                  formControlName="planName"
+                  placeholder="e.g., Early Bird, Regular Monthly"
+                ></ion-input>
+
                 <ion-select
+                  class="ion-margin-top"
                   label="Plan Type"
                   labelPlacement="floating"
                   fill="outline"
@@ -83,15 +92,16 @@
             } @else {
               <div class="plan-display-card">
                 <div class="plan-details">
-                  <div class="flex">
-                    <ion-icon name="time-outline" color="primary"></ion-icon>
-                    <span class="plan-type">{{ plan.value.planType }}</span>
+                  <div class="plan-header">
+                    <span class="plan-name">{{ plan.value.planName }}</span>
+                    <ion-chip class="plan-type-chip">{{ plan.value.planType }}</ion-chip>
                   </div>
                   <div class="detail-row">
+                    <ion-icon name="time-outline" color="primary"></ion-icon>
                     <span>{{ plan.value.timeSlot }}</span>
                   </div>
                   <div class="detail-row">
-                    <ion-icon name="cash-outline"></ion-icon>
+                    <ion-icon name="cash-outline" color="success"></ion-icon>
                     <span class="plan-rate">₹ {{ plan.value.rate }}</span>
                   </div>
                   @if (plan.value.description) {
