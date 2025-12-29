@@ -16,7 +16,7 @@
           [color]="section.valid ? 'success' : 'warning'"
         ></ion-icon>
       </h4>
-      <ion-button fill="clear" (click)="navigateToSection(0)">
+      <ion-button fill="clear" (click)="navigateToSectionByKey('basicInformation')">
         <ion-icon slot="start" name="create-outline"></ion-icon>
         Edit
       </ion-button>
@@ -41,8 +41,8 @@
     </div>
   </div>
 }
-@if (getSectionAsFormGroup('libraryImages'); as section) {
-  <div class="preview-section" [formGroup]="section">
+@if (getSectionAsFormArray('libraryImages'); as section) {
+  <div class="preview-section">
     <div class="section-header">
       <h4>
         Library Images
@@ -51,7 +51,7 @@
           [color]="section.valid ? 'success' : 'warning'"
         ></ion-icon>
       </h4>
-      <ion-button fill="clear" (click)="navigateToSection(1)">
+      <ion-button fill="clear" (click)="navigateToSectionByKey('libraryImages')">
         <ion-icon slot="start" name="create-outline"></ion-icon>
         Edit
       </ion-button>
@@ -59,7 +59,7 @@
     <div class="section-content">
       <ion-grid class="preview-grid">
         <ion-row>
-          @for (photo of asFormArray(section.get('libraryPhotos')).controls; track $index) {
+          @for (photo of section.controls; track $index) {
             <ion-col size="6" size-md="4">
               <div class="image-preview-wrapper">
                 <ion-img [src]="photo.get('previewUrl')?.value"></ion-img>
@@ -81,7 +81,7 @@
           [color]="section.valid ? 'success' : 'warning'"
         ></ion-icon>
       </h4>
-      <ion-button fill="clear" (click)="navigateToSection(1)">
+      <ion-button fill="clear" (click)="navigateToSectionByKey('hostProfile')">
         <ion-icon slot="start" name="create-outline"></ion-icon>
         Edit
       </ion-button>
@@ -132,7 +132,7 @@
           [color]="section.valid ? 'success' : 'warning'"
         ></ion-icon>
       </h4>
-      <ion-button fill="clear" (click)="navigateToSection(2)">
+      <ion-button fill="clear" (click)="navigateToSectionByKey('seatManagement')">
         <ion-icon slot="start" name="create-outline"></ion-icon>
         Edit
       </ion-button>
@@ -165,7 +165,7 @@
           [color]="section.valid ? 'success' : 'warning'"
         ></ion-icon>
       </h4>
-      <ion-button fill="clear" (click)="navigateToSection(3)">
+      <ion-button fill="clear" (click)="navigateToSectionByKey('amenities')">
         <ion-icon slot="start" name="create-outline"></ion-icon>
         Edit
       </ion-button>
@@ -191,7 +191,7 @@
           [color]="section.valid ? 'success' : 'warning'"
         ></ion-icon>
       </h4>
-      <ion-button fill="clear" (click)="navigateToSection(4)">
+      <ion-button fill="clear" (click)="navigateToSectionByKey('bookCollection')">
         <ion-icon slot="start" name="create-outline"></ion-icon>
         Edit
       </ion-button>
@@ -217,7 +217,7 @@
           [color]="section.valid ? 'success' : 'warning'"
         ></ion-icon>
       </h4>
-      <ion-button fill="clear" (click)="navigateToSection(5)">
+      <ion-button fill="clear" (click)="navigateToSectionByKey('pricingPlans')">
         <ion-icon slot="start" name="create-outline"></ion-icon>
         Edit
       </ion-button>
@@ -233,7 +233,7 @@
                   <span>₹{{ plan.rate }}</span>
                 </ion-card-header>
                 <ion-card-content>
-                  <div class="plan-type">{{ plan.planType }}</div>
+                  <div class="plan-type">{{ plan.planName }} ({{ plan.planType }})</div>
                   <p>{{ plan.description }}</p>
                 </ion-card-content>
               </ion-card>
@@ -255,7 +255,7 @@
           [color]="section.valid ? 'success' : 'warning'"
         ></ion-icon>
       </h4>
-      <ion-button fill="clear" (click)="navigateToSection(7)">
+      <ion-button fill="clear" (click)="navigateToSectionByKey('requirements')">
         <ion-icon slot="start" name="create-outline"></ion-icon>
         Edit
       </ion-button>
@@ -292,7 +292,7 @@
           [color]="section.valid ? 'success' : 'warning'"
         ></ion-icon>
       </h4>
-      <ion-button fill="clear" (click)="navigateToSection(7)">
+      <ion-button fill="clear" (click)="navigateToSectionByKey('codeOfConduct')">
         <ion-icon slot="start" name="create-outline"></ion-icon>
         Edit
       </ion-button>

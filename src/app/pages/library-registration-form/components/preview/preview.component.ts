@@ -119,4 +119,13 @@ export class PreviewComponent implements OnInit {
     // You might need to adjust the route based on your app's routing setup
     this.router.navigate(['/library-registration-form']);
   }
+
+  navigateToSectionByKey(key: string): void {
+    const index = this.lrfService.steps.findIndex((step) => step.key === key);
+    if (index !== -1) {
+      this.navigateToSection(index);
+    } else {
+      console.warn(`Section with key '${key}' not found.`);
+    }
+  }
 }
