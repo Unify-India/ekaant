@@ -24,6 +24,7 @@ import { getAvailableSlots } from './booking/getAvailableSlots';
 import { allocateSeat } from './booking/allocateSeat';
 import { cancelBooking } from './booking/cancelBooking';
 import { createSubscription } from './booking/createSubscription';
+import { managerApproveSeat } from './booking/managerApproveSeat';
 
 // Uploads
 import { getSignedUploadUrl } from './uploads/getSignedUploadUrl';
@@ -51,6 +52,7 @@ export const booking = {
   allocateSeat: allocateSeat,
   cancelBooking: cancelBooking,
   createSubscription: createSubscription,
+  managerApproveSeat: managerApproveSeat,
 };
 
 export const uploads = {

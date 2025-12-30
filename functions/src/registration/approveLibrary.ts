@@ -145,7 +145,7 @@ export const approveLibrary = onCall({ region: DEPLOYMENT_REGION }, async (reque
 
     return {
       status: 'success',
-      message: `Library ${basicInfo.libraryName || ''} approved successfully.`,
+      message: `Library ${registrationData.basicInformation?.libraryName || ''} approved successfully.`,
       tempPassword: tempPassword, // Sending back for admin's info
     };
   } catch (error) {

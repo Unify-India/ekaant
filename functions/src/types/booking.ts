@@ -38,6 +38,8 @@ export interface IBooking {
     status: 'confirmed' | 'cancelled' | 'absent';
     createdAt: FirebaseFirestore.Timestamp;
     updatedAt: FirebaseFirestore.Timestamp;
+    seatNumber?: string;
+    sourceApplicationId?: string;
 }
 
 export interface IAvailabilitySlot {
@@ -80,4 +82,10 @@ export interface ICreateSubscriptionData {
     endDate: string; // YYYY-MM-DD
     slotTypeId: string;
   };
+}
+
+export interface IManagerApproveSeatData {
+  applicationId: string;
+  seatId?: string;
+  autoAllot?: boolean;
 }
