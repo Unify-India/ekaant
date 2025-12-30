@@ -42,12 +42,13 @@ export interface IAmenities {
 }
 
 export interface IPricingDetails {
-  amenities: IAmenities[];
+  amenities?: IAmenities[];
+  endTime?: string;
   price: number;
   pricingName: string;
   pricingType: string;
   shift?: string;
-  timeRange?: string;
+  startTime?: string;
   unit: string;
 }
 
