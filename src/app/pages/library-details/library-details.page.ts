@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Auth, authState } from '@angular/fire/auth';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonProgressBar, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -23,6 +24,8 @@ import {
   shieldOutline,
   closeCircleOutline,
   arrowForward,
+  waterOutline,
+  videocamOutline,
 } from 'ionicons/icons';
 import { AmenitiesCardComponent } from 'src/app/components/amenities-card/amenities-card.component';
 import { ListCodeOfConductComponent } from 'src/app/components/list-code-of-conduct/list-code-of-conduct.component';
@@ -49,7 +52,6 @@ import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials
     PriceCardComponent,
     AmenitiesCardComponent,
     RequirementsListComponent,
-    ListCodeOfConductComponent,
   ],
 })
 export class LibraryDetailsPage implements OnInit {
@@ -76,8 +78,9 @@ export class LibraryDetailsPage implements OnInit {
       city: '',
       state: '',
       zipCode: '',
-      operatingHoursStart: '',
-      operatingHoursEnd: '',
+      is24Hours: false,
+      openTime: '',
+      closeTime: '',
       genderCategory: '',
     },
     seatManagement: {
@@ -103,7 +106,6 @@ export class LibraryDetailsPage implements OnInit {
     managerIds: [],
     ownerId: '',
     occupiedSeats: 0,
-    status: '',
     totalSeats: 0,
     rating: {
       averageRating: 0,
@@ -121,25 +123,11 @@ export class LibraryDetailsPage implements OnInit {
   displayAmenities: IAmenities[] = [];
 
   // TODO: Fetch these from DB or Constants
-  bookCategoryList: IBookCategory[] = [
-    { name: 'Engineering & Technology', selected: true },
-    { name: 'Medical Sciences', selected: false },
-    { name: 'Management & Business', selected: false },
-    { name: 'Arts & Literature', selected: false },
-    { name: 'Science & Mathematics', selected: false },
-    { name: 'Competitive Exams', selected: false },
-  ];
+  bookCategoryList: IBookCategory[] = [];
 
-  codeOfConduct: string[] = [
-    'Maintain complete silence in study areas',
-    'Keep your assigned seat clean and organized',
-    'No food or beverages at study desks',
-    'Internet Usage Policy: Visiting illegal, adult, or pornographic websites is strictly prohibited.',
-    'Mobile phones must be on silent mode',
-    "Respect other students' study time and space",
-  ];
+  codeOfConduct: SafeHtml | null = null;
 
-  constructor() {
+  constructor(private sanitizer: DomSanitizer) {
     addIcons({
       timeOutline,
       peopleOutline,
@@ -160,6 +148,8 @@ export class LibraryDetailsPage implements OnInit {
       shieldOutline,
       closeCircleOutline,
       arrowForward,
+      waterOutline,
+      videocamOutline,
     });
   }
 
@@ -207,14 +197,8 @@ export class LibraryDetailsPage implements OnInit {
       this.mapPricingPlans(rawPlans);
 
       // 3. Map Code of Conduct
-      if (data.codeOfConduct) {
-        if (Array.isArray(data.codeOfConduct)) {
-          this.codeOfConduct = data.codeOfConduct;
-        } else if (typeof data.codeOfConduct === 'object') {
-          this.codeOfConduct = Object.keys(data.codeOfConduct).filter(
-            (k) => data.codeOfConduct[k] === true || typeof data.codeOfConduct[k] === 'string',
-          );
-        }
+      if (data.codeOfConduct && typeof data.codeOfConduct === 'string') {
+        this.codeOfConduct = this.sanitizer.bypassSecurityTrustHtml(data.codeOfConduct);
       }
 
       // 4. Construct the ILibrary object
@@ -242,8 +226,9 @@ export class LibraryDetailsPage implements OnInit {
           state: '',
           zipCode: '',
           genderCategory: '',
-          operatingHoursStart: '',
-          operatingHoursEnd: '',
+          is24Hours: false,
+          openTime: '',
+          closeTime: '',
         };
       }
     } catch (error) {
@@ -358,7 +343,7 @@ export class LibraryDetailsPage implements OnInit {
   get operatingHours(): string {
     const info = this.libraryData.basicInformation;
     if (!info) return '';
-    return `${info.operatingHoursStart || 'N/A'} - ${info.operatingHoursEnd || 'N/A'}`;
+    return `${info.openTime} || 'N/A'} - ${info.closeTime || 'N/A'}`;
   }
 
   get availableSeats(): number {
