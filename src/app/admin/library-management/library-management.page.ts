@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { Functions, httpsCallable } from '@angular/fire/functions';
+import { AlertController, ToastController } from '@ionic/angular';
 import { IonChip, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -26,6 +28,9 @@ import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials
 })
 export class LibraryManagementPage implements OnInit {
   libraries$!: Observable<any[]>;
+  private functions = inject(Functions);
+  private alertController = inject(AlertController);
+  private toastController = inject(ToastController);
 
   constructor(
     private router: Router,
@@ -49,9 +54,39 @@ export class LibraryManagementPage implements OnInit {
   }
 
   // Placeholder for delete action
-  deleteRequest(libraryId: string) {
-    console.log('Deleting library:', libraryId);
-    // Here you would typically call a service to delete the item from 'libraries' collection
+  async deleteRequest(libraryId: string) {
+    const alert = await this.alertController.create({
+      header: 'Confirm Deletion',
+      message: 'Are you sure you want to delete this library and all its associated data? This action cannot be undone.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: async () => {
+            await this.executeDelete(libraryId);
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  private async executeDelete(libraryId: string) {
+    const deleteFn = httpsCallable(this.functions, 'admin-deleteLibrary');
+    try {
+      const result = await deleteFn({ libraryId });
+      const message = (result.data as any)?.message || 'Library deleted successfully.';
+      this.presentToast(message, 'success');
+      // Refresh the list
+      this.libraries$ = this.libraryService.getApprovedLibraries();
+    } catch (error: any) {
+      console.error('Error deleting library:', error);
+      this.presentToast(error.message, 'danger');
+    }
   }
 
   // Placeholder for export action
@@ -63,5 +98,13 @@ export class LibraryManagementPage implements OnInit {
   addNewRequest() {
     console.log('Navigating to add new library form...');
     // Example: this.router.navigate(['/admin/new-library']);
+  }
+  private async presentToast(message: string, color: 'success' | 'danger') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      color,
+    });
+    toast.present();
   }
 }
