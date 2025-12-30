@@ -1,13 +1,45 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>student-applications</ion-title>
+    <ion-title>Student Applications</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">student-applications</ion-title>
+      <ion-title size="large">Student Applications</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <div class="ion-padding">
+    <div *ngIf="isLoading" class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+      <p>Loading applications...</p>
+    </div>
+
+    <div *ngIf="!isLoading && applications.length === 0" class="ion-text-center ion-padding">
+      <ion-text color="medium">
+        <p>No applications found for your library.</p>
+      </ion-text>
+    </div>
+
+    <ion-list *ngIf="!isLoading && applications.length > 0">
+      <ion-card *ngFor="let app of applications">
+        <ion-card-content>
+          <ion-item lines="none">
+            <ion-label>
+              <h2>{{ app.studentName }}</h2>
+              <p>{{ app.studentEmail }}</p>
+              <p>
+                <ion-text color="dark">Plan: {{ app.selectedPlan?.planName }}</ion-text>
+              </p>
+            </ion-label>
+            <ion-badge [color]="getStatusColor(app.applicationStatus)" slot="end">
+              {{ app.applicationStatus | titlecase }}
+            </ion-badge>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+    </ion-list>
+  </div>
 </ion-content>
