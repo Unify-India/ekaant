@@ -62,11 +62,12 @@ export interface IBasicInformation {
   addressLine1: string;
   addressLine2?: string;
   city: string;
+  closeTime: string;
   genderCategory: string;
+  is24Hours: boolean;
   libraryName: string;
   mapUrl?: string;
-  operatingHoursEnd: string;
-  operatingHoursStart: string;
+  openTime: string;
   state: string;
   zipCode: string;
 }
@@ -167,11 +168,10 @@ export interface ILibraryRegistrationRequest {
   libraryImages: ILibraryImage[];
   managerIds: string[];
   occupiedSeats: number;
-  ownerId: string;
+  ownerId?: string;
   pricingPlans: IPricingPlan[];
   requirements: IRequirement[];
   seatManagement: ISeatManagement;
-  status: string;
   totalSeats: number;
   updatedAt: Timestamp | string;
 }
