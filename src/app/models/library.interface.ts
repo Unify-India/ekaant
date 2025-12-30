@@ -88,6 +88,7 @@ export interface ISeat {
   hasPower: boolean;
   id: string;
   isAC?: boolean;
+  lastMaintenance?: Timestamp | string;
   seatNumber: string;
   status: 'active' | 'maintenance' | 'disabled';
 }
