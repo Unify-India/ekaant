@@ -39,7 +39,14 @@
             <div>
               <ion-label>Operating Hours</ion-label>
               <p>
-                <strong>{{ operatingHours }}</strong>
+                @if (libraryData.basicInformation.is24Hours) {
+                  <strong>24 Hours</strong>
+                } @else {
+                  <strong>
+                    {{ libraryData.basicInformation.openTime }} -
+                    {{ libraryData.basicInformation.closeTime }}
+                  </strong>
+                }
               </p>
             </div>
           </div>
@@ -178,21 +185,21 @@
         <app-requirements-list [requirements]="displayRequirements"></app-requirements-list>
       </ion-card>
 
-      <div class="code-of-conduct">
-        <app-list-code-of-conduct [codeOfConduct]="codeOfConduct"></app-list-code-of-conduct>
-      </div>
+      @if (codeOfConduct) {
+        <ion-card class="ion-padding code-of-conduct">
+          <h2>Code of Conduct</h2>
+          <div [innerHTML]="codeOfConduct"></div>
+        </ion-card>
+      }
 
       <ion-card id="host-info" class="ion-padding">
         <h2>Meet the Host</h2>
         <div class="host-details-container">
-          <div class="img-container">
-            <ion-avatar>
-              <img
-                [src]="libraryData.hostProfile.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'"
-                alt="Host Avatar"
-              />
-            </ion-avatar>
-          </div>
+          @if (libraryData.hostProfile.photoURL) {
+            <div class="img-container">
+              <img [src]="libraryData.hostProfile.photoURL" alt="Host Avatar" />
+            </div>
+          }
           <div class="host-details">
             <h3>{{ libraryData.hostProfile.fullName || 'Host' }}</h3>
             <p>{{ libraryData.hostProfile.visionStatement }}</p>
