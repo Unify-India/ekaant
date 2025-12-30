@@ -120,11 +120,31 @@ for **both** screens.
 - [ ] Implement the `onUserDelete` Auth trigger in `auth/onUserDelete.ts`.
 - [ ] Implement the `manageClaims` callable function for admins.
 
-## 28 Nov 2025
+## 30 Dec 2025
 
-1. Library registration by manager payload misses the status parameter, resulting in missing status while rendering in Application status page.
-2. We need to add the showRegistrationHeader flag in application status page for app-preview
-3. In the registration flow, in the last stage preview screen, the host image got some issue as the preview is not working as expected.
+### Student Onboarding & User Management
+
+- [x] **Manager Dashboard Updates**
+  - [x] Added "Onboard Student" (success) and "Add Historical Booking" (tertiary) action buttons.
+  - [x] Styled buttons with responsive grid layout (stack on mobile, side-by-side on desktop).
+  - [x] Modernized template with Angular `@for` and `@if` syntax.
+- [x] **Enrolled Users Management (`manager/users`)**
+  - [x] Implemented data table for library-associated users.
+  - [x] Columns: Actions (View/Edit), Name (with Avatar), Email, Role, Join Date, Status.
+  - [x] Integrated Firestore fetching from `libraries/{libraryId}/users`.
+  - [x] Handled `Timestamp` to `Date` conversion for template pipes.
+- [x] **Student Onboarding Flow (`manager/onboard-user`)**
+  - [x] Implemented two-card reactive form for manual enrollment.
+  - [x] **Section 1: Personal Details** (Name, Email, Phone, Address, ID Card, AC Pref).
+  - [x] **Section 2: Enrollment & Payment** (Plan Dropdown, Billing Type, Amount, Dates, Study Hours).
+  - [x] **Pricing Integration**: Populated plan dropdown from `localStorage` (managedLibraries) with auto-fill for rates.
+  - [x] **Data Persistence**: 
+    - [x] Created document in root `users` collection.
+    - [x] Created document in `libraries/{libraryId}/users` sub-collection.
+    - [x] Initialized `associatedLibraries` structure (`enrolled`, `applied`, `previous`).
+- [x] **UI/UX Modernization**
+  - [x] Refactored forms to use latest Ionic outlined syntax (`fill="outline"`, `labelPlacement="floating"`).
+  - [x] Standardized table styling across manager views.
 
 ## Security & Hardening (Pre-Prod)
 
