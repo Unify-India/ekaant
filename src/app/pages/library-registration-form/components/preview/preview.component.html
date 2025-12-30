@@ -282,8 +282,8 @@
   </div>
 }
 
-@if (getSectionAsFormGroup('codeOfConduct'); as section) {
-  <div class="preview-section" [formGroup]="section">
+@if (getSection('codeOfConduct'); as section) {
+  <div class="preview-section">
     <div class="section-header">
       <h4>
         Code of Conduct
@@ -297,7 +297,7 @@
         Edit
       </ion-button>
     </div>
-    <div class="section-content" [innerHTML]="section.value.conductText"></div>
+    <div class="section-content" [innerHTML]="section.value"></div>
   </div>
 }
 
