@@ -10,16 +10,14 @@
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-grid>
     <ion-row>
-      <ion-col size="12" size-sm="6" size-lg="4" *ngFor="let seat of seats; trackBy: seat?.id">
+      @for (seat of seats; track seat.id) {
+      <ion-col size="12" size-sm="6" size-lg="4">
         <ion-card class="cubicle-card" (click)="manageSlot(seat)" button>
           <ion-card-content>
             <div class="card-header">
               <div class="cubicle-id">{{ seat.seatNumber }}</div>
-              <div
-                class="status-badge"
-                [ngClass]="seat.status"
-                *ngIf="statusDetails[seat.status]; else unknownStatus"
-              >
+              @if (statusDetails[seat.status]) {
+              <div class="status-badge" [ngClass]="seat.status">
                 <ion-icon
                   [name]="statusDetails[seat.status].icon"
                   [color]="statusDetails[seat.status].color"
@@ -29,17 +27,19 @@
                   {{ statusDetails[seat.status].label }}
                 </ion-label>
               </div>
-              <ng-template #unknownStatus>
-                <div class="status-badge">
-                  <ion-label color="medium">{{ seat.status }}</ion-label>
-                </div>
-              </ng-template>
+              } @else {
+              <div class="status-badge">
+                <ion-label color="medium">{{ seat.status }}</ion-label>
+              </div>
+              }
             </div>
 
             <div class="amenities">
-              <ion-chip outline="true" *ngFor="let amenity of getAmenities(seat)">
+              @for (amenity of getAmenities(seat); track amenity) {
+              <ion-chip outline="true">
                 <ion-label>{{ amenity }}</ion-label>
               </ion-chip>
+              }
             </div>
 
             <div class="card-footer">
@@ -60,11 +60,14 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
+      }
     </ion-row>
-    <ion-row *ngIf="seats.length === 0">
+    @if (seats.length === 0) {
+    <ion-row>
       <ion-col size="12" class="ion-text-center">
         <p>No seats configured for this library.</p>
       </ion-col>
     </ion-row>
+    }
   </ion-grid>
 </ion-content>

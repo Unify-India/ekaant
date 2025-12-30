@@ -33,7 +33,7 @@ import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials
 export class SlotManagementPage implements OnInit {
   seats: ISeat[] = [];
 
-  statusDetails: any = {
+  statusDetails = {
     active: { label: 'Available', icon: 'ellipse', color: 'success' },
     occupied: { label: 'Occupied', icon: 'person-circle', color: 'primary' },
     maintenance: { label: 'Maintenance', icon: 'construct', color: 'warning' },
@@ -56,6 +56,7 @@ export class SlotManagementPage implements OnInit {
         try {
           const libraries: ILibrary[] = JSON.parse(managedLibrariesStr);
           const primaryLib = libraries.find((l) => l.id === user.primaryLibraryId);
+          console.log('Primary library', primaryLib);
           if (primaryLib && primaryLib.seatManagement && primaryLib.seatManagement.seats) {
             this.seats = primaryLib.seatManagement.seats;
           }
@@ -67,6 +68,7 @@ export class SlotManagementPage implements OnInit {
   }
 
   getAmenities(seat: ISeat): string[] {
+    console.info('seat', seat);
     const amenities = [];
     if (seat.isAC) amenities.push('AC');
     if (seat.hasPower) amenities.push('Power Outlet');
