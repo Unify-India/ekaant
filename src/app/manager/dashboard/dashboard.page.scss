@@ -36,6 +36,12 @@
   justify-content: space-between;
   align-items: center;
 }
+.seat-stats {
+  margin-top: 10px;
+  span {
+    margin-right: 0.5rem;
+  }
+}
 
 .availability-box {
   text-align: right;
@@ -50,6 +56,24 @@
   span {
     font-size: 13px;
     color: var(--ion-color-medium);
+  }
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  ion-button {
+    margin: 0;
+    --border-radius: 0.4rem;
+    height: 54px;
+    font-weight: 600;
+    font-size: 16px;
   }
 }
 

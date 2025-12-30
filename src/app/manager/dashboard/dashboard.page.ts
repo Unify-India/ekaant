@@ -14,7 +14,14 @@ import {
   IonBadge,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { barChartOutline, calendarOutline, pulseOutline, trendingUpOutline } from 'ionicons/icons';
+import {
+  barChartOutline,
+  calendarOutline,
+  personAddOutline,
+  pulseOutline,
+  timeOutline,
+  trendingUpOutline,
+} from 'ionicons/icons';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 
 @Component({
@@ -92,7 +99,14 @@ export class DashboardPage implements OnInit {
   ];
 
   constructor() {
-    addIcons({ trendingUpOutline, calendarOutline, pulseOutline, barChartOutline });
+    addIcons({
+      trendingUpOutline,
+      calendarOutline,
+      pulseOutline,
+      barChartOutline,
+      personAddOutline,
+      timeOutline,
+    });
   }
 
   ngOnInit() {}
