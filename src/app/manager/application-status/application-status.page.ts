@@ -30,6 +30,7 @@ export class ApplicationStatusPage implements OnInit {
   ngOnInit() {
     const user = this.authService.getCurrentUser();
     if (user) {
+      console.info('user', user);
       this.currentUserId = user.uid;
       this.loadApplicationStatus(user.uid);
     } else {
