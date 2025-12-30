@@ -10,51 +10,61 @@
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-grid>
     <ion-row>
-      @for (cubicle of mockCubicles; track cubicle.id) {
-        <ion-col size="12" size-sm="6" size-lg="4">
-          <ion-card class="cubicle-card" (click)="manageSlot(cubicle)" button>
-            <ion-card-content>
-              <div class="card-header">
-                <div class="cubicle-id">{{ cubicle.id }}</div>
-                <div class="status-badge" [ngClass]="cubicle.status">
-                  <ion-icon
-                    [name]="statusDetails[cubicle.status].icon"
-                    [color]="statusDetails[cubicle.status].color"
-                    class="status-dot"
-                  ></ion-icon>
-                  <ion-label [color]="statusDetails[cubicle.status].color">
-                    {{ statusDetails[cubicle.status].label }}
-                  </ion-label>
+      <ion-col size="12" size-sm="6" size-lg="4" *ngFor="let seat of seats; trackBy: seat?.id">
+        <ion-card class="cubicle-card" (click)="manageSlot(seat)" button>
+          <ion-card-content>
+            <div class="card-header">
+              <div class="cubicle-id">{{ seat.seatNumber }}</div>
+              <div
+                class="status-badge"
+                [ngClass]="seat.status"
+                *ngIf="statusDetails[seat.status]; else unknownStatus"
+              >
+                <ion-icon
+                  [name]="statusDetails[seat.status].icon"
+                  [color]="statusDetails[seat.status].color"
+                  class="status-dot"
+                ></ion-icon>
+                <ion-label [color]="statusDetails[seat.status].color">
+                  {{ statusDetails[seat.status].label }}
+                </ion-label>
+              </div>
+              <ng-template #unknownStatus>
+                <div class="status-badge">
+                  <ion-label color="medium">{{ seat.status }}</ion-label>
                 </div>
-              </div>
+              </ng-template>
+            </div>
 
-              <div class="amenities">
-                @for (amenity of cubicle.amenities; track amenity) {
-                  <ion-chip outline="true">
-                    <ion-label>{{ amenity }}</ion-label>
-                  </ion-chip>
-                }
-              </div>
+            <div class="amenities">
+              <ion-chip outline="true" *ngFor="let amenity of getAmenities(seat)">
+                <ion-label>{{ amenity }}</ion-label>
+              </ion-chip>
+            </div>
 
-              <div class="card-footer">
-                <p>
-                  Last maintenance:
-                  <strong>{{ cubicle.lastMaintenance | date: 'mediumDate' }}</strong>
-                </p>
-                <ion-button
-                  fill="clear"
-                  size="small"
-                  class="more-btn"
-                  (click)="moreActions(cubicle, $event)"
-                  [attr.aria-label]="'More actions for ' + cubicle.id"
-                >
-                  <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
-                </ion-button>
-              </div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      }
+            <div class="card-footer">
+              <p>
+                <!-- Placeholder for last maintenance or other info since it's not in ISeat -->
+                <span class="text-muted">Seat ID: {{ seat.id }}</span>
+              </p>
+              <ion-button
+                fill="clear"
+                size="small"
+                class="more-btn"
+                (click)="moreActions(seat, $event)"
+                [attr.aria-label]="'More actions for ' + seat.seatNumber"
+              >
+                <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="seats.length === 0">
+      <ion-col size="12" class="ion-text-center">
+        <p>No seats configured for this library.</p>
+      </ion-col>
     </ion-row>
   </ion-grid>
 </ion-content>

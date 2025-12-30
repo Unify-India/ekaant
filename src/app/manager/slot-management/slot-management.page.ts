@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   IonButton,
   IonButtons,
@@ -12,59 +12,77 @@ import {
   IonHeader,
   IonIcon,
   IonLabel,
-  IonNote,
   IonRow,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { construct, ellipsisVertical, ellipse, personCircle } from 'ionicons/icons';
+import { construct, ellipsisVertical, ellipse, personCircle, closeCircle } from 'ionicons/icons';
+import { AuthService } from 'src/app/auth/service/auth.service';
+import { ILibrary, ISeat } from 'src/app/models/library.interface';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
-
-interface Cubicle {
-  amenities: string[];
-  id: string;
-  lastMaintenance: string;
-  notes?: string;
-  status: 'available' | 'occupied' | 'maintenance';
-}
 
 @Component({
   selector: 'app-slot-management',
   templateUrl: './slot-management.page.html',
   styleUrls: ['./slot-management.page.scss'],
   standalone: true,
-  imports: [IonIcon, IonChip, IonLabel, IonButton, BaseUiComponents, UiEssentials],
+  imports: [IonIcon, IonChip, IonLabel, IonButton, BaseUiComponents, UiEssentials, CommonModule],
 })
-export class SlotManagementPage {
-  mockCubicles: Cubicle[] = [
-    { id: 'C-01', amenities: ['Wi-Fi', 'AC', 'Power Outlet'], lastMaintenance: '2024-12-15', status: 'available' },
-    { id: 'C-02', amenities: ['Wi-Fi', 'AC', 'Power Outlet'], lastMaintenance: '2025-01-01', status: 'maintenance' },
-    { id: 'C-03', amenities: ['Wi-Fi', 'Power Outlet'], lastMaintenance: '2024-12-20', status: 'available' },
-    { id: 'C-04', amenities: ['Wi-Fi', 'AC'], lastMaintenance: '2024-12-10', status: 'occupied' },
-    { id: 'C-05', amenities: ['Wi-Fi', 'AC', 'Power Outlet'], lastMaintenance: '2024-12-18', status: 'available' },
-    { id: 'C-06', amenities: ['Wi-Fi', 'Power Outlet'], lastMaintenance: '2024-12-22', status: 'available' },
-  ];
+export class SlotManagementPage implements OnInit {
+  seats: ISeat[] = [];
 
-  statusDetails = {
-    available: { label: 'Available', icon: 'ellipse', color: 'success' },
+  statusDetails: any = {
+    active: { label: 'Available', icon: 'ellipse', color: 'success' },
     occupied: { label: 'Occupied', icon: 'person-circle', color: 'primary' },
     maintenance: { label: 'Maintenance', icon: 'construct', color: 'warning' },
+    disabled: { label: 'Disabled', icon: 'close-circle', color: 'medium' },
   };
 
-  constructor() {
-    addIcons({ ellipse, personCircle, construct, ellipsisVertical });
+  constructor(private authService: AuthService) {
+    addIcons({ ellipse, personCircle, construct, ellipsisVertical, closeCircle });
   }
 
-  manageSlot(cubicle: Cubicle) {
-    console.log('Manage cubicle', cubicle.id, cubicle);
+  ngOnInit() {
+    this.loadSeats();
+  }
+
+  loadSeats() {
+    const user = this.authService.getCurrentUser();
+    if (user && user.primaryLibraryId) {
+      const managedLibrariesStr = localStorage.getItem('managedLibraries');
+      if (managedLibrariesStr) {
+        try {
+          const libraries: ILibrary[] = JSON.parse(managedLibrariesStr);
+          const primaryLib = libraries.find((l) => l.id === user.primaryLibraryId);
+          if (primaryLib && primaryLib.seatManagement && primaryLib.seatManagement.seats) {
+            this.seats = primaryLib.seatManagement.seats;
+          }
+        } catch (e) {
+          console.error('Error parsing managed libraries from local storage', e);
+        }
+      }
+    }
+  }
+
+  getAmenities(seat: ISeat): string[] {
+    const amenities = [];
+    if (seat.isAC) amenities.push('AC');
+    if (seat.hasPower) amenities.push('Power Outlet');
+    // Default amenities can be added here if needed
+    if (amenities.length === 0) amenities.push('Standard');
+    return amenities;
+  }
+
+  manageSlot(seat: ISeat) {
+    console.log('Manage seat', seat.id, seat);
     // TODO: Implement navigation, modal, or popover to edit status/details
   }
 
-  moreActions(cubicle: Cubicle, event: Event) {
+  moreActions(seat: ISeat, event: Event) {
     event.stopPropagation();
-    console.log('More actions for', cubicle.id);
+    console.log('More actions for', seat.id);
     // TODO: Show popover or action sheet
   }
 }
