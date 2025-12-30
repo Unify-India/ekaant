@@ -1,0 +1,42 @@
+ion-card {
+  margin: 0;
+  height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--ion-color-dark);
+}
+
+ion-item {
+  --background: transparent;
+  --padding-start: 0;
+}
+
+.section-label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.action-row {
+  max-width: 100%;
+  padding-bottom: 2rem;
+}
+
+ion-checkbox {
+  --size: 20px;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  ion-col[sizeMd="6"] {
+    margin-bottom: 1rem;
+  }
+}

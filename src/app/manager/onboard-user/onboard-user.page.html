@@ -1,0 +1,210 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/manager/users"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Onboard Student</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Onboard Student</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <form [formGroup]="onboardForm" (ngSubmit)="onSubmit()">
+    <ion-grid>
+      <ion-row>
+        <!-- Personal Details -->
+        <ion-col size="12" sizeMd="6">
+          <ion-card>
+            <ion-card-content>
+              <h2 class="card-title">Personal Details</h2>
+
+              <ion-input
+                class="ion-margin-bottom"
+                label="Full Name *"
+                labelPlacement="floating"
+                fill="outline"
+                formControlName="fullName"
+                placeholder="Enter full name"
+                [class.ion-invalid]="fullName?.invalid && fullName?.touched"
+                errorText="Full name is required"
+              ></ion-input>
+
+              <ion-input
+                class="ion-margin-bottom"
+                label="Email Address *"
+                labelPlacement="floating"
+                fill="outline"
+                formControlName="email"
+                type="email"
+                placeholder="Enter email address"
+                [class.ion-invalid]="email?.invalid && email?.touched"
+                errorText="Valid email is required"
+              ></ion-input>
+
+              <ion-input
+                class="ion-margin-bottom"
+                label="Phone Number *"
+                labelPlacement="floating"
+                fill="outline"
+                formControlName="phoneNumber"
+                type="tel"
+                placeholder="Enter phone number"
+                [class.ion-invalid]="phoneNumber?.invalid && phoneNumber?.touched"
+                errorText="Phone number is required"
+              ></ion-input>
+
+              <ion-input
+                class="ion-margin-bottom"
+                label="Address *"
+                labelPlacement="floating"
+                fill="outline"
+                formControlName="address"
+                placeholder="Enter address"
+                [class.ion-invalid]="address?.invalid && address?.touched"
+                errorText="Address is required"
+              ></ion-input>
+
+              <ion-input
+                class="ion-margin-bottom"
+                label="ID Card Number *"
+                labelPlacement="floating"
+                fill="outline"
+                formControlName="idCardNumber"
+                placeholder="Aadhar, PAN, or Student ID"
+                maxlength="14"
+                [class.ion-invalid]="idCardNumber?.invalid && idCardNumber?.touched"
+                errorText="ID card number is required"
+              ></ion-input>
+
+              <div class="ion-margin-top">
+                <ion-checkbox formControlName="acPreference" labelPlacement="end">AC Preference</ion-checkbox>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <!-- Enrollment & Payment Details -->
+        <ion-col size="12" sizeMd="6">
+          <ion-card>
+            <ion-card-content>
+              <h2 class="card-title">Enrollment & Payment</h2>
+
+              <ion-select
+                class="ion-margin-bottom"
+                label="Subscription Plan *"
+                labelPlacement="floating"
+                fill="outline"
+                formControlName="selectedPlan"
+                (ionChange)="onPlanChange($event)"
+                [class.ion-invalid]="selectedPlan?.invalid && selectedPlan?.touched"
+                errorText="Plan name is required"
+              >
+                @for (plan of pricingPlans; track plan.planName) {
+                  <ion-select-option [value]="plan.planName">
+                    {{ plan.planName }} ({{ plan.rate | currency: 'INR' }})
+                  </ion-select-option>
+                }
+              </ion-select>
+
+              <ion-select
+                class="ion-margin-bottom"
+                label="Billing Type *"
+                labelPlacement="floating"
+                fill="outline"
+                formControlName="billingCycle"
+                [class.ion-invalid]="billingCycle?.invalid && billingCycle?.touched"
+                errorText="Billing type is required"
+              >
+                <ion-select-option value="monthly">Monthly</ion-select-option>
+                <ion-select-option value="quarterly">Quarterly</ion-select-option>
+                <ion-select-option value="yearly">Yearly</ion-select-option>
+              </ion-select>
+
+              <ion-input
+                class="ion-margin-bottom"
+                label="Payment Amount *"
+                labelPlacement="floating"
+                fill="outline"
+                formControlName="amount"
+                type="number"
+                placeholder="0.00"
+                [class.ion-invalid]="amount?.invalid && amount?.touched"
+                errorText="Valid amount is required"
+              ></ion-input>
+
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col size="6" class="ion-padding-end">
+                    <ion-input
+                      class="ion-margin-bottom"
+                      label="Payment Date *"
+                      labelPlacement="floating"
+                      fill="outline"
+                      type="date"
+                      formControlName="paymentDate"
+                      [class.ion-invalid]="paymentDate?.invalid && paymentDate?.touched"
+                    ></ion-input>
+                  </ion-col>
+                  <ion-col size="6" class="ion-padding-start">
+                    <ion-input
+                      class="ion-margin-bottom"
+                      label="Start Date *"
+                      labelPlacement="floating"
+                      fill="outline"
+                      type="date"
+                      formControlName="startDate"
+                      [class.ion-invalid]="startDate?.invalid && startDate?.touched"
+                    ></ion-input>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <ion-label class="section-label ion-margin-top ion-margin-bottom">Preferred Study Hours</ion-label>
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col size="6" class="ion-padding-end">
+                    <ion-input
+                      label="Start Time"
+                      labelPlacement="floating"
+                      fill="outline"
+                      type="time"
+                      formControlName="startTime"
+                    ></ion-input>
+                  </ion-col>
+                  <ion-col size="6" class="ion-padding-start">
+                    <ion-input
+                      label="End Time"
+                      labelPlacement="floating"
+                      fill="outline"
+                      type="time"
+                      formControlName="endTime"
+                    ></ion-input>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+
+      <ion-row class="ion-margin-top action-row">
+        <ion-col size="12" class="ion-text-end">
+          <ion-button fill="outline" color="medium" (click)="onCancel()" class="ion-margin-end">Cancel</ion-button>
+          <ion-button type="submit" color="primary" [disabled]="isSubmitting">
+            @if (!isSubmitting) {
+              <span>Onboard Student</span>
+              <ion-icon slot="end" name="save-outline"></ion-icon>
+            } @else {
+              <ion-spinner name="crescent"></ion-spinner>
+            }
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
+</ion-content>
