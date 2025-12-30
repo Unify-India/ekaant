@@ -13,8 +13,9 @@ import {
 import { connectAuthEmulator } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, map, Observable } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
+import { LibraryService } from 'src/app/services/library/library.service';
 import { ToasterService } from 'src/app/services/toaster/toaster.service';
 import { environment } from 'src/environments/environment';
 
@@ -26,6 +27,7 @@ export class AuthService {
   private toaster = inject(ToasterService);
   private auth = inject(Auth);
   private firestore = inject(Firestore);
+  private libraryService = inject(LibraryService);
 
   private currentUser: IUser | null = null;
   private authStatusListener = new BehaviorSubject<IUser | null>(null);
@@ -53,6 +55,7 @@ export class AuthService {
         // User signed out
         this.currentUser = null;
         sessionStorage.removeItem('currentUser');
+        localStorage.removeItem('managedLibraries'); // Clear managed libraries on logout
         this.authStatusListener.next(null);
       }
     });
@@ -67,6 +70,36 @@ export class AuthService {
           ...userData,
           uid,
         };
+
+        // --- Manager Library Logic ---
+        if (this.currentUser.role === 'manager' && this.currentUser.managedLibraryIds?.length) {
+          try {
+            const libraries = await firstValueFrom(
+              this.libraryService.getLibrariesByIds(this.currentUser.managedLibraryIds),
+            );
+
+            if (libraries && libraries.length > 0) {
+              localStorage.setItem('managedLibraries', JSON.stringify(libraries));
+
+              // If no primary library is set, set the first one
+              if (!this.currentUser.primaryLibraryId) {
+                const firstLibId = libraries[0].id;
+                if (firstLibId) {
+                  this.currentUser.primaryLibraryId = firstLibId;
+                  // Persist the new primary library ID to Firestore
+                  await updateDoc(doc(this.firestore, 'users', uid), {
+                    primaryLibraryId: firstLibId,
+                  });
+                }
+              }
+            }
+          } catch (libError) {
+            console.error('Error fetching managed libraries:', libError);
+            // Non-blocking error, but good to log
+          }
+        }
+        // -----------------------------
+
         sessionStorage.setItem('currentUser', JSON.stringify(this.currentUser));
         this.authStatusListener.next(this.currentUser);
       } else {
