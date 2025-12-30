@@ -167,11 +167,13 @@ export interface ILibraryRegistrationRequest {
   libraryImages: ILibraryImage[];
   managerIds: string[];
   occupiedSeats: number;
+  ownerId: string;
   pricingPlans: IPricingPlan[];
   requirements: IRequirement[];
   seatManagement: ISeatManagement;
   status: string;
   totalSeats: number;
+  updatedAt: Timestamp | string;
 }
 
 export interface ILibrary extends ILibraryRegistrationRequest {
