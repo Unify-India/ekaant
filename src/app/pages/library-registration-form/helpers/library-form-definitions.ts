@@ -1,4 +1,4 @@
-import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { AMENITIES_DATA } from 'src/app/models/constants/amenities.constants';
 import { IPricingPlan } from 'src/app/models/library.interface';
 
@@ -136,10 +136,8 @@ export function createRequirementGroup(fb: FormBuilder, req: any = {}) {
   });
 }
 
-export function createCodeOfConductForm(fb: FormBuilder): FormGroup {
-  return fb.group({
-    conductText: ['', [Validators.required, Validators.minLength(50)]],
-  });
+export function createCodeOfConductControl(fb: FormBuilder) {
+  return fb.control('', [Validators.required, Validators.minLength(50)]);
 }
 
 export function minOneCheckboxSelectedValidator(): (control: AbstractControl) => ValidationErrors | null {
