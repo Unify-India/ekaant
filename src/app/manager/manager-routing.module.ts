@@ -28,6 +28,13 @@ const routes: Routes = [
           import('./student-applications/student-applications.page').then((m) => m.StudentApplicationsPage),
       },
       {
+        path: 'student-application-detail/:id',
+        loadComponent: () =>
+          import('./student-application-detail/student-application-detail.page').then(
+            (m) => m.StudentApplicationDetailPage,
+          ),
+      },
+      {
         path: 'application-status',
         loadComponent: () =>
           import('./application-status/application-status.page').then((m) => m.ApplicationStatusPage),
@@ -48,6 +55,10 @@ const routes: Routes = [
       {
         path: 'users',
         loadComponent: () => import('./users/users.page').then((m) => m.UsersPage),
+      },
+      {
+        path: 'onboard-user',
+        loadComponent: () => import('./onboard-user/onboard-user.page').then((m) => m.OnboardUserPage),
       },
       {
         path: 'bookings',
