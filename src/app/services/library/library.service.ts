@@ -19,7 +19,7 @@ import {
 } from '@angular/fire/firestore';
 import { from, map, Observable, of, switchMap, forkJoin } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
-import { ILibrary, ILibraryState, Library } from 'src/app/models/library.interface';
+import { ILibrary, ILibraryRegistrationRequest, ILibraryState, Library } from 'src/app/models/library.interface';
 
 import { FirebaseService } from '../firebase/firebase-service';
 
@@ -127,7 +127,7 @@ export class LibraryService {
           return [];
         }
         return snapshot.docs.map((doc) => {
-          const data = doc.data() as ILibrary;
+          const data = doc.data() as ILibraryRegistrationRequest;
           const addressParts = [
             data.basicInformation?.addressLine1,
             data.basicInformation?.addressLine2,
@@ -142,7 +142,7 @@ export class LibraryService {
             libraryManager: data.hostProfile?.fullName,
             address: addressParts.join(', '),
             totalSeats: data?.totalSeats,
-            applicationStatus: data.status,
+            applicationStatus: data.applicationStatus,
             // Include other top-level fields if necessary for display
             // ...data,
           };
