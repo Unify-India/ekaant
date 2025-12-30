@@ -10,7 +10,7 @@ import {
   createAmenitiesForm,
   createBasicInformationForm,
   createBookCollectionForm,
-  createCodeOfConductForm,
+  createCodeOfConductControl,
   createFacilityRangeGroup,
   createHostProfileForm,
   createLibraryImagesArray,
@@ -70,7 +70,7 @@ export class LibraryRegistrationFormService {
       seatManagement: createSeatManagementForm(this.fb),
       pricingPlans: createPricingPlansForm(this.fb),
       requirements: createRequirementsForm(this.fb),
-      codeOfConduct: createCodeOfConductForm(this.fb),
+      codeOfConduct: createCodeOfConductControl(this.fb),
     });
 
     (async () => {
@@ -157,7 +157,7 @@ export class LibraryRegistrationFormService {
       this.mainForm.get('amenities')?.patchValue(data.amenities || {});
     }
 
-    this.mainForm.get('codeOfConduct')?.patchValue(data.codeOfConduct || {});
+    this.mainForm.get('codeOfConduct')?.patchValue(data.codeOfConduct || '');
 
     if (data.seatManagement) {
       this.mainForm.get('seatManagement.totalSeats')?.patchValue(data.seatManagement.totalSeats);
