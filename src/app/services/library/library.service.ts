@@ -403,4 +403,14 @@ export class LibraryService {
       timestamp: serverTimestamp(),
     });
   }
+
+  public getStudentApplicationsForLibrary(libraryId: string): Observable<any[]> {
+    console.info('library id', libraryId);
+    const q = query(
+      collection(this.firestore, 'studentLibraryApplications'),
+      where('libraryId', '==', libraryId),
+      orderBy('createdAt', 'desc'),
+    );
+    return collectionData(q, { idField: 'id' });
+  }
 }
