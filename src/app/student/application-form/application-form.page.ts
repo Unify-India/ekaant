@@ -33,6 +33,7 @@ import {
 import { Subscription, combineLatest } from 'rxjs';
 import { PriceCardComponent } from 'src/app/components/price-card/price-card.component';
 import { IUser } from 'src/app/models/global.interface';
+import { IPricingDetails, IPricingPlan, ILibrary } from 'src/app/models/library.interface';
 import { LibraryService } from 'src/app/services/library/library.service';
 import { UserService } from 'src/app/services/user/user.service';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
@@ -77,9 +78,14 @@ export class ApplicationFormPage implements OnInit, OnDestroy {
 
   libraryId: string | null = null;
   studentProfile: IUser | null = null;
-  libraryDetails: any | null = null;
-  selectedPlan: any | null = null;
+  libraryDetails: ILibrary | null = null;
+  displayPlans: (IPricingDetails & { originalPlan: IPricingPlan })[] = [];
+  selectedPlan: IPricingPlan | null = null;
   isLoading = true;
+
+  isProfileNameValid = false;
+  isProfileEmailValid = false;
+  isProfilePhoneValid = false;
   private subscription: Subscription = new Subscription();
 
   constructor(
@@ -118,6 +124,10 @@ export class ApplicationFormPage implements OnInit, OnDestroy {
         next: ([studentProfile, libraryDetails]) => {
           this.studentProfile = studentProfile;
           this.libraryDetails = libraryDetails;
+          if (libraryDetails && libraryDetails.pricingPlans) {
+            this.displayPlans = this.mapPricingPlans(libraryDetails.pricingPlans);
+          }
+          this.validateStudentProfile();
           this.isLoading = false;
         },
         error: (error) => {
@@ -128,9 +138,22 @@ export class ApplicationFormPage implements OnInit, OnDestroy {
     );
   }
 
-  selectPlan(plan: any) {
-    this.selectedPlan = plan;
-    this.totalFee = plan.price; // Assuming the plan object has a 'price' property
+  mapPricingPlans(plans: IPricingPlan[]): (IPricingDetails & { originalPlan: IPricingPlan })[] {
+    if (!plans) return [];
+    return plans.map((p) => ({
+      pricingType: p.planType,
+      price: p.rate,
+      pricingName: p.planName,
+      unit: p.planType,
+      timeRange: p.timeSlot,
+      amenities: [], // Not available on IPricingPlan
+      originalPlan: p, // Keep a reference to the original
+    }));
+  }
+
+  selectPlan(mappedPlan: IPricingDetails & { originalPlan: IPricingPlan }) {
+    this.selectedPlan = mappedPlan.originalPlan;
+    this.totalFee = this.selectedPlan.rate; // Now correctly uses 'rate' from original plan
     this.reservationFee = this.totalFee * 0.05; // 5% reservation fee
   }
 
@@ -167,6 +190,24 @@ export class ApplicationFormPage implements OnInit, OnDestroy {
       color: color,
     });
     toast.present();
+  }
+
+  validateStudentProfile() {
+    if (!this.studentProfile) {
+      this.isProfileNameValid = false;
+      this.isProfileEmailValid = false;
+      this.isProfilePhoneValid = false;
+      return;
+    }
+    this.isProfileNameValid = !!this.studentProfile.name;
+    // A simple email regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    this.isProfileEmailValid = !!this.studentProfile.email && emailRegex.test(this.studentProfile.email);
+    this.isProfilePhoneValid = !!this.studentProfile.phoneNumber;
+  }
+
+  get isStudentProfileValid(): boolean {
+    return this.isProfileNameValid && this.isProfileEmailValid && this.isProfilePhoneValid;
   }
 
   ngOnDestroy() {

@@ -1,4 +1,4 @@
-I<ion-header [translucent]="true">
+<ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/student/dashboard"></ion-back-button>
@@ -20,7 +20,7 @@ I<ion-header [translucent]="true">
         <div class="blue-violet-gradient icon-container">
           <ion-icon name="book-outline" size="large"></ion-icon>
         </div>
-        <h2 class="section-title">Apply for Membership at {{ libraryDetails.basicInformation?.libraryName }}</h2>
+        <h2 class="section-title">Apply for Membership at {{ libraryDetails.basicInformation.libraryName }}</h2>
         <p class="section-subtitle">
           Your information is pre-filled from your profile. Please review it, select a plan, and confirm to apply.
         </p>
@@ -50,6 +50,9 @@ I<ion-header [translucent]="true">
                 fill="outline"
                 [value]="studentProfile.name"
                 readonly
+                [class.ion-invalid]="!isProfileNameValid"
+                [class.ion-touched]="!isProfileNameValid"
+                error-text="Full name is required. Please update your profile."
               ></ion-input>
               <ion-input
                 label="Email Address"
@@ -57,6 +60,9 @@ I<ion-header [translucent]="true">
                 fill="outline"
                 [value]="studentProfile.email"
                 readonly
+                [class.ion-invalid]="!isProfileEmailValid"
+                [class.ion-touched]="!isProfileEmailValid"
+                error-text="A valid email is required. Please update your profile."
               ></ion-input>
               <ion-input
                 label="Phone Number"
@@ -64,6 +70,9 @@ I<ion-header [translucent]="true">
                 fill="outline"
                 [value]="studentProfile.phoneNumber"
                 readonly
+                [class.ion-invalid]="!isProfilePhoneValid"
+                [class.ion-touched]="!isProfilePhoneValid"
+                error-text="Phone number is required. Please update your profile."
               ></ion-input>
             </div>
           </ion-card-content>
@@ -77,8 +86,12 @@ I<ion-header [translucent]="true">
           <ion-card-content>
             @if (libraryDetails.pricingPlans && libraryDetails.pricingPlans.length > 0) {
               <ion-list>
-                @for (plan of libraryDetails.pricingPlans; track plan.id) {
-                  <ion-item (click)="selectPlan(plan)" class="plan-item" [class.selected]="selectedPlan?.id === plan.id">
+                @for (plan of displayPlans; track $index) {
+                  <ion-item
+                    (click)="selectPlan(plan)"
+                    class="plan-item"
+                    [class.selected]="selectedPlan === plan.originalPlan"
+                  >
                     <app-price-card [pricing]="plan"></app-price-card>
                   </ion-item>
                 }
@@ -101,7 +114,7 @@ I<ion-header [translucent]="true">
             @if (selectedPlan) {
               <div class="fee-summary">
                 <div class="fee-row">
-                  <span>Total Fee ({{ selectedPlan.name }})</span>
+                  <span>Total Fee ({{ selectedPlan.planName }})</span>
                   <strong class="fee-amount">₹{{ totalFee | number: '1.2-2' }}</strong>
                 </div>
                 <div class="fee-row">
@@ -119,8 +132,11 @@ I<ion-header [translucent]="true">
 
             <ion-item lines="none" class="checkbox-item">
               <ion-checkbox [(ngModel)]="acceptTerms" labelPlacement="end" aria-label="Accept terms and conditions">
-                I accept the <a routerLink="/terms" class="link">Terms and Conditions</a> and
-                <a routerLink="/privacy-policy" class="link">Privacy Policy</a>.
+                I accept the
+                <a routerLink="/terms" class="link">Terms and Conditions</a>
+                and
+                <a routerLink="/privacy-policy" class="link">Privacy Policy</a>
+                .
               </ion-checkbox>
             </ion-item>
 
