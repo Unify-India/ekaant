@@ -15,8 +15,11 @@ import {
 import { AttendanceCardComponent } from 'src/app/components/attendance-card/attendance-card.component';
 import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.module';
 import { UiEssentials } from 'src/app/shared/core/micro-components/ui-essentials.module';
+import { BookingService, IBooking } from 'src/app/services/booking/booking.service';
+import { AuthService } from 'src/app/auth/service/auth.service';
 
 import { ReportAbsenceModal } from '../components/report-absence/report-absence.component';
+import { CommonModule } from '@angular/common';
 
 interface Attendance {
   date: string;
@@ -30,28 +33,26 @@ interface Attendance {
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [BaseUiComponents, UiEssentials, AttendanceCardComponent, RouterLink],
+  imports: [BaseUiComponents, UiEssentials, AttendanceCardComponent, RouterLink, CommonModule],
 })
 export class DashboardPage implements OnInit {
   pageTitle = 'Student Dashboard';
 
   today = {
-    seatId: 'C-05',
-    date: 'Saturday, September 27, 2025',
-    amenities: ['Wi-Fi', 'AC', 'Power Outlet'],
+    seatId: '',
+    date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+    amenities: ['Wi-Fi', 'AC', 'Power Outlet'], // Placeholder for now, ideally fetch from seat/library config
     checkedIn: false,
   };
+
   public seatAssignment: {
     seatNumber: string;
     date: string;
     amenities: string[];
-  } | null = {
-    seatNumber: 'C-05',
-    date: 'Saturday, September 27, 2025',
-    amenities: ['Wi-Fi', 'AC', 'Power Outlet'],
-  };
+  } | null = null;
 
   public attendanceHistory: Attendance[] = [
+    // Mock data - replace with real fetch later
     {
       date: 'Sep 20, 2025',
       timeRange: '03:17 PM - 03:17 PM',
@@ -69,6 +70,8 @@ export class DashboardPage implements OnInit {
   constructor(
     private router: Router,
     private modalController: ModalController,
+    private bookingService: BookingService,
+    private authService: AuthService
   ) {
     addIcons({
       logOutOutline,
@@ -80,6 +83,34 @@ export class DashboardPage implements OnInit {
       personCircleOutline,
       calendarOutline,
     });
+  }
+
+  ngOnInit() {
+    this.loadTodayBooking();
+  }
+
+  loadTodayBooking() {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.bookingService.getTodayBooking(user.uid).subscribe({
+        next: (booking) => {
+          if (booking) {
+            this.seatAssignment = {
+              seatNumber: booking.seatNumber || 'Assigned', // Fallback if seatNumber missing
+              date: this.today.date,
+              amenities: this.today.amenities, // TODO: Fetch real amenities
+            };
+            this.today.seatId = booking.seatId;
+          } else {
+            this.seatAssignment = null;
+          }
+        },
+        error: (err) => {
+          console.error('Error fetching booking:', err);
+          this.seatAssignment = null;
+        }
+      });
+    }
   }
 
   onCheckIn() {
@@ -104,7 +135,6 @@ export class DashboardPage implements OnInit {
   openProfile() {
     this.router.navigate(['/profile']);
   }
-  ngOnInit() {}
 
   async openReportAbsenceModal() {
     const modal = await this.modalController.create({
