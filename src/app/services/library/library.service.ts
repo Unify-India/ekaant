@@ -43,7 +43,8 @@ export class LibraryService {
 
     if (!approvedSnapshot.empty) {
       const libraryData = approvedSnapshot.docs[0].data();
-      // Synthesize applicationStatus for consistency, as 'libraries' collection has 'status'
+      // The library is from the 'libraries' collection, so its status is 'approved'.
+      // We ensure the applicationStatus field is set for consistency.
       return { ...libraryData, applicationStatus: 'approved' } as ILibraryState;
     }
 
@@ -152,7 +153,7 @@ export class LibraryService {
   }
 
   public getApprovedLibraries(): Observable<any[]> {
-    const q = query(collection(this.firestore, 'libraries'), where('status', '==', 'approved'));
+    const q = query(collection(this.firestore, 'libraries'), where('applicationStatus', '==', 'approved'));
     return from(getDocs(q)).pipe(
       map((snapshot) => {
         if (snapshot.empty) {
@@ -174,7 +175,7 @@ export class LibraryService {
             libraryManager: data.hostProfile?.fullName,
             address: addressParts.join(', '),
             totalSeats: data?.totalSeats,
-            applicationStatus: data.status, // Map 'status' to 'applicationStatus' for UI consistency
+            applicationStatus: data.applicationStatus,
           };
         });
       }),
