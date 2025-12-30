@@ -100,36 +100,43 @@ export const approveLibrary = onCall({ region: DEPLOYMENT_REGION }, async (reque
 
     // 4. Create Public `libraries` Document
     const libraryRef = db.collection('libraries').doc(libraryId);
-    
-    // Mapping from registrationData to library schema
-    const basicInfo = registrationData.basicInformation || {};
-    const seatManagement = registrationData.seatManagement || {};
 
-    await libraryRef.set({
-      name: basicInfo.libraryName || 'Unnamed Library',
+    // Construct the new library document based on the ILibrary interface
+    const newLibraryData = {
+      // Copy all fields from registrationData, providing defaults
+      amenities: registrationData.amenities || [],
+      applicationStatus: 'approved',
+      basicInformation: registrationData.basicInformation || {},
+      bookCollection: registrationData.bookCollection || {},
+      codeOfConduct: registrationData.codeOfConduct || '',
+      createdAt: registrationData.createdAt || new Date(),
+      hostProfile: registrationData.hostProfile || {},
+      libraryImages: registrationData.libraryImages || [],
+      pricingPlans: registrationData.pricingPlans || [],
+      requirements: registrationData.requirements || [],
+      seatManagement: registrationData.seatManagement || {},
+      totalSeats: registrationData.totalSeats || (registrationData.seatManagement?.seats?.length || 0),
+
+      // Override specific fields
       ownerId: managerUserRecord.uid,
       managerIds: [managerUserRecord.uid],
-      address: basicInfo.fullAddress || '', // Fallback to fullAddress if parts are missing
-      basicInformation: basicInfo,
-      hostProfile: hostProfile,
-      seatManagement: seatManagement,
-      amenities: registrationData.amenities || [],
-      bookCollection: registrationData.bookCollection || {},
-      pricingPlans: registrationData.pricingPlans || [],
-      libraryImages: registrationData.libraryImages || [],
-      status: 'approved',
-      createdAt: new Date(),
-      // Initialize ratings
+      updatedAt: new Date(),
+
+      // Initialize library-specific fields
       rating: {
-        average: 0,
-        totalReviews: 0
+        averageRating: 0,
+        totalReviews: 0,
       },
       occupiedSeats: 0,
-      totalSeats: seatManagement.totalSeats || 0
-    });
+    };
 
-    // 5. Delete Original Request
-    await registrationRequestRef.delete();
+    await libraryRef.set(newLibraryData);
+
+    // 5. Update Original Request instead of deleting
+    await registrationRequestRef.update({
+      applicationStatus: 'approved',
+      updatedAt: new Date(),
+    });
 
     // TODO: 6. Send Welcome Email
     logger.info(
