@@ -278,10 +278,18 @@
     display: flex;
     align-items: center;
     width: 15%;
+    background-color: #ffc409;
+    aspect-ratio: 1;
+    height: auto;
     text-align: center;
-    ion-avatar {
-      width: min(120px, 100%);
-      height: auto;
+    object-fit: contain;
+    border-radius: 50%;
+    overflow: hidden;
+    img {
+      object-fit: contain;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
   @media screen and (max-width: 568px) {
