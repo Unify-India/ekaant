@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { eyeOutline, createOutline } from 'ionicons/icons';
@@ -22,7 +22,7 @@ import { LibraryRegistrationFormService } from '../../service/library-registrati
 })
 export class CodeOfConductComponent implements OnInit {
   private lrfService = inject(LibraryRegistrationFormService);
-  public conductForm!: FormGroup;
+  public conductControl!: FormControl;
 
   public readonly pageTitle = 'Code of Conduct';
   public readonly subTitle = 'Library rules and policies';
@@ -50,7 +50,7 @@ export class CodeOfConductComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.conductForm = this.lrfService.getFormGroup('codeOfConduct');
+    this.conductControl = this.lrfService.mainForm.get('codeOfConduct') as FormControl;
   }
 
   togglePreview(state: boolean): void {
