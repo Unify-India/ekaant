@@ -157,19 +157,18 @@
         <!-- Images -->
         <ion-accordion value="images">
           <ion-item slot="header" color="light" class="accordion-header">
-            <ion-label>Library Images ({{ fullLibraryData.libraryImages?.libraryPhotos?.length || 0 }})</ion-label>
+            <ion-label>Library Images ({{ fullLibraryData.libraryImages?.length || 0 }})</ion-label>
           </ion-item>
           <div class="ion-padding image-grid" slot="content">
             <div class="scrolling-wrapper">
-              <div class="card" *ngFor="let img of fullLibraryData.libraryImages?.libraryPhotos">
-                <img
-                  [src]="img.previewUrl"
-                  style="height: 150px; width: auto; border-radius: 8px; margin-right: 10px"
-                />
-                <p class="ion-text-center">
-                  <small>{{ img.caption || 'No Caption' }}</small>
-                </p>
-              </div>
+              @for (img of fullLibraryData.libraryImages; track $index) {
+                <div class="card">
+                  <img [src]="img.imageURL" />
+                  <p class="ion-text-center">
+                    <small>{{ img.caption || 'No Caption' }}</small>
+                  </p>
+                </div>
+              }
             </div>
           </div>
         </ion-accordion>

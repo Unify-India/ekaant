@@ -159,7 +159,9 @@ export class LibraryRequestDetailPage implements OnInit {
     }
   }
 
+  // TODO: Add proper library interface here
   private _mapDataToForm(data: any): any {
+    console.info('data', data);
     const addressParts = [
       data.basicInformation?.addressLine1,
       data.basicInformation?.addressLine2,
