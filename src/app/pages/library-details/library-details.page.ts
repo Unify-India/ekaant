@@ -63,7 +63,6 @@ export class LibraryDetailsPage implements OnInit {
   isLoading = true;
   libraryId: string | null = null;
 
-  // Initial empty state matching ILibrary structure as closely as needed for initial render safety
   libraryData: ILibrary = {
     id: '',
     amenities: [],
@@ -102,14 +101,16 @@ export class LibraryDetailsPage implements OnInit {
     requirements: [],
     createdAt: '',
     managerIds: [],
+    ownerId: '',
     occupiedSeats: 0,
-    status: 'pending',
+    status: '',
     totalSeats: 0,
     rating: {
       averageRating: 0,
       totalReviews: 0,
     },
     reviews: [],
+    updatedAt: '',
   };
 
   public readonly starSummaryArray = [1, 2, 3, 4, 5];
