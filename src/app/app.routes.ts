@@ -93,6 +93,10 @@ export const routes: Routes = [
     path: 'admin-login',
     loadComponent: () => import('./admin/admin-login/admin-login.page').then((m) => m.AdminLoginPage),
   },
+  {
+    path: 'add-payment',
+    loadComponent: () => import('./manager/payment-history/add-payment/add-payment.page').then( m => m.AddPaymentPage)
+  },
 ];
 
 export const staticRoutes = [
