@@ -97,6 +97,10 @@ export const routes: Routes = [
     path: 'add-payment',
     loadComponent: () => import('./manager/payment-history/add-payment/add-payment.page').then( m => m.AddPaymentPage)
   },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./auth/reset-password/reset-password.page').then( m => m.ResetPasswordPage)
+  },
 ];
 
 export const staticRoutes = [
