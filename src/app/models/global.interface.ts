@@ -18,6 +18,7 @@ export interface IUser {
   phoneNumber?: string;
   preferredEndTime?: string;
   preferredStartTime?: string;
+  primaryLibraryId?: string;
   profileCompleted?: boolean;
   profileCompletion?: number;
   role: string | 'admin' | 'manager' | 'student';
