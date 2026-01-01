@@ -1,13 +1,116 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>student-application-detail</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/manager/student-applications"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Application Details</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">student-application-detail</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
+  @if (isLoading) {
+  <div class="ion-text-center ion-padding">
+    <ion-spinner></ion-spinner>
+    <p>Loading application...</p>
+  </div>
+  } @else if (application) {
+  <div class="details-container">
+    <!-- Student Details -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Student Information</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item>
+            <ion-label>
+              <p>Name</p>
+              <h2>{{ application.studentName }}</h2>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>
+              <p>Email</p>
+              <h2>{{ application.studentEmail }}</h2>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>
+              <p>Phone</p>
+              <h2>{{ application.studentPhone || 'N/A' }}</h2>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Plan & Slot Verification -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Plan & Slot Verification</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item>
+            <ion-icon slot="start" name="time-outline" color="primary"></ion-icon>
+            <ion-label>
+              <p>Selected Plan</p>
+              <h2>{{ application.selectedPlan?.planName }}</h2>
+              <p>Time Slot: <ion-text color="dark">{{ application.selectedPlan?.timeSlot }}</ion-text></p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Seat Allotment -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Seat Allotment</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item>
+            <ion-toggle [(ngModel)]="autoAllot" (ionChange)="onAutoAllotChange($event)">
+              Auto Allot Seat
+            </ion-toggle>
+          </ion-item>
+
+          <ion-item>
+            <ion-select
+              label="Select Seat"
+              labelPlacement="floating"
+              [(ngModel)]="selectedSeatId"
+              [disabled]="autoAllot"
+              placeholder="Choose a seat"
+            >
+              @for (seat of seats; track seat.id) {
+              <ion-select-option [value]="seat.id" [disabled]="seat.status !== 'active'">
+                Seat {{ seat.seatNumber }} ({{ seat.status }})
+              </ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    @if (application.applicationStatus === 'pending') {
+    <div class="ion-padding-horizontal ion-margin-top">
+      <ion-button expand="block" color="success" (click)="onAccept()" [disabled]="isLoading">
+        @if (!isLoading) {
+        <ion-icon slot="start" name="checkmark-circle"></ion-icon>
+        } @else {
+        <ion-spinner slot="start" name="crescent"></ion-spinner>
+        }
+        {{ isLoading ? 'Allocating...' : 'Allocate & Accept' }}
+      </ion-button>
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="ion-text-center ion-padding">
+    <p>Application not found.</p>
+  </div>
+  }
 </ion-content>
