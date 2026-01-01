@@ -1,23 +1,41 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
+  AlertController,
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonChip,
+  IonCol,
   IonContent,
+  IonGrid,
   IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonList,
-  IonItem,
+  IonIcon,
   IonLabel,
-  IonBadge,
+  IonMenuButton,
+  IonRow,
   IonSpinner,
   IonText,
-  IonCard,
-  IonCardContent,
+  IonTitle,
+  IonToolbar,
 } from '@ionic/angular/standalone';
-import { Subscription, switchMap, of, filter } from 'rxjs';
+import { addIcons } from 'ionicons';
+import { checkmarkCircleOutline, closeCircleOutline, eyeOutline } from 'ionicons/icons';
+import { filter, of, Subscription, switchMap } from 'rxjs';
 import { AuthService } from 'src/app/auth/service/auth.service';
 import { LibraryService } from 'src/app/services/library/library.service';
+
+export interface StudentApplication {
+  id: string;
+  studentName: string;
+  studentEmail: string;
+  selectedPlan?: {
+    planName: string;
+  };
+  applicationStatus: string;
+}
 
 @Component({
   selector: 'app-student-applications',
@@ -31,25 +49,33 @@ import { LibraryService } from 'src/app/services/library/library.service';
     IonToolbar,
     CommonModule,
     FormsModule,
-    IonList,
-    IonItem,
     IonLabel,
-    IonBadge,
     IonSpinner,
     IonText,
     IonCard,
-    IonCardContent,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonButton,
+    IonButtons,
+    IonMenuButton,
+    IonIcon,
+    IonChip,
   ],
 })
 export class StudentApplicationsPage implements OnInit, OnDestroy {
-  applications: any[] = [];
+  applications: StudentApplication[] = [];
   isLoading = true;
   private subscription: Subscription = new Subscription();
 
   constructor(
     private authService: AuthService,
     private libraryService: LibraryService,
-  ) {}
+    private router: Router,
+    private alertController: AlertController,
+  ) {
+    addIcons({ eyeOutline, checkmarkCircleOutline, closeCircleOutline });
+  }
 
   ngOnInit() {
     this.subscription.add(
@@ -73,7 +99,7 @@ export class StudentApplicationsPage implements OnInit, OnDestroy {
         )
         .subscribe({
           next: (apps) => {
-            this.applications = apps;
+            this.applications = apps as StudentApplication[];
             this.isLoading = false;
           },
           error: (err) => {
@@ -99,5 +125,55 @@ export class StudentApplicationsPage implements OnInit, OnDestroy {
       default:
         return 'medium';
     }
+  }
+
+  viewApplication(application: StudentApplication) {
+    this.router.navigate(['/manager/student-application-detail', application.id]);
+  }
+
+  acceptApplication(application: StudentApplication) {
+    // Navigate to detail page where they can allot seat and confirm acceptance
+    this.router.navigate(['/manager/student-application-detail', application.id]);
+  }
+
+  async rejectApplication(application: StudentApplication) {
+    const alert = await this.alertController.create({
+      header: 'Reject Application',
+      inputs: [
+        {
+          name: 'reason',
+          type: 'text',
+          placeholder: 'Reason for rejection',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+        },
+        {
+          text: 'Reject',
+          handler: async (data) => {
+            if (!data.reason) {
+              // Optional: You could show a toast or another alert here saying reason is required
+              return false; // Prevent closing if validation fails, or just proceed
+            }
+            try {
+              await this.libraryService.updateStudentApplication(application.id, {
+                applicationStatus: 'rejected',
+                rejectionReason: data.reason,
+              });
+              console.log('Rejected with reason:', data.reason);
+            } catch (error) {
+              console.error('Error rejecting application:', error);
+            }
+            return true;
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
 }
