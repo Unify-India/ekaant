@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { Firestore, collection, query, getDocs, Timestamp } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
@@ -15,7 +16,6 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonAvatar,
   IonChip,
   IonLabel,
   IonBadge,
@@ -24,10 +24,9 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personAddOutline, eyeOutline, createOutline } from 'ionicons/icons';
-import { Firestore, collection, query, getDocs, Timestamp } from '@angular/fire/firestore';
 import { AuthService } from 'src/app/auth/service/auth.service';
-import { User } from 'src/app/models/user';
 import { UserStatus } from 'src/app/models/enums';
+import { User } from 'src/app/models/user';
 
 @Component({
   selector: 'app-enrolled-users',
@@ -47,7 +46,6 @@ import { UserStatus } from 'src/app/models/enums';
     IonGrid,
     IonRow,
     IonCol,
-    IonAvatar,
     IonChip,
     IonLabel,
     IonBadge,

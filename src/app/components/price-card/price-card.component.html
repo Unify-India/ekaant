@@ -3,8 +3,8 @@
     <div class="header-content">
       <ion-card-title>{{ pricing.pricingName }}</ion-card-title>
       <!-- Conditionally render timeRange only if it exists -->
-      @if (pricing.timeRange) {
-        <ion-card-subtitle>{{ pricing.timeRange }}</ion-card-subtitle>
+      @if (pricing.startTime && pricing.endTime) {
+        <ion-card-subtitle>{{ pricing.startTime }} - {{ pricing.endTime }}</ion-card-subtitle>
       }
     </div>
     <div class="price-info">
