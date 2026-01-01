@@ -29,6 +29,9 @@ import { managerApproveSeat } from './booking/managerApproveSeat';
 // Uploads
 import { getSignedUploadUrl } from './uploads/getSignedUploadUrl';
 
+// Admin Callables
+import { onboardUser } from './admin/onboardUser';
+
 
 logger.info('Functions cold start');
 
@@ -44,6 +47,10 @@ export const registration = {
   approveLibrary: approveLibrary,
   rejectLibrary: rejectLibrary,
   libraryRegistrationRequest: libraryRegistrationRequest,
+};
+
+export const admin = {
+  onboardUser: onboardUser,
 };
 
 export const booking = {
