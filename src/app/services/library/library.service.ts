@@ -39,6 +39,11 @@ export class LibraryService {
     return approveFn(data);
   }
 
+  async onboardUser(data: any): Promise<any> {
+    const onboardFn = httpsCallable(this.functions, 'admin-onboardUser');
+    return onboardFn(data);
+  }
+
   async getManagerLibraryState(user: IUser): Promise<ILibraryState | null> {
     // 1. Check for an approved library first
     const approvedQuery = query(

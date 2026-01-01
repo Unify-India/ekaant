@@ -24,12 +24,15 @@ import {
   IonIcon,
   IonSpinner,
 } from '@ionic/angular/standalone';
+import { AlertController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { saveOutline } from 'ionicons/icons';
 import { AuthService } from 'src/app/auth/service/auth.service';
 import { UserRole, UserStatus } from 'src/app/models/enums';
 import { ILibrary, IPricingPlan } from 'src/app/models/library.interface';
 import { User } from 'src/app/models/user';
+import { LibraryService } from 'src/app/services/library/library.service';
+import { ToasterService } from 'src/app/services/toaster/toaster.service';
 
 @Component({
   selector: 'app-onboard-user',
@@ -66,6 +69,9 @@ export class OnboardUserPage implements OnInit {
   private router = inject(Router);
   private firestore = inject(Firestore);
   private authService = inject(AuthService);
+  private libraryService = inject(LibraryService);
+  private toaster = inject(ToasterService);
+  private alertController = inject(AlertController);
 
   onboardForm: FormGroup;
   isSubmitting = false;
@@ -185,50 +191,48 @@ export class OnboardUserPage implements OnInit {
         throw new Error('Library ID not found');
       }
 
-      const newUserId = doc(collection(this.firestore, 'users')).id;
-
-      const userData: User = {
-        uid: newUserId,
+      const onboardData = {
         email: formValue.email,
-        displayName: formValue.fullName,
+        fullName: formValue.fullName,
         phoneNumber: formValue.phoneNumber,
-        role: UserRole.Student,
-        status: UserStatus.Active,
-        createdAt: new Date(),
-
-        // Profile
         address: formValue.address,
         idCardNumber: formValue.idCardNumber,
         acPreference: formValue.acPreference,
-
-        // Context
         libraryId: libraryId,
-        associatedLibraries: {
-          enrolled: libraryId,
-          applied: [],
-          previous: [],
-        },
-        currentSubscription: {
+        planDetails: {
           planName: formValue.selectedPlan,
           billingCycle: formValue.billingCycle,
           amount: formValue.amount,
-          paymentDate: new Date(formValue.paymentDate),
-          startDate: new Date(formValue.startDate),
+          paymentDate: formValue.paymentDate,
+          startDate: formValue.startDate,
           startTime: formValue.startTime,
           endTime: formValue.endTime,
         },
       };
 
-      // 1. Create in root users collection
-      await setDoc(doc(this.firestore, 'users', newUserId), userData);
+      const result: any = await this.libraryService.onboardUser(onboardData);
 
-      // 2. Create in library's subcollection
-      await setDoc(doc(this.firestore, `libraries/${libraryId}/users`, newUserId), userData);
+      if (result.data && result.data.status === 'success') {
+        const { password, email } = result.data;
 
-      this.router.navigate(['/manager/users']);
-    } catch (error) {
+        const alert = await this.alertController.create({
+          header: 'User Onboarded Successfully',
+          message: `User created with email: <b>${email}</b><br><br>Temporary Password: <b style="font-size: 1.2em; color: var(--ion-color-primary);">${password}</b><br><br>Please share this password with the student. They should change it upon their first login.`,
+          buttons: [
+            {
+              text: 'OK',
+              handler: () => {
+                this.router.navigate(['/manager/users']);
+              },
+            },
+          ],
+        });
+
+        await alert.present();
+      }
+    } catch (error: any) {
       console.error('Error onboarding user:', error);
-      // Handle error (show toast)
+      this.toaster.showToast(error.message || 'Error onboarding user. Please try again.', 'danger');
     } finally {
       this.isSubmitting = false;
     }
