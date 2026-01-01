@@ -9,6 +9,7 @@ import {
   UserCredential,
   user,
   authState,
+  sendPasswordResetEmail,
 } from '@angular/fire/auth';
 import { connectAuthEmulator } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from '@angular/fire/firestore';
@@ -428,8 +429,18 @@ export class AuthService {
   }
 
   async resetPassword(email: string): Promise<void> {
-    // Implementation for password reset
-    this.toaster.showToast('Password reset email sent!', 'success');
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+      this.toaster.showToast('Password reset email sent! Check your inbox.', 'success');
+    } catch (error: any) {
+      console.error('Error sending reset email:', error);
+      if (error.code === 'auth/user-not-found') {
+        this.toaster.showToast('No account found with this email.', 'warning');
+      } else {
+        this.toaster.showToast('Failed to send reset email. Please try again.', 'danger');
+      }
+      throw error;
+    }
   }
 
   hasValidSubscription(): boolean {
@@ -474,7 +485,7 @@ export class AuthService {
       'auth/invalid-credential': 'Invalid login credentials.',
 
       // Registration specific
-      'auth/email-already-in-use': 'This email is already registered.',
+      'auth/email-already-in-use': 'This email is already registered. If you were onboarded by a library manager, please use "Forgot Password" to access your account.',
       'auth/weak-password': 'Password should be at least 6 characters.',
 
       // Social login specific
