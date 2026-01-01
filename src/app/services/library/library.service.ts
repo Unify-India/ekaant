@@ -17,6 +17,7 @@ import {
   deleteDoc,
   writeBatch,
 } from '@angular/fire/firestore';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import { from, map, Observable, of, switchMap, forkJoin } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
 import { ILibrary, ILibraryRegistrationRequest, ILibraryState, Library } from 'src/app/models/library.interface';
@@ -28,9 +29,15 @@ import { FirebaseService } from '../firebase/firebase-service';
 })
 export class LibraryService {
   private firestore = inject(Firestore);
+  private functions = inject(Functions);
   private firebaseService = inject(FirebaseService);
 
   constructor() {}
+
+  async approveApplication(data: { applicationId: string; seatId?: string; autoAllot?: boolean }): Promise<any> {
+    const approveFn = httpsCallable(this.functions, 'booking-managerApproveSeat');
+    return approveFn(data);
+  }
 
   async getManagerLibraryState(user: IUser): Promise<ILibraryState | null> {
     // 1. Check for an approved library first
@@ -412,5 +419,45 @@ export class LibraryService {
       orderBy('createdAt', 'desc'),
     );
     return collectionData(q, { idField: 'id' });
+  }
+
+  public getStudentApplicationById(id: string): Observable<any> {
+    const docRef = doc(this.firestore, 'studentLibraryApplications', id);
+    return from(getDoc(docRef)).pipe(
+      map((snapshot) => {
+        if (snapshot.exists()) {
+          return { id: snapshot.id, ...snapshot.data() };
+        } else {
+          return null;
+        }
+      }),
+    );
+  }
+
+  public async updateStudentApplication(docId: string, data: any): Promise<void> {
+    const ref = doc(this.firestore, 'studentLibraryApplications', docId);
+    return await updateDoc(ref, {
+      ...data,
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  public getLibrariesByIds(ids: string[]): Observable<ILibrary[]> {
+    if (!ids || ids.length === 0) {
+      return of([]);
+    }
+    // Firestore 'in' query supports up to 10 values.
+    // If we expect more, we need to batch or execute multiple queries.
+    // For now, assuming < 10 managed libraries per manager.
+    const librariesRef = collection(this.firestore, 'libraries');
+    const q = query(librariesRef, where('__name__', 'in', ids));
+
+    return from(getDocs(q)).pipe(
+      map((snapshot) => {
+        return snapshot.docs.map((doc) => {
+          return this.getFullLibraryData(doc, 'libraries');
+        });
+      }),
+    );
   }
 }
