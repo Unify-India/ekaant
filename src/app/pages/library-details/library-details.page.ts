@@ -119,6 +119,7 @@ export class LibraryDetailsPage implements OnInit {
 
   payPerUsePlans: IPricingDetails[] = [];
   monthlyPlans: IPricingDetails[] = [];
+  quarterlyPlans: IPricingDetails[] = [];
   displayRequirements: string[] = [];
   displayAmenities: IAmenities[] = [];
 
@@ -272,6 +273,9 @@ export class LibraryDetailsPage implements OnInit {
         price: p.rate || p.price,
         pricingName: p.planName || p.planType,
         unit: p.planType?.toLowerCase().includes('pay per use') ? 'hour' : 'day',
+        startTime: p.startTime || undefined, // Explicitly handle undefined
+        endTime: p.endTime || undefined,     // Explicitly handle undefined
+        timeRange: p.timeSlot,
         amenities: [],
       }));
 
@@ -287,6 +291,23 @@ export class LibraryDetailsPage implements OnInit {
         price: p.rate || p.price,
         pricingName: p.planName || p.planType,
         unit: p.planType?.toLowerCase().includes('weekly') ? 'week' : 'month',
+        startTime: p.startTime,
+        endTime: p.endTime,
+        timeRange: p.timeSlot,
+        amenities: [{ amenityName: 'Reserved Seat', isAvailable: true }],
+      }));
+
+    this.quarterlyPlans = plans
+      .filter(
+        (p) => p.planType?.toLowerCase().includes('quarterly')
+      )
+      .map((p) => ({
+        pricingType: 'Quarterly',
+        price: p.rate || p.price,
+        pricingName: p.planName || p.planType,
+        unit: 'quarter',
+        startTime: p.startTime,
+        endTime: p.endTime,
         timeRange: p.timeSlot,
         amenities: [{ amenityName: 'Reserved Seat', isAvailable: true }],
       }));

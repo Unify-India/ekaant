@@ -165,6 +165,15 @@
               </div>
             </div>
           }
+
+          @if (quarterlyPlans.length > 0) {
+            <div class="pricing-section">
+              <h2 class="sub-section-heading">Quarterly Memberships</h2>
+              <div *ngFor="let plan of quarterlyPlans">
+                <app-price-card [pricing]="plan"></app-price-card>
+              </div>
+            </div>
+          }
         </div>
       </ion-card>
 
