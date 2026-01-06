@@ -2,13 +2,12 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import {
   ISeat,
-  ISlotType,
-  IPricing,
-  IAvailabilitySlot,
+  IPricingPlan,
   IAvailableSlotInfo,
   IGetAvailableSlotsData,
 } from "../types/booking";
 import { DEPLOYMENT_REGION } from "../config";
+import { timeToMinutes, isOverlap } from "../utils/time";
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
@@ -18,15 +17,8 @@ const rtdb = admin.database();
 
 /**
  * @function getAvailableSlots
- * @description HTTPS Callable function to get available slots for a given date and seat requirement.
- *
- * @param request - The request object from the client.
- * @param request.data.libraryId - The ID of the library.
- * @param request.data.date - The date for which to check availability (YYYY-MM-DD).
- * @param request.data.seatRequirements - The requirements for the seat (e.g., { isAC: true }).
- *
- * @returns {Promise<IAvailableSlotInfo[]>} - A promise that resolves with an array of available slots, including price and count.
- * @throws {HttpsError} - Throws an error for invalid arguments or if data is not found.
+ * @description HTTPS Callable function to get available slots (plans) for a given date.
+ * Refactored to use dynamic pricingPlans and minute-based availability.
  */
 export const getAvailableSlots = onCall<IGetAvailableSlotsData, Promise<IAvailableSlotInfo[]>>(
   { region: DEPLOYMENT_REGION },
@@ -34,62 +26,93 @@ export const getAvailableSlots = onCall<IGetAvailableSlotsData, Promise<IAvailab
     const { libraryId, date, seatRequirements } = request.data;
 
     try {
-      // 2. Fetch all required config from Firestore in parallel
-      const [seatsSnapshot, slotTypesSnapshot, pricingSnapshot] =
-        await Promise.all([
-          db.collection("libraries").doc(libraryId).collection("seats").get(),
-          db.collection("libraries").doc(libraryId).collection("slotTypes").get(),
-          db.collection("libraries").doc(libraryId).collection("pricing").get(),
-        ]);
+      // 1. Fetch library doc (for pricingPlans) and seats subcollection
+      const libraryRef = db.collection("libraries").doc(libraryId);
+      const [librarySnap, seatsSnapshot] = await Promise.all([
+        libraryRef.get(),
+        libraryRef.collection("seats").get()
+      ]);
 
-      if (seatsSnapshot.empty || slotTypesSnapshot.empty || pricingSnapshot.empty) {
-        throw new HttpsError(
-          "not-found", `Configuration not found for library ${libraryId}.`
-        );
+      if (!librarySnap.exists) {
+        throw new HttpsError("not-found", "Library not found.");
+      }
+      
+      const libraryData = librarySnap.data();
+      const pricingPlans: IPricingPlan[] = libraryData?.pricingPlans || [];
+
+      if (pricingPlans.length === 0) {
+         // Fallback: Check if there are legacy slotTypes? 
+         // For now, assuming migration to pricingPlans is key.
+         // If no plans, return empty.
+         return [];
       }
 
-      const allSeats = seatsSnapshot.docs.map(doc => doc.data() as ISeat);
-      const allSlotTypes = slotTypesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ISlotType));
-      const allPricing = pricingSnapshot.docs.map(doc => doc.data() as IPricing);
+      if (seatsSnapshot.empty) {
+        throw new HttpsError("not-found", "No seats configured.");
+      }
 
-      // 3. Filter seats based on requirements to get eligible seat count
-      const seatCategory = seatRequirements.isAC ? "AC" : "NON_AC";
+      const allSeats = seatsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ISeat));
+
+      // 2. Filter Eligible Seats
       const eligibleSeats = allSeats.filter(seat => seat.isAC === seatRequirements.isAC && seat.status === 'active');
       const eligibleSeatCount = eligibleSeats.length;
 
       if (eligibleSeatCount === 0) {
-        return []; // No seats match the criteria, so no slots can be available.
+        return []; 
       }
 
-      // 4. Fetch live availability from Realtime Database
+      // 3. Fetch Live Availability (Date level)
+      // Path: availability/{libraryId}/{date}/{seatId}/{start_end}
       const availabilityRef = rtdb.ref(`availability/${libraryId}/${date}`);
       const availabilitySnapshot = await availabilityRef.once("value");
-      const availabilityData: { [slotId: string]: IAvailabilitySlot } = availabilitySnapshot.val() || {};
+      const availabilityData = availabilitySnapshot.val() || {}; // { seatId: { "s_e": bookingId, ... } }
 
-      // 5. Determine available slots
+      // 4. Calculate Availability for each Plan
       const availableSlots: IAvailableSlotInfo[] = [];
 
-      for (const slotType of allSlotTypes) {
-        const slotAvailability = availabilityData[slotType.id] || { totalBooked: 0 };
-        const totalBooked = slotAvailability.totalBooked;
-        const seatsAvailable = eligibleSeatCount - totalBooked;
+      for (const plan of pricingPlans) {
+          // Skip plans without valid time
+          if (!plan.startTime || !plan.endTime) continue;
 
-        if (seatsAvailable > 0) {
-          // Find the corresponding price
-          const priceRule = allPricing.find(
-            (p) =>
-              p.durationType === slotType.durationType &&
-              p.seatCategory === seatCategory
-          );
+          const startMinutes = timeToMinutes(plan.startTime);
+          const endMinutes = timeToMinutes(plan.endTime);
+          if (isNaN(startMinutes) || isNaN(endMinutes)) continue;
 
-          if (priceRule) {
-            availableSlots.push({
-              ...slotType,
-              price: priceRule.basePrice,
-              seatsAvailable: seatsAvailable,
-            });
+          let seatsAvailable = 0;
+
+          // Check every eligible seat for this plan's time range
+          for (const seat of eligibleSeats) {
+              const seatBookings = availabilityData[seat.id] || {};
+              let isFree = true;
+
+              for (const key of Object.keys(seatBookings)) {
+                  const [existStart, existEnd] = key.split('_').map(Number);
+                  if (isOverlap(startMinutes, endMinutes, existStart, existEnd)) {
+                      isFree = false;
+                      break;
+                  }
+              }
+
+              if (isFree) {
+                  seatsAvailable++;
+              }
           }
-        }
+
+          if (seatsAvailable > 0) {
+              // Map IPricingPlan to IAvailableSlotInfo
+              // IAvailableSlotInfo extends ISlotType (id, startTime, endTime, durationType, isPeak)
+              // We map plan fields to these.
+              
+              availableSlots.push({
+                  id: plan.planName, // Use name as ID if no ID
+                  startTime: plan.startTime,
+                  endTime: plan.endTime,
+                  durationType: '4h', // Placeholder or derive from planType
+                  isPeak: false,      // Placeholder
+                  price: plan.rate,
+                  seatsAvailable: seatsAvailable
+              });
+          }
       }
 
       return availableSlots;
