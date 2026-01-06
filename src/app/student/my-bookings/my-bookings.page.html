@@ -7,10 +7,100 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">{{ pageTitle }}</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  @if (isLoading) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+      <p>Loading your bookings...</p>
+    </div>
+  } @else {
+    <ion-card class="table-card">
+      <div class="table-container">
+        <ion-grid class="data-grid">
+          <!-- Header Row -->
+          <ion-row class="grid-header">
+            <ion-col size="1" class="ion-text-center">Actions</ion-col>
+            <ion-col size="2">
+              <ion-icon name="calendar-outline" class="ion-margin-end"></ion-icon>
+              Date
+            </ion-col>
+            <ion-col size="2.5">
+              <ion-icon name="location-outline" class="ion-margin-end"></ion-icon>
+              Library
+            </ion-col>
+            <ion-col size="1.5">Plan</ion-col>
+            <ion-col size="1" class="ion-text-center">Seat</ion-col>
+            <ion-col size="2">
+              <ion-icon name="time-outline" class="ion-margin-end"></ion-icon>
+              Time
+            </ion-col>
+            <ion-col size="2" class="ion-text-center">Status</ion-col>
+          </ion-row>
+
+          <!-- Data Rows -->
+          @if (bookings.length > 0) {
+            @for (booking of bookings; track booking.id) {
+              <ion-row class="grid-row">
+                <ion-col size="1" class="action-buttons ion-text-center">
+                  <ion-button fill="clear" size="small" (click)="viewBooking(booking)" title="View Details">
+                    <ion-icon slot="icon-only" name="eye-outline" color="primary"></ion-icon>
+                  </ion-button>
+                  @if (booking.status === 'confirmed') {
+                    <ion-button fill="clear" size="small" (click)="cancelBooking(booking)" title="Cancel Booking">
+                      <ion-icon slot="icon-only" name="close-circle-outline" color="danger"></ion-icon>
+                    </ion-button>
+                  }
+                </ion-col>
+                <ion-col size="2">
+                  {{ booking.startDate | date: 'mediumDate' }}
+                  @if (booking.startDate !== booking.endDate) {
+                    <br />
+                    <span class="text-small" style="color: var(--ion-color-medium)">
+                      - {{ booking.endDate | date: 'mediumDate' }}
+                    </span>
+                  }
+                </ion-col>
+                <ion-col size="2.5">
+                  <ion-text color="dark">
+                    <strong>{{ libraryNames[booking.libraryId] || 'Loading...' }}</strong>
+                  </ion-text>
+                </ion-col>
+                <ion-col size="1.5">
+                  <small>{{ booking.planName || 'Standard' }}</small>
+                </ion-col>
+                <ion-col size="1" class="ion-text-center">
+                  <ion-chip color="secondary" class="ion-no-margin">
+                    <ion-label>{{ booking.seatNumber || 'N/A' }}</ion-label>
+                  </ion-chip>
+                </ion-col>
+                <ion-col size="2">
+                  <small>{{ formatTime(booking.startMinutes) }} - {{ formatTime(booking.endMinutes) }}</small>
+                </ion-col>
+                <ion-col size="2" class="ion-text-center">
+                  <ion-chip [color]="getStatusColor(booking.status)">
+                    <ion-label>{{ booking.status | titlecase }}</ion-label>
+                  </ion-chip>
+                </ion-col>
+              </ion-row>
+            }
+          } @else {
+            <ion-row>
+              <ion-col size="12" class="ion-text-center ion-padding">
+                <ion-text color="medium">
+                  <p>You don't have any bookings yet.</p>
+                </ion-text>
+                <ion-button fill="outline" routerLink="/student/dashboard">Discover Libraries</ion-button>
+              </ion-col>
+            </ion-row>
+          }
+        </ion-grid>
+      </div>
+    </ion-card>
+  }
 </ion-content>
