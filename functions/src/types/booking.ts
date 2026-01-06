@@ -22,6 +22,19 @@ export interface IPricing {
   basePrice: number;
 }
 
+export interface IPricingPlan {
+  description?: string;
+  endTime?: string;
+  planName: string;
+  planType: string;
+  rate: number;
+  slotTypeId?: string;
+  startTime?: string;
+  timeSlot: string;
+  startDate?: string;
+  endDate?: string;
+}
+
 export interface ILibraryConfig {
   seats: ISeat[];
   slotTypes: ISlotType[];
@@ -33,13 +46,17 @@ export interface IBooking {
     userId: string;
     libraryId: string;
     seatId: string;
-    slotTypeId: string;
-    bookingDate: string; // YYYY-MM-DD
+    slotTypeId?: string; // Optional now as we rely on minutes
+    startDate: string; // YYYY-MM-DD
+    endDate: string; // YYYY-MM-DD
     status: 'confirmed' | 'cancelled' | 'absent';
     createdAt: FirebaseFirestore.Timestamp;
     updatedAt: FirebaseFirestore.Timestamp;
     seatNumber?: string;
     sourceApplicationId?: string;
+    startMinutes: number;
+    endMinutes: number;
+    planName?: string;
 }
 
 export interface IAvailabilitySlot {
@@ -66,8 +83,10 @@ export interface IGetAvailableSlotsData {
 export interface IAllocateSeatData {
   libraryId: string;
   date: string; // YYYY-MM-DD
-  slotTypeId: string;
+  startTime: string; // HH:MM
+  endTime: string;   // HH:MM
   seatRequirements: { isAC: boolean };
+  slotTypeId?: string;
 }
 
 export interface ICancelBookingData {
@@ -80,7 +99,10 @@ export interface ICreateSubscriptionData {
   subscriptionDetails: {
     startDate: string; // YYYY-MM-DD
     endDate: string; // YYYY-MM-DD
-    slotTypeId: string;
+    startTime: string; // HH:MM
+    endTime: string;   // HH:MM
+    slotTypeId?: string;
+    planName?: string;
   };
 }
 
@@ -88,4 +110,7 @@ export interface IManagerApproveSeatData {
   applicationId: string;
   seatId?: string;
   autoAllot?: boolean;
+  startDate?: string;
+  endDate?: string;
+  paymentAmount?: number;
 }
