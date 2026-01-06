@@ -12,13 +12,7 @@ const rtdb = admin.database();
 /**
  * @function cancelBooking
  * @description HTTPS Callable function to cancel a booking. It de-allocates the seat in RTDB and updates the booking status in Firestore.
- *
- * @param request - The request object from the client.
- * @param request.data.bookingId - The ID of the booking to be cancelled.
- * @param request.auth - The authentication information of the user.
- *
- * @returns {Promise<{success: boolean, message: string}>} - A promise that resolves with a success message.
- * @throws {HttpsError} - Throws for auth errors, invalid arguments, or if the booking cannot be cancelled.
+ * Refactored for multi-day single-document bookings.
  */
 export const cancelBooking = onCall<ICancelBookingData, Promise<{success: boolean, message: string}>>(
   { region: DEPLOYMENT_REGION },
@@ -41,7 +35,6 @@ export const cancelBooking = onCall<ICancelBookingData, Promise<{success: boolea
   const booking = bookingDoc.data() as IBooking;
 
   // 3. Authorize the user
-  // For now, only the user who made the booking can cancel it.
   if (booking.userId !== userId) {
     throw new HttpsError("permission-denied", "You are not authorized to cancel this booking.");
   }
@@ -51,26 +44,25 @@ export const cancelBooking = onCall<ICancelBookingData, Promise<{success: boolea
     throw new HttpsError("failed-precondition", `Booking is already in '${booking.status}' state and cannot be cancelled.`);
   }
 
-  const { libraryId, bookingDate, slotTypeId, seatId } = booking;
-  
-  // 4. De-allocate the seat in Realtime Database via transaction
-  const availabilityRef = rtdb.ref(`availability/${libraryId}/${bookingDate}/${slotTypeId}`);
+  const { libraryId, seatId, startDate, endDate, startMinutes, endMinutes } = booking;
+  const timeKey = `${startMinutes}_${endMinutes}`;
 
-  await availabilityRef.transaction(currentData => {
-    if (currentData === null) {
-      // Data is missing in RTDB. Log it but proceed to update Firestore.
-      console.warn(`RTDB availability data missing for path: ${availabilityRef.toString()}`);
-      return null;
-    }
-    // Check if the specific seat booking exists before modifying
-    if (currentData.seats && currentData.seats[seatId] === bookingId) {
-        currentData.totalBooked--;
-        delete currentData.seats[seatId];
-    } else {
-        console.warn(`Booking ${bookingId} for seat ${seatId} not found in RTDB at path: ${availabilityRef.toString()}`);
-    }
-    return currentData;
+  // 4. De-allocate in RTDB for all dates
+  const rtdbUpdates: { [path: string]: any } = {};
+  const dates: string[] = [];
+  let cur = new Date(startDate);
+  const end = new Date(endDate);
+  while (cur <= end) {
+      dates.push(cur.toISOString().split('T')[0]);
+      cur.setDate(cur.getDate() + 1);
+  }
+
+  dates.forEach(date => {
+      // Set value to null to delete the key
+      rtdbUpdates[`availability/${libraryId}/${date}/${seatId}/${timeKey}`] = null;
   });
+
+  await rtdb.ref().update(rtdbUpdates);
 
   // 5. Update the booking status in Firestore
   await bookingRef.update({
