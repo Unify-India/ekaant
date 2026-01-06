@@ -130,6 +130,29 @@ ion-card {
   }
 }
 
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  // gap: 1rem
+}
+
+.pricing-card-wrapper {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    border-color: var(--ion-color-primary);
+    background-color: var(--ion-color-primary-tint);
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.2);
+  }
+}
+
 @media (max-width: 768px) {
   .confirmation-card {
     ion-card-content {

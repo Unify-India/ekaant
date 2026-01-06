@@ -85,22 +85,84 @@
           </ion-card-header>
           <ion-card-content>
             @if (libraryDetails.pricingPlans && libraryDetails.pricingPlans.length > 0) {
-              <ion-list>
+              <div class="pricing-grid">
                 @for (plan of displayPlans; track $index) {
-                  <ion-item
+                  <div
+                    class="pricing-card-wrapper"
                     (click)="selectPlan(plan)"
-                    class="plan-item"
                     [class.selected]="selectedPlan === plan.originalPlan"
                   >
                     <app-price-card [pricing]="plan"></app-price-card>
-                  </ion-item>
+                  </div>
                 }
-              </ion-list>
+              </div>
             } @else {
               <p class="ion-padding">No pricing plans are available for this library at the moment.</p>
             }
           </ion-card-content>
         </ion-card>
+
+        <!-- Duration Selection -->
+        @if (selectedPlan) {
+          <ion-card class="ion-margin">
+            <ion-card-header>
+              <div class="ion-flex ion-justify-content-between ion-align-items-center">
+                <ion-card-title>2.1 Select Duration</ion-card-title>
+                <ion-chip color="primary">{{ selectedPlan.planType }}</ion-chip>
+              </div>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list lines="inset">
+                <ion-item>
+                  <ion-icon slot="start" name="calendar-outline" color="primary"></ion-icon>
+                  <ion-label>
+                    <h3>Start Date</h3>
+                    <p>When do you want to start?</p>
+                  </ion-label>
+                  <ion-datetime-button datetime="startDate"></ion-datetime-button>
+                  <ion-modal [keepContentsMounted]="true">
+                    <ng-template>
+                      <ion-datetime
+                        id="startDate"
+                        presentation="date"
+                        [(ngModel)]="startDate"
+                        (ionChange)="onDateChange($event)"
+                        [min]="minDate"
+                      ></ion-datetime>
+                    </ng-template>
+                  </ion-modal>
+                </ion-item>
+
+                <ion-item>
+                  <ion-icon slot="start" name="calendar-outline" color="secondary"></ion-icon>
+                  <ion-label>
+                    <h3>End Date</h3>
+                    <p>Auto-calculated validity</p>
+                  </ion-label>
+                  <ion-datetime-button datetime="endDate"></ion-datetime-button>
+                  <ion-modal [keepContentsMounted]="true">
+                    <ng-template>
+                      <ion-datetime
+                        id="endDate"
+                        presentation="date"
+                        [(ngModel)]="endDate"
+                        [disabled]="true"
+                      ></ion-datetime>
+                    </ng-template>
+                  </ion-modal>
+                </ion-item>
+              </ion-list>
+              <div class="ion-padding-top ion-margin-top ion-border-top">
+                <p class="text-small">
+                  <ion-icon name="information-circle-outline" color="medium" class="ion-margin-end"></ion-icon>
+                  The validity period is automatically set to 
+                  <strong>{{ selectedPlan.planType === 'Monthly Membership' ? '30' : (selectedPlan.planType === 'Quarterly Membership' ? '90' : (selectedPlan.planType === 'Weekly Membership' ? '7' : '1')) }} days</strong> 
+                  based on your selection.
+                </p>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        }
 
         <!-- Confirmation -->
         <ion-card class="confirmation-card ion-margin">

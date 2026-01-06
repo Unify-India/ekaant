@@ -21,6 +21,11 @@ import {
   ToastController,
   IonCheckbox,
   IonIcon,
+  IonDatetime,
+  IonDatetimeButton,
+  IonModal,
+  IonLabel,
+  IonChip,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -29,6 +34,7 @@ import {
   personCircleOutline,
   personOutline,
   arrowForwardOutline,
+  calendarOutline,
 } from 'ionicons/icons';
 import { Subscription, combineLatest } from 'rxjs';
 import { PriceCardComponent } from 'src/app/components/price-card/price-card.component';
@@ -44,6 +50,8 @@ import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.m
   styleUrls: ['./application-form.page.scss'],
   standalone: true,
   imports: [
+    IonChip,
+    IonLabel,
     IonContent,
     IonHeader,
     IonTitle,
@@ -66,6 +74,9 @@ import { BaseUiComponents } from 'src/app/shared/core/micro-components/base-ui.m
     IonIcon,
     BaseUiComponents,
     RouterLink,
+    IonDatetime,
+    IonDatetimeButton,
+    IonModal,
   ],
 })
 export class ApplicationFormPage implements OnInit, OnDestroy {
@@ -83,6 +94,10 @@ export class ApplicationFormPage implements OnInit, OnDestroy {
   selectedPlan: IPricingPlan | null = null;
   isLoading = true;
 
+  startDate: string = new Date().toISOString().split('T')[0];
+  minDate: string = new Date().toISOString().split('T')[0];
+  endDate: string = new Date().toISOString().split('T')[0];
+
   isProfileNameValid = false;
   isProfileEmailValid = false;
   isProfilePhoneValid = false;
@@ -95,7 +110,14 @@ export class ApplicationFormPage implements OnInit, OnDestroy {
     private router: Router,
     private toastController: ToastController,
   ) {
-    addIcons({ bookOutline, personOutline, arrowForwardOutline, personCircleOutline, informationCircleOutline });
+    addIcons({
+      bookOutline,
+      personOutline,
+      arrowForwardOutline,
+      personCircleOutline,
+      informationCircleOutline,
+      calendarOutline,
+    });
   }
 
   ngOnInit() {
@@ -155,6 +177,38 @@ export class ApplicationFormPage implements OnInit, OnDestroy {
     this.selectedPlan = mappedPlan.originalPlan;
     this.totalFee = this.selectedPlan.rate; // Now correctly uses 'rate' from original plan
     this.reservationFee = this.totalFee * 0.05; // 5% reservation fee
+    this.calculateEndDate();
+  }
+
+  onDateChange(event?: any) {
+    const newVal = event?.detail?.value;
+    if (newVal) {
+      this.startDate = newVal.split('T')[0];
+    }
+    this.calculateEndDate();
+  }
+
+  calculateEndDate() {
+    if (!this.selectedPlan || !this.startDate) return;
+
+    const start = new Date(this.startDate);
+    if (isNaN(start.getTime())) return;
+
+    const end = new Date(start);
+    const planType = (this.selectedPlan.planType || '').toLowerCase();
+
+    // Flexible matching for plan types
+    if (planType.includes('weekly')) {
+      end.setDate(start.getDate() + 6); // 7 days total
+    } else if (planType.includes('monthly')) {
+      end.setDate(start.getDate() + 29); // 30 days total
+    } else if (planType.includes('quarterly')) {
+      end.setDate(start.getDate() + 89); // 90 days total
+    } else {
+      // Default to same day for Daily/Pay Per Use
+    }
+
+    this.endDate = end.toISOString().split('T')[0];
   }
 
   async submitApplication() {
@@ -169,7 +223,12 @@ export class ApplicationFormPage implements OnInit, OnDestroy {
       studentEmail: this.studentProfile.email,
       libraryId: this.libraryDetails.id,
       libraryName: this.libraryDetails.basicInformation?.libraryName,
-      selectedPlan: this.selectedPlan,
+      selectedPlan: {
+        ...this.selectedPlan,
+        startDate: this.startDate,
+        endDate: this.endDate,
+        slotTypeId: this.selectedPlan.slotTypeId || this.selectedPlan.timeSlot, // Prefer slotTypeId, fallback to timeSlot
+      },
       applicationStatus: 'pending', // Initial status
     };
 
