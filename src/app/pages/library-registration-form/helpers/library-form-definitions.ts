@@ -110,7 +110,10 @@ export function createPricingPlanGroup(fb: FormBuilder, plan: Partial<IPricingPl
   return fb.group({
     planName: [plan.planName || '', Validators.required],
     planType: [plan.planType || '', Validators.required],
-    timeSlot: [plan.timeSlot || '', Validators.required],
+    timeSlot: [plan.timeSlot || ''],
+    startTime: [plan.startTime || '', Validators.required],
+    endTime: [plan.endTime || '', Validators.required],
+    slotTypeId: [plan.slotTypeId || ''],
     rate: [plan.rate || null, [Validators.required, Validators.min(0)]],
     description: [plan.description || ''],
   });
