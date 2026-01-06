@@ -6,9 +6,12 @@ export interface ILibraryState {
 
 export interface IPricingPlan {
   description?: string;
+  endTime?: string;
   planName: string;
   planType: string;
   rate: number;
+  slotTypeId?: string;
+  startTime?: string;
   timeSlot: string;
 }
 export interface Library {
@@ -49,6 +52,7 @@ export interface IPricingDetails {
   pricingType: string;
   shift?: string;
   startTime?: string;
+  timeRange?: string;
   unit: string;
 }
 
