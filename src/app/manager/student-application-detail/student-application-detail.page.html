@@ -63,6 +63,50 @@
       </ion-card-content>
     </ion-card>
 
+    <!-- Enrollment & Payment -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Enrollment & Payment</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+         <ion-input
+            class="ion-margin-bottom"
+            label="Payment Amount *"
+            labelPlacement="floating"
+            fill="outline"
+            type="number"
+            [(ngModel)]="paymentAmount"
+          ></ion-input>
+
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col size="6" class="ion-padding-end">
+                <ion-input
+                  class="ion-margin-bottom"
+                  label="Start Date *"
+                  labelPlacement="floating"
+                  fill="outline"
+                  type="date"
+                  [(ngModel)]="startDate"
+                  (ionChange)="onStartDateChange($event)"
+                ></ion-input>
+              </ion-col>
+              <ion-col size="6" class="ion-padding-start">
+                <ion-input
+                  class="ion-margin-bottom"
+                  label="End Date *"
+                  labelPlacement="floating"
+                  fill="outline"
+                  type="date"
+                  [value]="endDate"
+                  readonly="true"
+                ></ion-input>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
     <!-- Seat Allotment -->
     <ion-card>
       <ion-card-header>
