@@ -2,32 +2,49 @@
   <ion-card-header>
     <div class="header-content">
       <ion-card-title>{{ pricing.pricingName }}</ion-card-title>
-      <!-- Conditionally render timeRange only if it exists -->
+      <!-- Display startTime and endTime if available, otherwise fallback to timeRange -->
       @if (pricing.startTime && pricing.endTime) {
         <ion-card-subtitle>{{ pricing.startTime }} - {{ pricing.endTime }}</ion-card-subtitle>
+      } @else if (pricing.timeRange) {
+        <ion-card-subtitle>{{ pricing.timeRange }}</ion-card-subtitle>
       }
     </div>
     <div class="price-info">
       <span class="price">₹{{ pricing.price }}</span>
-      <span class="unit">/{{ pricing.unit }}</span>
+      <span class="unit">
+        @if (pricing.unit.toLowerCase().includes('month')) {
+          per Month
+        } @else if (pricing.unit.toLowerCase().includes('quarter')) {
+          per Quarter
+        } @else if (pricing.unit.toLowerCase().includes('week')) {
+          per Week
+        } @else if (pricing.unit.toLowerCase().includes('day')) {
+          per Day
+        } @else if (pricing.unit.toLowerCase().includes('hour')) {
+          per Hour
+        } @else {
+          / {{ pricing.unit }}
+        }
+      </span>
     </div>
   </ion-card-header>
 
-  <ion-card-content>
-    <ion-list lines="none">
-      <!-- Loop through amenities -->
-      @for (amenity of pricing.amenities; track $index) {
-        <div class="ion-align-items-center ion-justify-content-start ion-flex">
-          <ion-icon
-            slot="start"
-            [name]="amenity.isAvailable ? 'checkmark-circle-outline' : 'close-circle-outline'"
-            [color]="amenity.isAvailable ? 'success' : 'danger'"
-          ></ion-icon>
-          <ion-label class="no-margin" [class.unavailable]="!amenity.isAvailable">
-            {{ amenity.amenityName }}
-          </ion-label>
-        </div>
-      }
-    </ion-list>
-  </ion-card-content>
+  @if (pricing.amenities !== undefined) {
+    <ion-card-content>
+      <ion-list lines="none">
+        @for (amenity of pricing.amenities; track $index) {
+          <div class="ion-align-items-center ion-justify-content-start ion-flex">
+            <ion-icon
+              slot="start"
+              [name]="amenity.isAvailable ? 'checkmark-circle-outline' : 'close-circle-outline'"
+              [color]="amenity.isAvailable ? 'success' : 'danger'"
+            ></ion-icon>
+            <ion-label class="no-margin" [class.unavailable]="!amenity.isAvailable">
+              {{ amenity.amenityName }}
+            </ion-label>
+          </div>
+        }
+      </ion-list>
+    </ion-card-content>
+  }
 </ion-card>
