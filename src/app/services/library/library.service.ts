@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { Database, ref, get, set } from '@angular/fire/database';
 import {
   Firestore,
   collection,
@@ -20,7 +21,7 @@ import {
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { from, map, Observable, of, switchMap, forkJoin } from 'rxjs';
 import { IUser } from 'src/app/models/global.interface';
-import { ILibrary, ILibraryRegistrationRequest, ILibraryState, Library } from 'src/app/models/library.interface';
+import { ILibrary, ILibraryRegistrationRequest, ILibraryState, ISeat, Library } from 'src/app/models/library.interface';
 
 import { FirebaseService } from '../firebase/firebase-service';
 
@@ -31,10 +32,58 @@ export class LibraryService {
   private firestore = inject(Firestore);
   private functions = inject(Functions);
   private firebaseService = inject(FirebaseService);
+  private rtdb = inject(Database);
 
   constructor() {}
 
-  async approveApplication(data: { applicationId: string; seatId?: string; autoAllot?: boolean }): Promise<any> {
+  async initializeLibrarySeatsInRTDB(libraryId: string): Promise<void> {
+    const seatsRef = ref(this.rtdb, `library-seats/${libraryId}`);
+    const snapshot = await get(seatsRef);
+
+    if (!snapshot.exists()) {
+      console.warn(`No seat data found for library ${libraryId} in RTDB. Initializing...`);
+
+      // Fetch from Firestore
+      const libraryDocRef = doc(this.firestore, `libraries/${libraryId}`);
+      const librarySnap = await getDoc(libraryDocRef);
+
+      if (librarySnap.exists()) {
+        const data = librarySnap.data() as ILibrary;
+        const seats = data.seatManagement?.seats || [];
+
+        if (seats.length > 0) {
+          // Create lightweight map
+          const seatsMap: Record<string, any> = {};
+          seats.forEach((seat: ISeat) => {
+            seatsMap[seat.id] = {
+              id: seat.id,
+              seatNumber: seat.seatNumber,
+              isAC: seat.isAC || false,
+              status: seat.status || 'active',
+            };
+          });
+
+          await set(seatsRef, seatsMap);
+          console.log(`Successfully migrated ${seats.length} seats to RTDB for library ${libraryId}.`);
+        } else {
+          console.warn(`Firestore has no seats configured for library ${libraryId}. Cannot sync.`);
+        }
+      } else {
+        console.error(`Library ${libraryId} not found in Firestore.`);
+      }
+    } else {
+      console.log(`RTDB already has seat data for library ${libraryId}.`);
+    }
+  }
+
+  async approveApplication(data: {
+    applicationId: string;
+    seatId?: string;
+    autoAllot?: boolean;
+    startDate?: string;
+    endDate?: string;
+    paymentAmount?: number;
+  }): Promise<any> {
     const approveFn = httpsCallable(this.functions, 'booking-managerApproveSeat');
     return approveFn(data);
   }
