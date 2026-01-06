@@ -39,13 +39,7 @@ export class PricingPlansComponent implements OnInit {
   public readonly emptyStateSubText = 'Click "Add Plan" to create your first pricing option.';
   public readonly addPlanButtonText = 'Add Plan';
 
-  public readonly planTypes = ['Pay Per Use', 'Daily Pass', 'Weekly Membership', 'Monthly Membership'];
-  public readonly timeSlots = [
-    '6 AM - 12 PM (Morning)',
-    '12 PM - 6 PM (Afternoon)',
-    '6 PM - 12 AM (Evening)',
-    'Full Day (24 Hours)',
-  ];
+  public readonly planTypes = ['Pay Per Use', 'Daily Pass', 'Weekly Membership', 'Monthly Membership', 'Quarterly Membership'];
 
   public editingIndex = signal<number | null>(null);
 
@@ -72,10 +66,31 @@ export class PricingPlansComponent implements OnInit {
 
   savePlan(index: number): void {
     const planGroup = this.pricingPlans.at(index);
+    this.updateTimeSlot(planGroup as FormGroup);
     planGroup.markAllAsTouched();
     if (planGroup.valid) {
       this.editingIndex.set(null);
     }
+  }
+
+  updateTimeSlot(group: FormGroup) {
+    const start = group.get('startTime')?.value;
+    const end = group.get('endTime')?.value;
+
+    if (start && end) {
+      const formattedStart = this.formatTime(start);
+      const formattedEnd = this.formatTime(end);
+      group.patchValue({ 
+        timeSlot: `${formattedStart} - ${formattedEnd}`,
+        slotTypeId: `${start}-${end}`
+      });
+    }
+  }
+
+  private formatTime(time: string): string {
+    if (!time) return '';
+    const date = new Date(`2000-01-01T${time}`);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
   editPlan(index: number): void {

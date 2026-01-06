@@ -45,18 +45,23 @@
                   }
                 </ion-select>
 
-                <ion-select
-                  class="ion-margin-top"
-                  label="Time Slot"
-                  labelPlacement="floating"
-                  fill="outline"
-                  formControlName="timeSlot"
-                  placeholder="Select Slot"
-                >
-                  @for (slot of timeSlots; track slot) {
-                    <ion-select-option [value]="slot">{{ slot }}</ion-select-option>
-                  }
-                </ion-select>
+                <div class="time-inputs ion-margin-top" style="display: flex; gap: 10px;">
+                  <ion-input
+                    label="Start Time"
+                    labelPlacement="floating"
+                    fill="outline"
+                    type="time"
+                    formControlName="startTime"
+                  ></ion-input>
+                  
+                  <ion-input
+                    label="End Time"
+                    labelPlacement="floating"
+                    fill="outline"
+                    type="time"
+                    formControlName="endTime"
+                  ></ion-input>
+                </div>
 
                 <ion-input
                   class="ion-margin-top"
