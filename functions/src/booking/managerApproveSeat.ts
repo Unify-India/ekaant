@@ -1,7 +1,9 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { IManagerApproveSeatData } from "../types/booking";
+import { FieldValue } from "firebase-admin/firestore";
+import { IManagerApproveSeatData, ISeat, IPricingPlan } from "../types/booking";
 import { DEPLOYMENT_REGION } from "../config";
+import { timeToMinutes, isOverlap } from "../utils/time";
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
@@ -13,6 +15,7 @@ const rtdb = admin.database();
  * @function managerApproveSeat
  * @description HTTPS Callable function to approve a student application and allocate a seat (manually or automatically).
  * This creates booking records for the duration of the plan and updates the application status.
+ * Refactored to use minute-based time ranges for collision detection.
  */
 export const managerApproveSeat = onCall<IManagerApproveSeatData, Promise<{ success: boolean; message: string }>>(
   { region: DEPLOYMENT_REGION },
@@ -21,7 +24,7 @@ export const managerApproveSeat = onCall<IManagerApproveSeatData, Promise<{ succ
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "User must be authenticated.");
     }
-    const { applicationId, seatId, autoAllot } = request.data;
+    const { applicationId, seatId, autoAllot, startDate: reqStartDate, endDate: reqEndDate, paymentAmount } = request.data;
 
     // 2. Fetch Application
     const appRef = db.collection("studentLibraryApplications").doc(applicationId);
@@ -39,44 +42,68 @@ export const managerApproveSeat = onCall<IManagerApproveSeatData, Promise<{ succ
     }
 
     const libraryId = appData.libraryId;
-    const selectedPlan = appData.selectedPlan;
+    const selectedPlan = appData.selectedPlan as IPricingPlan;
 
     if (!selectedPlan) {
       throw new HttpsError("failed-precondition", "Application has no selected plan details.");
     }
 
     // Extract plan details. 
-    // We expect startDate/endDate to be strings (YYYY-MM-DD) or Timestamps.
-    let startDate = selectedPlan.startDate;
-    let endDate = selectedPlan.endDate;
-    const slotTypeId = selectedPlan.slotTypeId;
+    let startDate = reqStartDate || selectedPlan.startDate;
+    let endDate = reqEndDate || selectedPlan.endDate;
 
     // Handle Timestamp conversion if necessary
-    if (typeof startDate === 'object' && startDate.toDate) startDate = startDate.toDate().toISOString().split('T')[0];
-    if (typeof endDate === 'object' && endDate.toDate) endDate = endDate.toDate().toISOString().split('T')[0];
+    if (typeof startDate === 'object' && (startDate as any).toDate) startDate = (startDate as any).toDate().toISOString().split('T')[0];
+    if (typeof endDate === 'object' && (endDate as any).toDate) endDate = (endDate as any).toDate().toISOString().split('T')[0];
 
-    if (!startDate || !endDate || !slotTypeId) {
-      throw new HttpsError("failed-precondition", "Plan is missing startDate, endDate, or slotTypeId.");
+    if (!startDate || !endDate) {
+      throw new HttpsError("failed-precondition", "Plan is missing startDate or endDate.");
+    }
+
+    // Determine Time Range in Minutes
+    let startMinutes: number;
+    let endMinutes: number;
+
+    // We prefer the plan's specific start/end times.
+    // Ensure the plan has valid time strings (e.g., "06:00").
+    if (selectedPlan.startTime && selectedPlan.endTime) {
+      startMinutes = timeToMinutes(selectedPlan.startTime);
+      endMinutes = timeToMinutes(selectedPlan.endTime);
+    } else {
+        // Fallback parsing from timeSlot string if necessary, e.g. "06:00 - 10:00"
+        // But for now, we enforce strict structure.
+        throw new HttpsError("failed-precondition", "Plan must have valid startTime and endTime (e.g. '06:00').");
+    }
+
+    if (isNaN(startMinutes) || isNaN(endMinutes)) {
+        throw new HttpsError("failed-precondition", "Invalid time format in plan.");
     }
 
     // 3. Fetch Seat Config
-    // We need seat details to confirm existence and getting seatNumber
-    const seatsRef = db.collection("libraries").doc(libraryId).collection("seats");
-    const seatsSnap = await seatsRef.get();
+    const libraryRef = db.collection("libraries").doc(libraryId);
+    const librarySnap = await libraryRef.get();
     
-    if (seatsSnap.empty) {
+    if (!librarySnap.exists) {
+      throw new HttpsError("not-found", "Library not found.");
+    }
+
+    const libraryData = librarySnap.data();
+    if (!libraryData?.seatManagement) {
+       throw new HttpsError("failed-precondition", "Library configuration error: No seat management data.");
+    }
+
+    const allSeats: ISeat[] = libraryData.seatManagement.seats || [];
+    if (allSeats.length === 0) {
       throw new HttpsError("failed-precondition", "Library has no seats configured.");
     }
 
-    const allSeats = seatsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-    const activeSeats = allSeats.filter(s => s.status === 'active');
-
+    const activeSeats = allSeats.filter((s: ISeat) => s.status === 'active');
     if (activeSeats.length === 0) {
       throw new HttpsError("failed-precondition", "No active seats available in this library.");
     }
 
     // 4. Determine Target Seat
-    let targetSeat: any = null;
+    let targetSeat: ISeat | undefined | null = null;
 
     // Generate all dates first
     const dates: string[] = [];
@@ -88,63 +115,63 @@ export const managerApproveSeat = onCall<IManagerApproveSeatData, Promise<{ succ
     }
 
     if (seatId) {
-      targetSeat = activeSeats.find(s => s.id === seatId);
+      // MANUAL ALLOCATION
+      targetSeat = activeSeats.find((s: ISeat) => s.id === seatId);
       if (!targetSeat) {
         throw new HttpsError("not-found", `Seat ${seatId} not found or not active.`);
       }
+
       // Check availability for this specific seat across all dates
-      const availabilityPromises = dates.map(d => 
-        rtdb.ref(`availability/${libraryId}/${d}/${slotTypeId}/seats/${targetSeat.id}`).once('value')
-      );
-      const snapshots = await Promise.all(availabilityPromises);
-      const conflictIndex = snapshots.findIndex(s => s.exists());
-      if (conflictIndex !== -1) {
-        throw new HttpsError("unavailable", `Seat ${targetSeat.seatNumber} is already booked on ${dates[conflictIndex]}.`);
+      // RTDB Path: availability/{libraryId}/{date}/{seatId} -> { "start_end": "bookingId" }
+      for (const date of dates) {
+          const seatRef = rtdb.ref(`availability/${libraryId}/${date}/${targetSeat.id}`);
+          const snapshot = await seatRef.once('value');
+          
+          if (snapshot.exists()) {
+              const bookings = snapshot.val();
+              for (const key of Object.keys(bookings)) {
+                  const [existStart, existEnd] = key.split('_').map(Number);
+                  if (isOverlap(startMinutes, endMinutes, existStart, existEnd)) {
+                       throw new HttpsError("unavailable", `Seat ${targetSeat.seatNumber} is already booked on ${date} (Overlap: ${key}).`);
+                  }
+              }
+          }
       }
 
     } else if (autoAllot) {
-      // Logic: Find a seat that is free on ALL dates.
-      // We need to fetch availability for all dates in the range.
-      // Optimization: Fetch availability for all dates for this library/slotType.
+      // AUTO ALLOCATION
+      // Find a seat that is free on ALL dates for the given time range.
       
-      const availabilityPromises = dates.map(d => 
-        rtdb.ref(`availability/${libraryId}/${d}/${slotTypeId}/seats`).once('value')
-      );
-      const snapshots = await Promise.all(availabilityPromises);
-      
-      // Calculate booked seat IDs for each date
-      const bookedMap: Record<string, Set<string>> = {}; // seatId -> Set of dates it is booked
-      
-      snapshots.forEach((snap, idx) => {
-        const date = dates[idx];
-        const val = snap.val();
-        if (val) {
-          Object.keys(val).forEach(sId => {
-            if (!bookedMap[sId]) bookedMap[sId] = new Set();
-            bookedMap[sId].add(date);
-          });
-        }
-      });
+      for (const seat of activeSeats) {
+        let isSeatFree = true;
 
-      // Find a seat from activeSeats that is NOT in bookedMap for ANY of the requested dates
-      // Actually, we just need a seat where for all dates d in dates, seatId is not in bookedMap[seatId] (if we flipped map)
-      // Simpler: iterate active seats, check if free on all dates.
-      
-      targetSeat = activeSeats.find(seat => {
-        const bookedDates = bookedMap[seat.id];
-        if (!bookedDates) return true; // Seat never booked
-        // Check if any of our requested dates are in the booked set
-        // Since we iterated dates to build the map, if the seat is in the map, it means it's booked on *some* date.
-        // But wait, the map contains bookings for *this slotType*.
-        // So we just need to check if any of our 'dates' overlap with 'bookedDates'.
-        // My map construction: iterating 'dates'. So if seatId is in bookedMap, it means it is booked on at least one of 'dates'.
-        // So, if seatId is in bookedMap, it is invalid for this full-duration booking.
-        return false;
-      });
+        for (const date of dates) {
+            const seatRef = rtdb.ref(`availability/${libraryId}/${date}/${seat.id}`);
+            const snapshot = await seatRef.once('value');
+
+            if (snapshot.exists()) {
+                const bookings = snapshot.val();
+                for (const key of Object.keys(bookings)) {
+                    const [existStart, existEnd] = key.split('_').map(Number);
+                    if (isOverlap(startMinutes, endMinutes, existStart, existEnd)) {
+                        isSeatFree = false;
+                        break;
+                    }
+                }
+            }
+            if (!isSeatFree) break; // Optimization: stop checking dates for this seat
+        }
+
+        if (isSeatFree) {
+            targetSeat = seat;
+            break; // Found a valid seat!
+        }
+      }
 
       if (!targetSeat) {
         throw new HttpsError("unavailable", "No single seat is available for the entire duration. Please try manual allocation or split bookings.");
       }
+
     } else {
       throw new HttpsError("invalid-argument", "Either seatId must be provided or autoAllot set to true.");
     }
@@ -152,45 +179,71 @@ export const managerApproveSeat = onCall<IManagerApproveSeatData, Promise<{ succ
     // 5. Execute Updates (RTDB + Firestore)
     const updates: any = {};
     const batch = db.batch();
+    const timeKey = `${startMinutes}_${endMinutes}`;
     
+    // Generate ONE Booking ID
+    const bookingRef = db.collection("bookings").doc();
+    const bookingId = bookingRef.id;
+
+    // RTDB: Loop through dates to block availability with the SAME bookingId
     dates.forEach(date => {
-      const bookingRef = db.collection("bookings").doc();
-      const bId = bookingRef.id;
-
-      // RTDB: Map seatId -> bookingId
-      updates[`availability/${libraryId}/${date}/${slotTypeId}/seats/${targetSeat.id}`] = bId;
-      updates[`availability/${libraryId}/${date}/${slotTypeId}/totalBooked`] = admin.database.ServerValue.increment(1);
-
-      // Firestore: Create Booking
-      batch.set(bookingRef, {
-        id: bId,
-        userId: appData.studentId || appData.studentEmail, // fallback
-        libraryId,
-        seatId: targetSeat.id,
-        slotTypeId,
-        bookingDate: date,
-        status: 'confirmed',
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        sourceApplicationId: applicationId,
-        seatNumber: targetSeat.seatNumber // Useful for quick reference
-      });
+      updates[`availability/${libraryId}/${date}/${targetSeat!.id}/${timeKey}`] = bookingId;
     });
 
+    // Firestore: Create ONE Booking Record
+    batch.set(bookingRef, {
+      id: bookingId,
+      userId: appData.studentId || appData.studentEmail,
+      libraryId,
+      seatId: targetSeat!.id,
+      startDate: startDate,
+      endDate: endDate,
+      status: 'confirmed',
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+      sourceApplicationId: applicationId,
+      seatNumber: targetSeat!.seatNumber,
+      startMinutes: startMinutes,
+      endMinutes: endMinutes,
+      planName: selectedPlan.planName // ADDED
+    });
+
+    // Create Payment Record if amount > 0
+    if (paymentAmount && paymentAmount > 0) {
+      const paymentRef = db.collection("payments").doc();
+      batch.set(paymentRef, {
+        id: paymentRef.id,
+        userId: appData.studentId || appData.studentEmail,
+        libraryId: libraryId,
+        amount: paymentAmount,
+        date: FieldValue.serverTimestamp(),
+        status: 'paid',
+        type: 'subscription',
+        planName: selectedPlan.planName,
+        applicationId: applicationId,
+        description: `Payment for ${selectedPlan.planName} (Application: ${applicationId})`,
+        startDate,
+        endDate
+      });
+    }
+
     // Update Application Doc
+    const updatedPlan = { ...selectedPlan, startDate, endDate };
+
     batch.update(appRef, {
       applicationStatus: 'approved',
       allocatedSeat: {
-        id: targetSeat.id,
-        seatNumber: targetSeat.seatNumber
+        id: targetSeat!.id,
+        seatNumber: targetSeat!.seatNumber
       },
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      selectedPlan: updatedPlan,
+      updatedAt: FieldValue.serverTimestamp()
     });
 
     // Commit
     await rtdb.ref().update(updates);
     await batch.commit();
 
-    return { success: true, message: `Application approved and seat ${targetSeat.seatNumber} allocated.` };
+    return { success: true, message: `Application approved and seat ${targetSeat!.seatNumber} allocated.` };
   }
 );
